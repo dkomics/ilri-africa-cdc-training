@@ -1,10 +1,10 @@
 ---
 title: README.md
-tags: ["SARS-CoV-2", "Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", "Activity"]
+tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", "Activity"]
 ---
-# **Building capacity in SARS-CoV-2 genomics in Africa**
+# **Building capacity in pathogen genomics in Africa**
 ---
-###### ***Trainers***: [John Juma](https://github.com/ajodeh-juma), [Ouso Daniel](https://github.com/ousodaniel) & [Gilbert Kibet](https://github.com/kibet-gilbert)
+###### ***Trainers***: [John Juma](https://github.com/ajodeh-juma), [Kennedy Mwangi](https://github.com/wanjauk) & [Gilbert Kibet](https://github.com/kibet-gilbert)
 ---
 
 - [Introduction](#introduction)
@@ -45,36 +45,19 @@ tags: ["SARS-CoV-2", "Genomics", "Bioinformatics", "Metadata", "Linux", "Analysi
 
 
 ## Introduction
-In early January 2020, the novel coronavirus (SARS-CoV-2) responsible for a
-pneumonia outbreak in Wuhan, China, was identified using next-generation
-sequencing (NGS) and readily available bioinformatics pipelines. In addition to
-virus discovery, these NGS technologies and bioinformatics resources are
-currently being employed for ongoing genomic surveillance of SARS-CoV-2
-worldwide, tracking its spread, evolution and patterns of variation on a global
-scale.
+
 
 ## Scope
-In this short workshop we will tackle, hands-on, the basic principles employed by the numerous bioinformatic pipelines:
-to generate consensus genome sequences of SARS-CoV-2 and identify variants using
-an actual dataset generated in our facility.
+In this workshop we will tackle, hands-on, the basic principles employed by the numerous bioinformatic pipelines: to generate consensus genome sequences of SARS-CoV-2 and identify variants using an actual dataset generated in our facility.
 
 > **Note**
 
-> This is part of the initiative fronted by the [Africa
-CDC](https://africacdc.org/) with generous support from the [Rockeffeler
-foundation](https://www.rockefellerfoundation.org/) to build capacity in pathogen genomics
-in Africa.
+> This is part of the initiative fronted by the [Africa CDC](https://africacdc.org/) with generous support from the [Rockeffeler foundation](https://www.rockefellerfoundation.org/) to build capacity in pathogen genomics in Africa.
 
 
 ## Background
 
-We will use a dataset comprising of raw sequence reads of SARS-CoV-2 samples
-obtained from a sequencing run on NextSeq 550 platorm at [ILRI](www.ilri.org).
-NextSeq 550 flowcell uses 4 lanes; and so, 4 reads of data per sequenced sample corresponding to the https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars1_R1.fastq.gz https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars1_R2.fastq.gz https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars2_R1.fastq.gz https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars2_R2.fastq.gz https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars3_R1.fastq.gz https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars3_R2.fastq.gz4
-lanes are generated with suffixes L001, L002, L003 and L004. The dataset we are
-using in this tutorial comprises of already concatenated sequences. These reads
-can be combined/concatenated into a single file bearing in mind the type of library
-sequencing either ```single``` or ```paired-end```.
+
 
 ## Prerequisite
 
@@ -90,7 +73,7 @@ We will use the computer lab at ILRI, which is already equipped with Linux-opera
 ### Preparation
 
 #### ***Log into the HPC***
-From the terminal (or equvalent tool) of your local computer, you can log into the HPC using the folowing command line, followed by pressing <ENTER>. You will be promted to type-in your password (the password will not be visible as you type it; just have faith). On a Linux system, you can use the `Ctrl-Alt-T` 7keyboard shortcut to open a terminal.
+From the terminal (or equvalent tool) of your local computer, you can log into the HPC using the following command line, followed by pressing <ENTER>. You will be promted to type-in your password (the password will not be visible as you type it; just have faith). On a Linux system, you can use the `Ctrl-Alt-T` keyboard shortcut to open a terminal.
 ```
 ssh <user_name>@hpc.ilri.cgiar.org
 ```
@@ -101,6 +84,7 @@ interactive -w compute05
 ```
 
 `ssh` allows you to securely connect to the remote computer over internet, while `interactive` allows you to reserve resources to work interactively in a specified node within the computing cluster using the `-w` flag.
+
 >**Note**
 >When running a job interactively, the time limit is 8 hours and Default number of CPU is 1.
 
@@ -112,7 +96,7 @@ interactive -w compute05
     mkdir -p $USER/AfricaCDC_training
     cd $USER/AfricaCDC_training
     ```
-2. The `assets, databases, primer-schemes, scripts` directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
+2. The <directories to soft-link> directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
     ```
     ln -s /var/scratch/global/AfricaCDC_training/[adps]* .
     ```
@@ -129,7 +113,7 @@ interactive -w compute05
 #### ***Data retrieval and integrity checks***
 1. While there are specialised tools for data retieval from nucleotide sequence databases, universal `Unix` command (`wget`) can be used to download data over internet.
     ```
-    wget --no-check-certificate https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars-fastqs.tar.gz
+    wget --no-check-certificate 
     ```
 2. After downloading your data, say from a sequencing facility site, it is often good practice to verify that your data was not intentionally/accidentally tampered with. To do this, your data service provider will likely accompany your data with a file containing a verification code: `checksum_file` (***will be provided***). The `md5sum` command, using the `-c` (check) tag, allows for checking the integrity of a file downloaded or acquired from a different source.
     ```
