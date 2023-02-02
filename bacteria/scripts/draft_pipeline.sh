@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 
 
+## Changing (switching between) nodes
+interactive -w compute07 -c 8 -J bact-Test -p highmem
+
+
 ## Preparing the project directory:
 mkdir -p bacteria/{data,scripts}
-mkdir -p bacteria/data/{fastq,fastqc,fastp}
-
+mkdir -p bacteria/data/{fastq,fastqc,fastp,spades}
 cd bacteria/
 
-## Downloading data from SRA matich the SRA039136 
-## Data from this project: Open-Source Genomic Analysis of Shiga-Toxin–Producing E. coli O104:H4 (https://www.nejm.org/doi/full/10.1056/NEJMoa1107643)
+# Downloading data from SRA matich the SRA039136 
+# Data from this project: Open-Source Genomic Analysis of Shiga-Toxin–Producing E. coli O104:H4 (https://www.nejm.org/doi/full/10.1056/NEJMoa1107643)
 
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292770/SRR292770_1.fastq.gz -P ./data/fastq
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292770/SRR292770_2.fastq.gz -P ./data/fastq
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292862/SRR292862_1.fastq.gz -P ./data/fastq
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292862/SRR292862_2.fastq.gz -P ./data/fastq
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292678/SRR292678_1.fastq.gz -P ./data/fastq
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292678/SRR292678_2.fastq.gz -P ./data/fastq
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292770/SRR292770_1.fastq.gz -P ./data/fastq
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292770/SRR292770_2.fastq.gz -P ./data/fastq
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292862/SRR292862_1.fastq.gz -P ./data/fastq
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292862/SRR292862_2.fastq.gz -P ./data/fastq
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292678/SRR292678_1.fastq.gz -P ./data/fastq
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292678/SRR292678_2.fastq.gz -P ./data/fastq
 
 ## Checking number of reads in a fastq.gz files:
 zgrep -c '^@' *.fastq.gz
@@ -28,6 +31,7 @@ zgrep -c '^@' *.fastq.gz
 ## Loading Modules:
 module load fastqc/0.11.9
 module load fastp/0.22.0
+module load spades/3.15
 
 ## Assessing Read Quality using fastqc before quality trimming
 fastqc -t 4 \
@@ -57,5 +61,12 @@ fastqc -t 4 \
 	./data/fastp/SRR292770_1.trim.fastq.gz \
 	./data/fastp/SRR292770_2.trim.fastq.gz
 
-## 
+## Genome Assembly using Spades
+spades.py -k 27 \
+	-1 ./data/fastp/SRR292770_1.trim.fastq.gz \
+	-2 ./data/fastp/SRR292770_2.trim.fastq.gz \
+	-o ./data/spades/ \
+	-t 8 \
+	-m 384
 
+## 
