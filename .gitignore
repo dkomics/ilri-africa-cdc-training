@@ -1,2 +1,3 @@
 docs/
+*.fastq.gz
 bacteria/data/*/*
