@@ -32,6 +32,10 @@ zgrep -c '^@' *.fastq.gz
 module load fastqc/0.11.9
 module load fastp/0.22.0
 module load spades/3.15
+module load quast/5.0.2
+module load BUSCO/5.2.2
+module load prokka/1.11
+
 
 ## Assessing Read Quality using fastqc before quality trimming
 fastqc -t 4 \
@@ -69,4 +73,33 @@ spades.py -k 27 \
 	-t 8 \
 	-m 384
 
-## 
+##Assess the structure of the genome - examine contiguity
+# Run quast
+quast.py \
+/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+-t 8 \
+-o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/quast
+
+
+# Gene content assessment
+# Run BUSCO
+# Note: to use the full path for output directory, one has to edit the config.ini file and set it from there. Use current dir for now.
+busco \
+-i /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+-m genome \
+-o busco-results \
+-l bacteria \
+-c 8
+
+# Genome annotation
+# Run PROKKA
+prokka \
+/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+--outdir /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/prokka \
+--cpus 8 \
+--mincontiglen 200 \
+--centre XXX \
+--force
+
+# PROKKA had errors while testing. Will use Glimmer instead
+
