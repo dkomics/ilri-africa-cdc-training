@@ -35,7 +35,10 @@ module load spades/3.15
 module load quast/5.0.2
 module load BUSCO/5.2.2
 module load prokka/1.11
-
+module load bwa/0.7.4
+module load samtools/1.9
+module load bedtools/2.29.0
+module load blast/2.12.0+
 
 ## Assessing Read Quality using fastqc before quality trimming
 fastqc -t 4 \
@@ -87,7 +90,7 @@ quast.py \
 busco \
 -i /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
 -m genome \
--o busco-results \
+-o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/busco \
 -l bacteria \
 -c 8
 
@@ -101,5 +104,49 @@ prokka \
 --centre XXX \
 --force
 
-# PROKKA had errors while testing. Will use Glimmer instead
+# Extract all the annotated products from the GFF
+grep -o "product=.*" /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/prokka/PROKKA_*.gff \
+| sed 's/product=//g' | sort | uniq -c | sort -nr > \
+/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/prokka/protein_abundances.txt
+
+# Extract the 16S gene sequence
+# NB: Can be used for organism identification
+./extract_sequences.sh "16S ribosomal RNA" \
+/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/prokka/*.ffn \
+> /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/prokka/16S_sequence.fasta
+
+
+# Organism identification
+# Using blast to search against the entire nucleotide database.
+./blob_blast.sh /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta
+
+
+# Read mapping to determine coverage
+fasta=/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/ecoli_genome/Escherichia_coli_str._K-12_genome.fasta
+forward=/var/scratch/global/gkibet/ilri-africa-cdc-training/bacteria/data/fastp/SRR292770_1.trim.fastq.gz
+reverse=/var/scratch/global/gkibet/ilri-africa-cdc-training/bacteria/data/fastp/SRR292770_1.trim.fastq.gz
+
+
+# Step 1: Index your reference genome. This is a requirement before read mapping.
+bwa index $fasta
+
+# Step 2: Map the reads and construct a SAM file.
+bwa mem -t 8 $fasta $forward $reverse > /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/raw_mapped.sam
+
+# Step3: Remove sequencing reads that did not match to the assembly and convert the SAM to a BAM.
+samtools view -@ 8 -Sb  /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/raw_mapped.sam \
+| samtools sort -@ 8 -o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam
+
+# Examine how many reads mapped with samtools
+samtools flagstat /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam
+
+# Step 4: Calculate per base coverage with bedtools
+
+# First,index the new bam file
+samtools index /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam
+
+bedtools genomecov \
+-ibam /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam \
+> /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/coverage.out
+
 
