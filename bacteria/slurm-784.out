@@ -1,0 +1,18 @@
+gzip: *.fastq.gz: No such file or directory
+0
+Skipping './data/fastq/SRR292770_1.fastq.gz' which didn't exist, or couldn't be read
+Skipping './data/fastq/SRR292770_2.fastq.gz' which didn't exist, or couldn't be read
+Skipping './data/fastp/SRR292770_1.trim.fastq.gz' which didn't exist, or couldn't be read
+Skipping './data/fastp/SRR292770_2.trim.fastq.gz' which didn't exist, or couldn't be read
+
+
+== Warning ==  No assembly mode was specified! If you intend to assemble high-coverage multi-cell/isolate data, use '--isolate' option.
+
+
+
+
+== Error ==  file not found: /home/gkibet/bioinformatics/github/ilri-africa-cdc-training/bacteria/bacteria/data/fastp/SRR292770_1.trim.fastq.gz (left reads, library number: 1, library type: paired-end)
+
+In case you have troubles running SPAdes, you can write to spades.support@cab.spbu.ru
+or report an issue on our GitHub repository github.com/ablab/spades
+Please provide us with params.txt and spades.log files from the output directory.

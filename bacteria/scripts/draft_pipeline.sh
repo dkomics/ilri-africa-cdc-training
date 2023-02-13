@@ -7,7 +7,7 @@ interactive -w compute07 -c 8 -J bact-Test -p highmem
 
 ## Preparing the project directory:
 mkdir -p bacteria/{data,scripts}
-mkdir -p bacteria/data/{fastq,fastqc,fastp,spades}
+mkdir -p bacteria/data/{fastq,fastqc,fastp,spades,card}
 cd bacteria/
 
 # Downloading data from SRA matich the SRA039136 
@@ -149,4 +149,44 @@ bedtools genomecov \
 -ibam /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam \
 > /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/coverage.out
 
+## AMR identification using RGI: https://github.com/arpcard/rgi#id69
+
+#Install/setup RGI- Awaiting instrallation by Alan. For now use singularity image:
+# setting up singularity image
+mkdir -p ./scripts/singularity
+apptainer pull ./scripts/singularity/rgi_latest.sif \
+	--force docker://finlaymaguire/rgi:latest
+
+# Data Download:
+
+cd ./data/card/
+wget https://card.mcmaster.ca/latest/data -P ./
+wget https://card.mcmaster.ca/latest/variants -P ./
+tar -xvf data ./card.json
+
+# Loading Reference data:
+cd ../../
+# Check database version - Systemwide
+apptainer run ./scripts/singularity/rgi_latest.sif \
+	rgi database --version
+# Clean the loacal database
+apptainer run ./scripts/singularity/rgi_latest.sif \
+	rgi clean --local 
+# Load the main database reflecting current version of ref data
+apptainer run ./scripts/singularity/rgi_latest.sif \
+	rgi load --card_json ./data/card/card.json \
+	--local
+# Check database version - Local
+apptainer run ./scripts/singularity/rgi_latest.sif \
+	rgi database --version --local
+# Perform 
+apptainer run ./scripts/singularity/rgi_latest.sif \
+	rgi main --input_sequence /path/to/nucleotide_input.fasta \
+       	--output_file /path/to/output_file \
+	--local \
+	-a PRODIGAL \
+	--clean \
+	--low_quality \
+	--num_threads 8 \
+	--split_prodigal_jobs
 
