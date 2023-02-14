@@ -21,27 +21,24 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
     - [Prepare the reference genome](#prepare-the-reference-genome)
     - [Quality assessment](#quality-assessment)
     - [Quality and Adapter filtering](#quality-and-adapter-filtering)
-    - [Decontamination](#decontamination)
-    - [Alignment](#mappingalignment)
-    - [Sort and Index alignment map](#sort-and-index-alignment-map)
-    - [Primer trimming](#primer-trimming)
-    - [Compute coverage](#compute-coverage)
-    - [Variant calling](#variant-calling)
-    - [Variant annotation](#variant-annotation)
     - [Consensus genome assembly](#consensus-genome-assembly)
-    - [Pangolin: Lineage assignment](#pangolin-lineage-assignment)
-    - [Nextclade: Clade assignment](#nexclade-clade-assignment)
-- [Summarize results](#summarize-results)
-- [Download reports](#download-reports)
-- [Data Retrieval and Review](#data-retrieval-and-review)
-    - [Transfer of data: MiSeq](#transfer-of-data-miseq)
-    - [Transfer of data: MinION](#transfer-of-data-minion)
-    - [Reviewing data: Illumina](#reviewing-data-illumina)
-    - [Reviewing data: ONT](#reviewing-data-ont)
-- [Working with metadata](#working-with-metadata)
-- [Galaxy workflows for *E. coli* data analysis](#galaxy-workflows-for-*E. coli*-data-analysis)
-- [Activity](#activity)
-    - [Galaxy Exercise](#galaxy-exercise-using-miseq-data)
+    - [Genome assessment](#genome-assessment)
+        - [Genome contiguity](#genome-contiguity)
+        - [Genome completeness](#genome-completeness)
+        - [Genome contamination](#genome-contamination)
+    - [Genome annotation](#genome-annotation)
+    - [Organism identification](#organism-identification)
+        - [BLAST](#blast)
+    - [Genome clean-up](#genome-clean-up)
+        - [Read mapping](#read-mapping)
+        - [Construct a coverage table](#Construct-a-coverage-table)
+        - [Non-target contig removal](#Non-target-contig-removal)
+        - [Filter the genome assembly by length](#Filter-the-genome-assembly-by-length)
+        - [Filter the genome assembly by coverage](#Filter-the-genome-assembly-by-coverage)
+        - [Construct a list of contigs to keep](#Construct-a-list-of-contigs-to-keep)
+        - [Filter your assembly based on a list of contigs](#Filter-your-assembly-based-on-a-list-of-contigs)
+        - [Check for contamination using UniVec](#Check-for-contamination-using-UniVec)
+
 
 
 ## Introduction
@@ -70,7 +67,7 @@ This module will come after the introductory Linux module and therefore assumes 
 ### Set-Up
 We will use the computer lab at ILRI, which is already equipped with Linux-operating desktop computers. Since we will be working from the remote servers, we will not need special setup for personal laptops. However, toward the end of the program, we can look into access to a Linux server from a Windows PC; or how to install a Linux (sub)system for any interested persons.
 
-### Preparation
+### Preparations
 
 #### ***Log into the HPC***
 From the terminal (or equvalent tool) of your local computer, you can log into the HPC using the following command line, followed by pressing <ENTER>. You will be promted to type-in your password (the password will not be visible as you type it; just have faith). On a Linux system, you can use the `Ctrl-Alt-T` keyboard shortcut to open a terminal.
@@ -273,337 +270,6 @@ The preceeding step will guide us on the possible filtering and trimming operati
     ***Optional***
         Run steps 3 and 4 above for the other 2 samples.
 
-#### ***Decontamination***
-
-At times, sequencing experients will pick up non-target nucleic acids: for instance, host genetic material in *E. coli*  sequencing. Such may obscure our signal of interest in the data; therefore, it is important to minimise or remove such sources of noise (unwanted background).
-There are several bioinformatics tools and databases which can be used in querying the reads data in order to remove such noise. A commonly used tool is [Kraken2](https://github.com/DerrickWood/kraken2/wiki).
-Kraken2 is a fast and memory efficient tool for taxonomic assignment of metagenomics sequencing reads. ```Kraken2``` can allow us to query the composition of our samples by searching for sequence reads against a pre-formatted database ("contaminant").
-
->**Note**
->Preformatted Kraken 2 and Bracken indexes can be found here: https://benlangmead.github.io/aws-indexes/k2 and downloaded without need of building new ones from scractch.
-
-
-In this tutorial, we will use pre-formatted kraken2 ```human``` database to identify human-derived reads in our samples. This may give us an indication of contamination from host reads.
-
-**Quiz:** *What type of contaminants would you think of in a *E. coli* sequencing experiment?*
-
----
-<details close>
-  <summary>Answer</summary>
-  Host DNA,
-  Host RNA and
-  Internal control (PhiX)
-</details>
-
----
-
-1. Human database search
-    - Change into the `kraken` directory results
-        ```
-        cd /var/scratch/$USER/AfricaCDC_training/results/kraken
-        ```
-    - Run `kraken2`
-        ```
-        kraken2 \
-              -db /var/scratch/$USER/AfricaCDC_training/databases/kraken2-human-db \
-              --threads 1 \
-              --unclassified-out E-coli.unclassified#.fastq \
-              --classified-out E-coli.classified#.fastq \
-              --report E-coli.kraken2.report.txt \
-              --output E-coli.kraken2.out \
-              --gzip-compressed \
-              --report-zero-counts \
-              --paired /var/scratch/$USER/AfricaCDC_training/results/fastp/E-coli_R1.trim.fastq.gz \
-              /var/scratch/$USER/AfricaCDC_training/results/fastp/E-coli_R2.trim.fastq.gz
-        ```
-    **Quiz:** *How many reads have hit the human genome as targets in the sample(s)?*
-
-    ---
-    <details close>
-      <summary>Answer</summary>
-      E-coli  -  60529 reads    (13.00%)<br>
-    </details>
-
-    ---
-
-    **Quiz:** *What percent of the sequencing reads are classified as *E. coli*?*
-
-    More information on output formats can be found [here](https://github.com/DerrickWood/kraken2/wiki/Manual#output-formats).
-
-    ***Optional***
-        Run steps 1 above for the other 2 samples.
-
-
-    **Quiz:** *Based on the results, which sample do you think will give us good results in terms of genome coverage?*
-
-
-#### ***Alignment***
-Aligning sequence reads to a reference genome is the first step in many
-comparative genomics pipelines, including pipelines for variant calling,
-isoform quantitation and differential gene expression. In many cases, the alignment step is the slowest. This is because for each read the aligner must solve a difficult computational problem: determining the read's likely point of origin with respect to a reference genome. This is always non trivial for several reasons:
-- The reference genome is often very big. Searching big things is harder than
-  searching small things.
-- You aren’t always looking for exact matches in the reference genome–or, at
-least, probably not.
-
-Here we use [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml), an ultrafast and memory-efficient tool for aligning sequencing reads to long reference sequences.
-
-
-1. Change to the ```bowtie2``` directory.
-    ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/bowtie2
-    ```
-
-2. Run the ```bowtie2``` command to align reads to the reference genome.
-
-    ```
-    bowtie2 \
-          -x /var/scratch/$USER/AfricaCDC_training/genome/bowtie2/<E-coli> \
-          -1 /var/scratch/$USER/AfricaCDC_training/results/kraken/E-coli.unclassified_1.fastq \
-          -2 /var/scratch/$USER/AfricaCDC_training/results/kraken/E-coli.unclassified_2.fastq \
-          --threads 1 \
-          --un-conc-gz E-coli.unmapped.fastq.gz \
-          --local \
-          --very-sensitive-local \
-          2> E-coli.bowtie2.log \
-          | samtools view -@ 1 -F4 -bhS -o E-coli.trim.dec.bam -
-    ```
-    ***Optional***
-        Run steps 1 and 2. above for the other 2 samples.
-
-#### ***Sort and Index alignment map***
-
-Alignments can often be manipulated using [```samtools```](http://www.htslib.org/) using several sub commands
-
-
-1. Sort the converted binary alignment (```.bam```)
-    ```
-    samtools sort -@ 1 -o E-coli.sorted.bam -T E-coli E-coli.trim.dec.bam
-    ```
-
-2. Index the sorted alignment
-    ```
-    samtools index -@ 1 E-coli.sorted.bam
-    ```
-    ***Optional***
-        Run steps 1 and 2. above for the other 2 samples.
-
-#### ***Primer trimming***
-Trim amplicon primers using [```iVar```](https://andersen-lab.github.io/ivar/html/manualpage.html)
-iVar uses primer positions supplied in a BED file to soft clip primer sequences from an aligned and sorted BAM file. Following this, the reads are trimmed based on a quality threshold (Default: 20). To do the quality trimming, iVar uses a sliding window approach (Default: 4). The windows slides from the 5' end to the 3' end and if at any point the average base quality in the window falls below the threshold, the remaining read is soft clipped. If after trimming, the length of the read is greater than the minimum length specified (Default: 30), the read is written to the new trimmed BAM file.
-
-1. Change to the output directory ```ivar```
-    ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/ivar/
-    ```
-
-2. Run the command to trim primers
-
-    ```
-    ivar trim \
-        -i /var/scratch/$USER/AfricaCDC_training/results/bowtie2/E-coli.sorted.bam \
-        -b /var/scratch/$USER/AfricaCDC_training/primer-schemes/V3/<E-coli>.primer.bed \
-        -p E-coli.primertrimmed \
-        -m 30 \
-        -q 20 > E-coli.ivar.log
-    ```
-3. Sort the primer trimmed alignment
-    ```
-    samtools sort \
-          -@ 1 \
-          -o E-coli.primertrimmed.sorted.bam \
-          -T E-coli E-coli.primertrimmed.bam
-    ```
-4. Index the sorted primer trimmed alignment
-    ```
-    samtools index -@ 1 E-coli.primertrimmed.sorted.bam
-    ```
-
-
-#### ***Compute coverage***
-Here we will use [bedtools](https://github.com/arq5x/bedtools2), your swiss-army knife for genomic arithmetic and interval manipulation.
-
-1. Change to the output directory ```bedtools```
-    ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/bedtools/
-    ```
-
-2. Compute coverage
-    ```
-    bedtools \
-        genomecov \
-        -d \
-        -ibam \
-        /var/scratch/$USER/AfricaCDC_training/results/ivar/E-coli.primertrimmed.sorted.bam \
-        > E-coli.coverage
-    ```
-3. Plot to visualize
-
-    ```
-    Rscript /var/scratch/$USER/AfricaCDC_training/scripts/plotGenomecov.R E-coli.coverage
-    ```
-
-
-
-#### ***Variant calling***
-`iVar` uses the output of the ```samtools mpileup``` command to call variants - single nucleotide variants(SNVs) and indels.
-
-
-Pileup format consists of TAB-separated lines, with each line representing the pileup of reads at a single genomic position.
-
-Several columns contain numeric quality values encoded as individual ASCII characters. Each character can range from "!" to "~" and is decoded by taking its ASCII value and subtracting 33; e.g., "A" encodes the numeric value 32.
-
-The first three columns give the position and reference:
-
-1. Chromosome name.
-2. 1-based position on the chromosome.
-3. Reference base at this position (this will be "N" on all lines if ```-f``` or ```--fasta-ref``` has not been used)
-
-In generating the mpileup, we will use the flags:
-```--count-orphans```: Do not skip anomalous read pairs in variant calling. Anomalous read pairs are those marked in the FLAG field as paired in sequencing but without the properly-paired flag set.
-```--ignore-overlaps```: Disable read-pair overlap detection
-```--no-BAQ```: Disable base alignment quality (BAQ) computation
-
-The ```tee``` command, used with a pipe, reads standard input from ```samtools mpileup```, then writes the output of the program to standard output and simultaneously copies it into the specified file ```.mpileup```
-
-
-In order to call variants correctly, the reference file used for alignment must be passed to `iVar` using the ```-r``` flag. The output of samtools pileup is piped into ivar variants to generate a ```.tsv``` file with the variants. There are two parameters that can be set for variant calling using `iVar` - minimum quality (Default: 20) and minimum frequency (Default: 0.03). Minimum quality is the minimum quality for a base to be counted towards the ungapped depth to calculate iSNV frequency at a given position. For insertions, the quality metric is discarded and the mpileup depth is used directly. Minimum frequency is the minimum frequency required for a SNV or indel to be reported.
-
-`iVar` can identify codons and translate variants into amino acids using a [GFF](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md) format containing the required coding regions (CDS). In absence of a GFF file, iVar will not perform the translation and "NA" will be added to the output file in place of the reference and alternate codons and amino acids.
-
-1. Change to the output directory ```ivar```
-    ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/ivar/
-    ```
-
-2. Call variants
-
-    ```
-    samtools mpileup \
-            --ignore-overlaps \
-            --count-orphans \
-            --no-BAQ \
-            --max-depth 0 \
-            --min-BQ 0 \
-            --reference /var/scratch/$USER/AfricaCDC_training/genome/<E-coli>.fasta \
-            /var/scratch/$USER/AfricaCDC_training/results/ivar/E-coli.primertrimmed.sorted.bam \
-            | tee E-coli.mpileup \
-            | ivar \
-                variants \
-                -t 0.25 \
-                -q 20 \
-                -m 10 \
-                -g /var/scratch/$USER/AfricaCDC_training/genome/<E-coli>.gff \
-                -r /var/scratch/$USER/AfricaCDC_training/genome/<E-coli>.fasta \
-                -p E-coli.variants
-    ```
-3. Convert the variants from ```.tsv``` to ```.vcf``` (Variant Call Format)
-
-    ```
-    python /var/scratch/$USER/AfricaCDC_training/scripts/ivar_variants_to_vcf.py \
-      E-coli.variants.tsv \
-      E-coli.vcf \
-      --pass_only \
-      --allele_freq_thresh 0.75 > E-coli.variant.counts.log
-    ```
-    ##### **VCF file format**
-
-    The header begins the file and provides metadata describing the body     of the file.
-    Header lines are denoted as starting with `#`.
-    Special keywords in the header are denoted with `##`.
-    Recommended keywords   include fileformat, fileDate and reference.
-
-    The header contains keywords that optionally semantically and      syntactically describe the fields used in the body of the file, notably INFO, FILTER, and FORMAT.
-
-
-    |   |      Name    |  Brief description (see the specification for details)[VCF](https://samtools.github.io/hts-specs/VCFv4.1.pdf).  |
-    |---|:-------------|:---------------------------------------------------------|
-    | 1 |  CHROM       |The name of the sequence (typically a chromosome) on which the variation is being called.                                                           |
-    | 2 |  POS         |The 1-based position of the variation on the given sequence.                                                          |
-    | 3 |  ID          |The identifier of the variation, e.g. a dbSNP rs identifier, or if unknown a ".". Multiple identifiers should be separated by semi-colons without white-space.                                                           |
-    | 4 |  REF         |The reference base (or bases in the case of an indel) at the given position on the given reference sequence.                                                          |
-    | 5 |  ALT         |The list of alternative alleles at this position.                                                           |
-    | 6 |  QUAL        |A quality score associated with the inference of the given alleles.                                                          |
-    | 7 |  FILTER      |A flag indicating which of a given set of filters the variation has failed or PASS if all the filters were passed successfully.                                                          |
-    | 8 |  INFO        |An extensible list of key-value pairs (fields) describing the variation.                                                          |
-    | 9 |  FORMAT      |An (optional) extensible list of fields for describing the samples                                                          |
-    | + |  SAMPLES     |For each (optional) sample described in the file, values are given for the fields listed in FORMAT                                                           |
-
-4. Compress vcf file
-    ```
-    bgzip -c E-coli.vcf > E-coli.vcf.gz
-    ```
-
-5. Create tabix index from a sorted bgzip tab-delimited genome file
-    ```
-    tabix -p vcf -f E-coli.vcf.gz
-    ```
-6. Generate stats from VCF file
-    ```
-    bcftools stats E-coli.vcf.gz > E-coli.stats.txt
-    ```
-
-
-#### ***Variant annotation***
-
-We will use [SnpEff](http://pcingola.github.io/SnpEff/se_introduction/). It annotates and predicts the effects of genetic variants on genes and proteins (such as amino acid changes). It requires a configured SnpEff database with the annotation or features of the genome.
-
-1. Change to the output directory ```snpeff```
-    ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/snpeff/
-    ```
-
-2. Annotate and predict variants
-
-    ```
-    java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar \
-        <E-coli> \
-        -c /var/scratch/$USER/AfricaCDC_training/databases/snpeff_db/snpeff.config \
-        -dataDir /var/scratch/$USER/AfricaCDC_training/databases/snpeff_db/data \
-        /var/scratch/$USER/AfricaCDC_training/results/ivar/E-coli.vcf.gz \
-        > E-coli.ann.vcf
-    ```
-3. Compress vcf file
-    ```
-    bgzip -c E-coli.ann.vcf > E-coli.ann.vcf.gz
-    ```
-4. Rename the ```summary.html``` and ```genes.txt``` file
-    ```
-    mv snpEff_summary.html E-coli.summary.html
-    mv snpEff_genes.txt E-coli.genes.txt
-    ```
-
-5. Create tabix index from a sorted bgzip tab-delimited genome file
-    ```
-    tabix -p vcf -f E-coli.ann.vcf.gz
-    ```
-
-6. Generate stats from VCF file
-    ```
-    bcftools stats E-coli.ann.vcf.gz > E-coli.stats.txt
-    ```
-
-7. Filter variants
-    [SnpSift](http://pcingola.github.io/SnpEff/ss_introduction/) annotates genomic variants using databases, filters, and manipulates genomic annotated variants. Once you annotated your files using SnpEff, you can use SnpSift to help you filter large genomic datasets in order to find the most significant variants for your experiment.
-    ```
-      java -Xmx4g -jar /export/apps/snpeff/4.1g/SnpSift.jar \
-            extractFields \
-            -s "," \
-            -e "." \
-            E-coli.ann.vcf.gz \
-            CHROM POS REF ALT \
-            "ANN[*].GENE" "ANN[*].GENEID" \
-            "ANN[*].IMPACT" "ANN[*].EFFECT" \
-            "ANN[*].FEATURE" "ANN[*].FEATUREID" \
-            "ANN[*].BIOTYPE" "ANN[*].RANK" "ANN[*].HGVS_C" \
-            "ANN[*].HGVS_P" "ANN[*].CDNA_POS" "ANN[*].CDNA_LEN" \
-            "ANN[*].CDS_POS" "ANN[*].CDS_LEN" "ANN[*].AA_POS" \
-            "ANN[*].AA_LEN" "ANN[*].DISTANCE" "EFF[*].EFFECT" \
-            "EFF[*].FUNCLASS" "EFF[*].CODON" "EFF[*].AA" "EFF[*].AA_LEN" \
-            > E-coli.snpsift.txt
-    ```
-
-
 #### ***Consensus genome assembly***
 To generate a consensus sequence iVar uses the output of samtools mpileup command. The mpileup output must be piped into ivar consensus. There are five parameters that can be set:
 - minimum quality ```-q``` (Default: 20).
@@ -648,359 +314,53 @@ The ```tee``` command reads from the standard input and writes to both standard 
     ```
 
 
-
-#### ***Nextclade: Clade assignment***
-[**Nextclade**](https://docs.nextstrain.org/projects/nextclade/en/stable/) is a tool within the [**Nextrain**](https://nextstrain.org/) collection that uses sequence differences for their assignment to [clades](https://clades.nextstrain.org/). It also reports suspect quality issues with such sequences. There are both [web-](https://clades.nextstrain.org/) and [command-line-interfaces](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli.html) for *nextclade*. To run it in the command-line, we need some reference files: genome, feature map, origin tree, primers and quality configurations. Luckily, for *E. coli*, these can be easily retrieved using the same tool, otherwise, you will have to create/retrieve accordingly.
-
-1. Get the reference dataset
-    ```
-    nextclade dataset get --name '*E. coli*' --reference 'MN908947' --output-dir /var/scratch/$USER/AfricaCDC_training/nextclade_db
-    ```
-2. Perform clade assignment
-    ```
-    nextclade \
-       --input-fasta /var/scratch/$USER/AfricaCDC_training/results/ivar/E-coli.cons.fa \
-       --input-dataset /var/scratch/$USER/AfricaCDC_training/nextclade_db \
-       --input-root-seq /var/scratch/$USER/AfricaCDC_training/nextclade_db/reference.fasta \
-       --genes E,M,N,ORF1a,ORF1b,ORF3a,ORF6,ORF7a,ORF7b,ORF8,ORF9b,S \
-       --input-gene-map /var/scratch/$USER/AfricaCDC_training/nextclade_db/genemap.gff \
-       --input-tree /var/scratch/$USER/AfricaCDC_training/nextclade_db/tree.json \
-       --input-qc-config /var/scratch/$USER/AfricaCDC_training/nextclade_db/qc.json \
-       --input-pcr-primers /var/scratch/$USER/AfricaCDC_training/nextclade_db/primers.csv \
-       --output-csv /var/scratch/$USER/AfricaCDC_training/results/nextclade/E-coli.csv \
-       --output-tree /var/scratch/$USER/AfricaCDC_training/results/nextclade/E-coli.auspice.json \
-       --output-dir /var/scratch/$USER/AfricaCDC_training/results/nextclade/ \
-       --output-basename E-coli.cons \
-       2> /var/scratch/$USER/AfricaCDC_training/results/nextclade/E-coli.nextclade.log
-    ```
-
-3. Visualization: The output of Nextclade includes a phylogenetic tree in `.json` format. This tree can be visualized in [Auspice](https://auspice.us/). First let us download the the `.json` file:
-```
-cp /var/scratch/$USER/AfricaCDC_training/results/nextclade/E-coli.auspice.json ~/
-```
-In your local computer use `scp` to copy the file to any desired destination:
-```
-scp <user_name>@hpc.ilri.cgiar.org:/home/<user_name>/*.json <destination_folder>
-```
-Open [Auspice](https://auspice.us/) and drag and drop the `.json` file in the [Auspice](https://auspice.us/). Now edit the tree.
-  - In `Dataset` click the drop down arrow and select `ncov`, below it select `open` and below it select `global`.
-  - In `Color By` click the drop down arrow and select `clade`.
-  - Do any other adjustments as you wish.
+#### ***Genome assessment***
 
 
-#### ***Pangolin Lineage Assignment***
-
-[Phylogenetic Assignment of Named Global Outbreak Lineages (Pangolin)](https://cov-lineages.org/resources/pangolin.html) implements a dynamic nomenclature of *E. coli* lineages, known as the Pango nomenclature. To assign [Pangolin Lineages](https://cov-lineages.org/lineage_list.html), we will use [the web version of pangolin](https://pangolin.cog-uk.io/). It also has a robust [command-line version](https://github.com/cov-lineages/pangolin) that we will look into later. With the web version we must retrieve out consensus genome from the analysis server (HPC) to our local computer. Follow the following steps to assign your query sequences pangolin lineages. Also here is a [***tutorial***](https://cov-lineages.org/resources/pangolin/tutorial.html).
-
-1. In your bowser open [Pangolin Web Application](https://pangolin.cog-uk.io/). This is the online version of [Pangolin](https://github.com/cov-lineages/pangolin).
-2. Now copy-paste/drag-drop your consensus file to the site and click `Start Analysis`
-3. Once done, download the results and if you need to, copy the names of sequences that failed the analysis to a file. The download is called `results.csv`.
-
-Here is how pangolin performs the analysis:
-![alt text](https://cov-lineages.org/assets/images/pangolin_pipelines.svg "Pangolin Analysis Workflow")
-
-Alternatively to perform the commandline analysis for Pangolin, let us proceed as follows. We will need to use a singularity image (think of a singularity image as a ready-to-use container within which we have packaged all the software needed to do a certain task) in this case packaging pangolin softwares*.
-1. Let us create a directory to store our image:
-```
-mkdir /var/scratch/$USER/AfricaCDC_training/singularity
-```
-2. Download the image:
-```
-singularity pull --dir /var/scratch/$USER/AfricaCDC_training/singularity/ \
-                    --force docker://staphb/pangolin:latest
-```
-3. Download Pangolin's referemce data: Downloads/updates to latest release of pangoLEARN and constellations
-```
-singularity run /var/scratch/$USER/AfricaCDC_training/singularity/pangolin_latest.sif \
-          pangolin --update-data \
-          --datadir /var/scratch/$USER/AfricaCDC_training/pangolin_db
-```
-4. Conduct Pangolin Lineage assignment:
-```
-singularity run /var/scratch/$USER/AfricaCDC_training/singularity/pangolin_latest.sif
-          pangolin /var/scratch/$USER/AfricaCDC_training/results/ivar/E-coli.cons.fa \
-          --alignment \
-          --usher \
-          --max-ambig 0.3 \
-          --min-length 25000 \
-          --outdir /var/scratch/$USER/AfricaCDC_training/results/pangolin/ \
-          --outfile E-coli.pangolin.usher.csv \
-          --datadir /var/scratch/$USER/AfricaCDC_training/pangolin_db/ \
-          2> /var/scratch/$USER/AfricaCDC_training/results/pangolin/E-coli.pangolin.usher.log
-```
+##### ***Genome contiguity***
 
 
-## Running [nf-core/viralrecon](https://nf-co.re/viralrecon) pipeline.
-
-The [nf-core](https://nf-co.re/) -"A community effort to collect a curated set of analysis pipelines built using Nextflow" - has [many pipelines that can be easily setup and used to analyse genomics data. We will be using [nf-core/viralrecon](https://nf-co.re/viralrecon) for our analysis. The most recent verion being [2.4.1](https://nf-co.re/viralrecon/2.4.1).
-
-To set it up we will follow the workflow in [Launch pipeline](https://nf-co.re/launch?id=1649311271_b34e829e5e3f).
-
-Our data is stored in `/var/scratch/global/ilri_AuCDC/miseq`. We need to:
-- SSH into HPC:
-
-```
-ssh <username>@hpc.ilri.cgiar.org
-```
-- Go into ineractive mode in compute05
-```
-interactive -c 3 -J nextflow
-```
-- Create a working directory in compute node:
-```
-mkdir -p /var/scratch/$USER/miseq_analysis/
-cd /var/scratch/$USER/miseq_analysis/
-mkdir results work
-```
-- Symbolicly link our data to the to a directory in `scratch`
-```
-mkdir -p /var/scratch/global/$USER/miseq_analysis/
-cd /var/scratch/global/$USER/miseq_analysis/
-ln -s /var/scratch/global/ilri_AuCDC/miseq/* ./
-```
-- Now let us go back to [Launch pipeline](https://nf-co.re/launch?id=1649311271_b34e829e5e3f) and do step by step set up.
-
-- Finally let us transfer `the parameters JSON to a file` to the HPC.
-
-- We can now launch the analysis as follows:
-  - Load modules and set some Java options
-```
-module load nextflow/21.10
-NXF_OPTS='-Xms1g -Xmx4g'
-```
-  -Change into working directory
-  ```
-  cd /var/scratch/$USER/miseq_analysis/
-  ```
-  - Launch the analysis:
-```
-nextflow run nf-core/viralrecon -r 2.4.1 -profile singularity -resume -work-dir /var/scratch/$USER/miseq_analysis/work -params-file /var/scratch/global/$USER/miseq_analysis/nf-params.json
-```
-- Wait for the run to be completed.
-- Let us download the multiQC file and visualize as follows:
-  - Check the `results` directory and `results/multiqc` directory:
-  ```
-  ls ./results
-  ls ./results/multiqc
-  ```
-  - Download the `./results/multiqc/multiqc_report.html` and visualize
-  - Clue: use the command `scp`
+##### ***Genome completeness***
 
 
-## Summarize results
-Aggregate results from bioinformatics analyses across many samples into a single report with [MultiQC](https://multiqc.info/)
-
-1. Change to the output directory `multiqc_out`
-    ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/multiqc/
-    ```
-2. Aggregate tools' outputs
-    ```
-    $ multiqc \
-        --force \
-        --title *E. coli* \
-        --export \
-        --outdir . \
-        --config /var/scratch/$USER/AfricaCDC_training/assets/multiqc_config.yaml \
-        /var/scratch/$USER/AfricaCDC_training/results/
-    ```
-
-## Download reports
-
-1. To help with file transfers, we will create a user-specific directory inside the `global` temporary directory of the head-node.
-    ```
-    $ mkdir /var/scratch/global/AfricaCDC_training_outputs/$USER
-    ```
-2. Copy output files of interest (multiqc, primer-trimmed bam).
-    ```
-    cp /var/scratch/$USER/AfricaCDC_training/results/ivar/*.sorted.bam* \
-        /var/scratch/global/AfricaCDC_training_outputs/$USER/
-    cp -r *E. coli*_multiqc_report_plots *.html \
-        /var/scratch/global/AfricaCDC_training_outputs/$USER/
-    ```
-3. On your local computer, open a terminal and create a directory in the `Downloads` directory
-
-    ```
-    mkdir -p /mnt/c/Downloads/AfricaCDC_training/results
-    cd /mnt/c/Downloads/AfricaCDC_training/results/
-    ```
-
-4. Copy all the contents of the `/var/scratch/global/AfricaCDC_training_outputs/<username>/` directory in the HPC to the local outputs directory you created in the previous step.
-    >**Note**
-
-    >Replace ```username``` with the actual provided HPC account username
-    ```
-    rsync \
-        -avP \
-        <username>@hpc.ilri.cgiar.org:/var/scratch/global/AfricaCDC_training_outputs/<username>/* \
-        .
-    ```
-    OR
-    ```
-        scp <username>@hpc.ilri.cgiar.org:/var/scratch/global/AfricaCDC_training_outputs/<username>/* \
-        .
-    ```
-
-## Data Retrieval and Review
-Having sequenced our samples in both MiSeq (Illumina) and MinION (ONT) we can now transfer the sequence output to the HPC where we will conduct the bioinformatics analysis.
-
-#### ***Transfer of data: Illumina***
-MiSeq is based on Windows and data transfer will be done by copy-pasting the data to HPC through the network. Ensure the transfer is completed successfully without errors.
-
-#### ***Transfer of data: MinION***
-The MinION sequencer stores its sequencing output in a Linux based computer. To transfer the data we logged into computer and transferred the data on the command line as follows.
-```
-rsync -avP <path-to-the-directory-with_sequencing-ouput>/ <username>:<path-to-the-directory-to-store-sequencing-ouput>/
-```
-Replaced `<path-to-the-directory-with_sequencing-ouput>` with the path to the directory storing the sequencing output. Replaced `<HPC-login-username>` with your hpc login username (i.e user##@hpc.ilri.cgiar.org) and `<path-to-the-directory-to-store-sequencing-output>` with path to the directory you want to store the data in the HPC.
-Example:`
-rsync -avP /media/SeqData_LTS/20220405_1121_MN2816_FAH91436_2b8e9827/ <username>@hpc.ilri.cgiar.org:/var/scratch/global/$USER/20220405_1121_MN2816_FAH91436_2b8e9827`
-
-#### ***Reviewing data: Illumina***
-Change working directory into the directory that stores the Illumina dataset
-```
-cd /var/scratch/global/miseq/
-```
-Now let us view what is the sequencing output. The output is a FASTA format. Note: in the second command replace `<one-of-the-fastq.gz>`
- with the name of the fastq.gz file
- ```
-ls fastq/
-less -S fastq/<one-of-the-fastq.gz>
-```
-
-#### ***Reviewing data: ONT***
-Change working directory into directory that stores the ONT data. Note: replace `<name-of-run-folder>` with the name of the run folder
-```
-cd /var/scratch/global/ONT/
-ls <name-of-run-folder>
-```
-
-## Working with metadata
-Metadata is the data associated with your main data; it describes your data in a manner that can allow drawing information upon analysing the data. Often, the importance of `metadata` is ignored; things like how to capture, store, encode and organise metadata, especially, having the downstream analyses and interpretation in mind.
-
-> **IMPORTANT**
-> Data without metadata is, mostly, garbage.
-
-We will take a look at an example metadata to highlight some concerns with metadata, and the reason(s) why they are important in data analyses workflows.
-
-test_lab|case_id|lab_id|loc|age|gender|occup|samp_type|symp|vacc_state|coll_dt|confir_dt|recep_dt
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-<strong>TESTING_LAB</strong>|<strong>CASE-ID</strong>|<strong>SampleNumber</strong>|<strong>LOCATION</strong>|<strong>AGE</strong>|<strong>GENDER (M/F)</strong>|<strong>OCCUPATION</strong>|<strong>SAMPLE TYPE</strong>|<strong>SYMPTOMS SHOWN (COUGH;FEVER;ETC)</strong>|<strong>VACCINATION STATUS</strong>|<strong>DATE OF SAMPLE COLLECTION</strong>|<strong>LAB CONFIRMATION DATE</strong>|<strong>DATE SAMPLE RECEIVED IN THE LAB</strong>
-LABA|place/id/date|COVD0308|Some Place|80|F|Food handler|NP & OP Swab|Asymptomatic|Yes|5th June 2020|08-Jun-20|08/06/20
-LABB|COM/SARS001/2022|COVD360|Comoros|38|F|None|NP-OP Swab|FC;CO;H|Yes|5th June 2020|08-Jun-20|08/06/20
-LABC|DJI/SARS001/2023|COVD 273|Djibouti|30|M|Business|NP-OP Swab|Asymptomatic|No|5th June 2020|08-Jun-20|08/06/20
-LABD|SWZ/SARS001/2024|COVD154|Eswatini|23|Female|Food seller|OP-NP Swap|No symptoms|Yes|5th June 2020|08-Jun-20|08/06/20
-LABE|ETH/SARS001/2025|COVD0875|Ethiopia|34|M|Targeted testing|NP-OP Swab|Asymptomatic|Yes|5th June 2020|08-Jun-20|08/06/20
-LABF|LBY/SARS001/2027|COVD00672|Libya|18|Female|Food handler|NP-OP Swab|Fever/Chills, Cough, Headache|Yes|5th June 2020|08-Jun-20|08/06/20
-LABG|MDG/SARS001/2028|COVD499|Madagascar|25|F|Targeted testing|NP Swab|Asymptomatic|No|5th June 2020|08-Jun-20|08/06/20
-LABH|MUS/SARS001/2029|COVD078|Mauritius|25|F|Not indicated|NP-OP Swab|Asymptomatic|No|5th June 2020|08-Jun-20|08/06/20
-LABI|SYC/SARS001/2030|COVD579|Seychelles|2 years|Male|Targeted testing|NP Swab|Asymptomatic|No|5th June 2020|08-Jun-20|08/06/20
-LABJ|SOM/SARS001/2031|300|Somalia|26|F|Food handler|NP-OP Swab|Asymptomatic|No|5th June 2020|08-Jun-20|08/06/20
-LABK|SSD/SARS001/2031|COVD00381|South Sudan|45|M|NA|NP-OP Swab|Asymptomatic|Yes|5th June 2020|08-Jun-20|08/06/20
-
-What are some of the issues you notice with the above metadata?
-
----
-<details close>
-  <summary>Answer</summary>
-
-  - Inconsistent header naming
-  - Future dates
-  - Mixed data types within column
-  - Inconsistent date formats
-  - Inconsistent sample type capturing
-  - Inconsistent symptoms
-  - Spaces in headers
-  - Use of commas
-  - ...
-</details>
+##### ***Genome contamination***
 
 
----
+#### ***Genome annotation***
 
-***Computation-wise, whichever way (poor/good) you choose to organise your data, ensure consistency***.
-            
-## Galaxy worflows for *E. coli* data analysis
-We will demonstrate how to analyze *E. coli* ampliconic data generated by ARTIC protocols and sequenced on Illumina and Oxford Nanopore machines.
-For the analysis, we will make use of the tutorial developed by galaxy core members:
 
-https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/*E. coli*-variant-discovery/tutorial.html
-            
-            
-#### ***Illumina ARTIC data analysis with Galaxy***
-For analysis of ampliconic ARTIC data, we will make use of the following datasets
-            
-## Data
-```
-https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/E-coli_R1.fastq.gz
-https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/E-coli_R2.fastq.gz
-https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars2_R1.fastq.gz
-https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars2_R2.fastq.gz
-https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars3_R1.fastq.gz
-https://hpc.ilri.cgiar.org/~douso/AfricaCDC_training/sars3_R2.fastq.gz
-```
+#### ***Organism identification***
 
-#### ***Oxford Nanopore ARTIC data analysis with Galaxy***
 
-## Find data on SRA
-First we need to find a good dataset to play with. The [Sequence Read Archive (SRA)](https://www.ncbi.nlm.nih.gov/sra) is the primary archive of unassembled reads operated by the US [National Institutes of Health (NIH)](https://www.ncbi.nlm.nih.gov/). SRA is a great place to get the sequencing data that underlie publications and studies. Let’s do that:
-            
-1. Go to NCBI’s SRA page by pointing your browser to https://www.ncbi.nlm.nih.gov/sra
-2. In the search box enter PRJNA909758 and click Search button. (Alternatively, you simply click on this [link](https://www.ncbi.nlm.nih.gov/sra/?term=PRJNA909758))
-3. Download metadata describing these datasets by:
+##### ***BLAST***
 
-    - clicking on **Send** to: dropdown
-    - Selecting **File**
-    - Changing Format to **RunInfo**
-    - Clicking **Create file**
-4. This would create a rather large `SraRunInfo.csv` file in your `Downloads` folder.
 
-Now that we have downloaded this file we can go to a Galaxy instance and start processing it.
-            
-We will follow these steps, highlighted in https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/*E. coli*/tutorial.html to get a subset of the data:
-    
-1. Process and filter ```SraRunInfo.csv``` file in Galaxy
-2. Here the `sra accessions` we will use are: `SRR22561688` and `SRR22561690`
-3. Download sequencing data with ```Faster Download and Extract Reads in FASTQ```
-            
-            
-### Repeat the analysis by using data generated from our lab:
-```
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ONT/fastq/barcode85.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ONT/fastq/barcode86.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ONT/fastq/barcode87.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ONT/fastq/barcode88.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ONT/fastq/barcode89.fastq.gz
-```
+#### ***Genome clean-up***
 
-## Activity            
-            
-## Galaxy Exercise using MiSeq Data            
-This activity it to help you practice the analysis on illumina data using the [Galaxy workflow](https://training.galaxyproject.org/training-material/topics/variant-analysis/tutorials/*E. coli*-variant-discovery/tutorial.html
-).      
-You are encouraged to change the parameters including: sample IDs (names), coverage depth cutoffs,...            
-Follow the steps as guided we used in the analysis of Illumina sequenced data  
-### Data
-```
-https://hpc.ilri.cgiar.org/~jjuma/*E. coli*-ILRI-WHO-2022/testdata-subsampled/COVM02379_S37_con_R1_001.fastq.gz
-https://hpc.ilri.cgiar.org/~jjuma/*E. coli*-ILRI-WHO-2022/testdata-subsampled/COVM02379_S37_con_R2_001.fastq.gz
-https://hpc.ilri.cgiar.org/~jjuma/*E. coli*-ILRI-WHO-2022/testdata-subsampled/COVM02720_S365_con_R1_001.fastq.gz
-https://hpc.ilri.cgiar.org/~jjuma/*E. coli*-ILRI-WHO-2022/testdata-subsampled/COVM02720_S365_con_R2_001.fastq.gz          
-```            
 
-### Additional Illumina data.
-The data below comes from a MiSeq sequencer            
-```
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample1_S2_L001_R1_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample1_S2_L001_R2_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample2_S1_L001_R1_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample2_S1_L001_R2_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample3_S3_L001_R1_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample3_S3_L001_R2_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample4_S6_L001_R1_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample4_S6_L001_R2_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample5_S8_L001_R1_001.fastq.gz
-https://hpc.ilri.cgiar.org/~gkibet/SARS-ILL/fastq/sample5_S8_L001_R2_001.fastq.gz            
-```            
----
-[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+##### ***Read mapping***
+
+
+##### ***Construct a coverage table***
+
+
+##### ***Non-target contig removal***
+
+
+##### ***Filter the genome assembly by length***
+
+
+##### ***Filter the genome assembly by coverage***
+
+
+##### ***Construct a list of contigs to keep***
+
+
+##### ***Filter your assembly based on a list of contigs***
+
+
+##### ***Check for contamination using UniVec***
+
+
+
+
