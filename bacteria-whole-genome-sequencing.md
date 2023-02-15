@@ -38,7 +38,8 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
         - [Construct a list of contigs to keep](#Construct-a-list-of-contigs-to-keep)
         - [Filter your assembly based on a list of contigs](#Filter-your-assembly-based-on-a-list-of-contigs)
         - [Check for contamination using UniVec](#Check-for-contamination-using-UniVec)
-
+    - [Genome visualization](#genome-visualization)
+    - [AMR identification](#AMR-identification)
 
 
 ## Introduction
@@ -49,7 +50,7 @@ In this workshop we will tackle, hands-on, the basic principles employed by the 
 
 > **Note**
 
-> This is part of the initiative fronted by the [Africa CDC](https://africacdc.org/) with generous support from the [Rockeffeler foundation](https://www.rockefellerfoundation.org/) to build capacity in pathogen genomics in Africa.
+> This is part of the initiative fronted by the [Africa CDC](https://africacdc.org/) with generous support from the <add org here> to build capacity in pathogen genomics in Africa.
 
 
 ## Background
@@ -162,27 +163,13 @@ interactive -w compute05
 2. Load modules using the `module load <tool-name>`command.
     ```
     module load fastqc/0.11.7
-    module load fastp/0.22.0
-    module load kraken/2.0.8-beta
-    module load bowtie2/2.3.4.1
-    module load samtools/1.11
-    module load ivar/1.3.1
-    module load bedtools/2.29.0
-    module load R/3.6
-    module load bcftools/1.11
-    module load snpeff/4.1g
-    module load multiqc/1.12
-    module load nextclade/1.11.0
-    module load python/3.9
+    
     ```
 
     **Optional**
     The above modules can also be loaded using a single command
     ```
-    module load fastqc/0.11.7 fastp/0.22.0 \
-    kraken/2.0.8-beta bowtie2/2.3.4.1 samtools/1.11 ivar/1.3.1 \
-    bedtools/2.29.0 R/3.6 bcftools/1.11 snpeff/4.1g multiqc/1.12 \
-    nextclade/1.11.0 python/3.9
+    module load fastqc/0.11.7 fastp/0.22.0 
     ```
 3. To list the loaded modules, type the below command.
     ```
@@ -202,28 +189,15 @@ interactive -w compute05
     ```
     cut -f 1,2 <E-coli>.fasta.fai > <E-coli>.fasta.sizes
     ```
-3. In order to allow easy access of genome regions during read mapping we will index the reference genome using ```bowtie2-build``` command.
+3. In order to allow easy access of genome regions during read mapping we will index the reference genome using ```bwa index``` command.
 
     ```
-    mkdir /var/scratch/$USER/AfricaCDC_training/genome/bowtie2
+    mkdir /var/scratch/$USER/AfricaCDC_training/genome/bwa
     ```
 
     ```
-    bowtie2-build \
-      --threads 1 \
-      /var/scratch/$USER/AfricaCDC_training/genome/<E-coli>.fasta \
-      /var/scratch/$USER/AfricaCDC_training/genome/bowtie2/<E-coli>
+    bwa index $fasta
     ```
-    The above command generates index files with the suffix `.bt2` for the reference genome with the prefix `<E-coli>.`
-4. Build SnpEff database for the reference genome
-
-    [SnpEff](http://pcingola.github.io/SnpEff/se_introduction/), a variant annotation and predictor needs a database to perform genomic annotations. There are pre-built databases for thousands of genomes, so chances are that your organism of choice already has a SnpEff database available.
-
-    >**Note** We will use pre-built *E. coli* SnpEff database
-
-
-    ***Optional***
-    In the (unlikely?) event that you need to build one yourself, you can build one using the commands found [here](http://pcingola.github.io/SnpEff/se_buildingdb/)
 
 #### ***Quality assessment***
 [`FastQC`](https://www.youtube.com/watch?v=bz93ReOv87Y)  is a common tool for Illumina read quality checks. The basic statistics from this report include `total sequences`, `sequence length` and `%GC`. Another 10 measures of quality are also graphically represented. Your experimental design will be crirical in interpreting `FastQC` reports. This step is very important for the subsequent data processes, especially at initial optimisation steps.
@@ -270,97 +244,146 @@ The preceeding step will guide us on the possible filtering and trimming operati
     ***Optional***
         Run steps 3 and 4 above for the other 2 samples.
 
-#### ***Consensus genome assembly***
-To generate a consensus sequence iVar uses the output of samtools mpileup command. The mpileup output must be piped into ivar consensus. There are five parameters that can be set:
-- minimum quality ```-q``` (Default: 20).
-- minimum frequency threshold ```-t``` (Default: 0).
-- minimum depth to call a consensus ```-m``` (Default: 10).
-- a flag ```-n``` to exclude nucleotides from regions with depth less than the minimum depth and a character to call in regions with coverage lower than the speicifed minimum depth (Default: 'N').
+#### ***Consensus genome assembly***  
 
-Minimum quality is the minimum quality of a base to be considered in calculations of variant frequencies at a given position. Minimum frequency threshold is the minimum frequency that a base must match to be called as the consensus base at a position. If one base is not enough to match a given frequency, then an ambigious nucleotide is called at that position. Minimum depth is the minimum required depth to call a consensus. If ```-k``` flag is set then these regions are not included in the consensus sequence. If ```-k``` is not set then by default, a 'N' is called in these regions. You can also specfy which character you want to add to the consensus to cover regions with depth less than the minimum depth. This can be done using ```-n``` option. It takes one of two values: ```-``` or ```N```.
-
-1. Change to the output directory ```ivar```
-    ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/ivar/
-    ```
-
-2. Generate pileup and consensus genome sequences
+Generate consensus genome sequences
 
     ```
-    samtools \
-            mpileup \
-            --reference /var/scratch/$USER/AfricaCDC_training/genome/<E-coli>.fasta \
-            --count-orphans \
-            --no-BAQ \
-            --max-depth 0 \
-            --min-BQ 0 \
-            -aa \
-            /var/scratch/$USER/AfricaCDC_training/results/ivar/E-coli.primertrimmed.sorted.bam \
-            | tee E-coli.mpileup \
-            | ivar \
-                consensus \
-                -t 0.75 \
-                -q 20 \
-                -m 10 \
-                -n N \
-                -p E-coli.cons
-    ```
-The ```tee``` command reads from the standard input and writes to both standard output and one or more files at the same time. ```tee``` is mostly used in combination with other commands through piping.
-
-3. Rename the consensus genome header
-
-    ```
-    sed -i '/^>/s/Consensus_\(.*\)_threshold.*/\1/' E-coli.cons.fa
+    spades.py -k 27 \
+	-1 ./data/fastp/SRR292770_1.trim.fastq.gz \
+	-2 ./data/fastp/SRR292770_2.trim.fastq.gz \
+	-o ./data/spades/ \
+	-t 8 \
+	-m 384
     ```
 
 
-#### ***Genome assessment***
+
+#### ***Genome assessment***  
+
+1. ##### ***Genome contiguity***  
+
+    ```
+    quast.py \
+    /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+    -t 8 \
+    -o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/quast
+    ```
+
+2. ##### ***Genome completeness***  
+
+    ```
+    busco \
+    -i /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+    -m genome \
+    -o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/busco \
+    -l bacteria \
+    -c 8
+    ```
+
+3. ##### ***Genome contamination***  
 
 
-##### ***Genome contiguity***
+#### ***Genome annotation***  
+
+    ```
+    prokka \
+    /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+    --outdir /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/prokka \
+    --cpus 8 \
+    --mincontiglen 200 \
+    --centre XXX \
+    --force
+    ```
+
+#### ***Organism identification***  
+
+    ```
+    ./blob_blast.sh \
+    /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta
+    ```
+
+1. ##### ***BLAST***  
+
+    ```
+    # run the scipt, note that it will automatically use nohup since it will take about 30 minutes to run
+    ./blob_blast.sh /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta
+
+    # view the reuslts, the last column is the species identification
+    tabview /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta.vs.nt.cul5.1e5.megablast.out
+    ```
+
+#### ***Genome clean-up***  
+
+1. ##### ***Read mapping***  
+    ```
+    fasta=/home/kmwangi/AfricaCDC_training/ilri-africa-cdc-training/bacteria/ecoli_genome/Escherichia_coli_str._K-12_genome.fasta
+    forward=/var/scratch/global/gkibet/ilri-africa-cdc-training/bacteria/data/fastp/SRR292770_1.trim.fastq.gz
+    reverse=/var/scratch/global/gkibet/ilri-africa-cdc-training/bacteria/data/fastp/SRR292770_1.trim.fastq.gz
+
+    # Step 1: Index your reference genome. This is a requirement before read mapping.
+    bwa index $fasta
+
+    # Step 2: Map the reads and construct a SAM file.
+    bwa mem -t 8 $fasta $forward $reverse > /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/raw_mapped.sam
+
+    # Step 3: Remove sequencing reads that did not match to the assembly and convert the SAM to a BAM.
+    samtools view -@ 8 -Sb  /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/raw_mapped.sam \
+    | samtools sort -@ 8 -o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam
+
+    # Step 4: Index the new bam file
+    samtools index /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam
+    ```
+
+2. ##### ***Construct a coverage table***  
+
+    ```
+    bedtools genomecov \
+    -ibam /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam \
+    > /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/coverage.out
+    ```
+
+3. ##### ***Non-target contig removal***  
 
 
-##### ***Genome completeness***
+4. ##### ***Filter the genome assembly by length***  
 
 
-##### ***Genome contamination***
+5. ##### ***Filter the genome assembly by coverage***  
 
 
-#### ***Genome annotation***
+6. ##### ***Construct a list of contigs to keep***  
 
 
-#### ***Organism identification***
+7. ##### ***Filter your assembly based on a list of contigs***  
 
 
-##### ***BLAST***
+8. ##### ***Check for contamination using UniVec***  
 
 
-#### ***Genome clean-up***
+#### ***Genome visualization***  
 
+#### ***AMR identification***  
 
-##### ***Read mapping***
+```
+    # Perform RGI analysis
 
+    rgi_output=/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/rgi
+    contigs_file=/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta
 
-##### ***Construct a coverage table***
+    rgi main --input_sequence $contigs_file \
+        --output_file $rgi_output \
+	    --local \
+	    -a BLAST \
+	    -g PRODIGAL \
+	    --clean \
+	    --low_quality \
+	    --num_threads 6 \
+	    --split_prodigal_jobs
+	
+	
+    # samples and AMR genes organized alphabetically:
+    rgi heatmap --input $rgi_output \
+        --output $rgi_output/rgi_alphabetic.png
 
-
-##### ***Non-target contig removal***
-
-
-##### ***Filter the genome assembly by length***
-
-
-##### ***Filter the genome assembly by coverage***
-
-
-##### ***Construct a list of contigs to keep***
-
-
-##### ***Filter your assembly based on a list of contigs***
-
-
-##### ***Check for contamination using UniVec***
-
-
-
-
+```
