@@ -126,15 +126,14 @@ interactive -w compute05
     ```cd ../../genome```.
     5. Use ```wget``` to fetch the files as follows:    
 
-            ```
-            wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz
-           
-            ```
+        ```
+        wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz
+        ```
     6. Retrieve the feature annotation file GFF using ```wget``` command as follows:    
 
-            ```
-             wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.gff.gz
-            ```
+        ```
+        wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.gff.gz
+        ```
     7. Rename the `FASTA` and `GFF` files
         ```
         mv GCF_000005845.2_ASM584v2_genomic.fna.gz E-coli-genome.fasta.gz
