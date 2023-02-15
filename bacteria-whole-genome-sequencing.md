@@ -124,8 +124,15 @@ interactive -w compute05
     3. Right click on the genome FASTA and select 'copy link'.
     4. Change into the ```genome``` directory using the command
     ```cd ../../genome```.
-    5. Use ```wget``` to fetch the file.
-    6. Retrieve the feature annotation file GFF using ```wget``` command.
+    5. Use ```wget``` to fetch the files as follows:
+            ```
+            wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz
+           
+            ```
+    6. Retrieve the feature annotation file GFF using ```wget``` command as follows:
+            ```
+             wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.gff.gz
+            ```
     7. Rename the `FASTA` and `GFF` files
         ```
         mv GCF_000005845.2_ASM584v2_genomic.fna.gz E-coli-genome.fasta.gz
@@ -234,9 +241,9 @@ The preceeding step will guide us on the possible filtering and trimming operati
 
 Generate consensus genome sequences  
 
-```
-module load spades/3.15
-```
+    ```
+    module load spades/3.15
+    ```
 
 1. Change into the `spades` directory
     ```
@@ -259,9 +266,9 @@ module load spades/3.15
 
 1. ##### ***Genome contiguity***  
 
-```
-module load quast/5.0.2
-```
+    ```
+    module load quast/5.0.2
+    ```
 
     ```
     quast.py \
@@ -272,9 +279,9 @@ module load quast/5.0.2
 
 2. ##### ***Genome completeness***  
 
-```
-module load BUSCO/5.2.2
-```
+    ```
+    module load BUSCO/5.2.2
+    ```
 
     ```
     busco \
@@ -290,9 +297,9 @@ module load BUSCO/5.2.2
 
 #### ***Genome annotation***  
 
-```
-module load prokka/1.11
-```
+    ```
+    module load prokka/1.11
+    ```
 
     ```
     prokka \
@@ -306,9 +313,9 @@ module load prokka/1.11
 
 #### ***Organism identification***  
 
-```
-module load blast/2.12.0+
-```
+    ```
+    module load blast/2.12.0+
+    ```
 
     ```
     bash /var/scratch/kmwangi/ilri-africa-cdc-training/scripts/blob_blast.sh \
@@ -328,10 +335,10 @@ module load blast/2.12.0+
 
 #### ***Genome clean-up***  
 
-```
-module load bwa/0.7.4
-module load samtools/1.9
-```
+    ```
+    module load bwa/0.7.4
+    module load samtools/1.9
+    ```
 
 1. ##### ***Read mapping***  
     ```
@@ -355,9 +362,9 @@ module load samtools/1.9
 
 2. ##### ***Construct a coverage table***  
 
-```
-module load bedtools/2.29.0
-```
+    ```
+    module load bedtools/2.29.0
+    ```
 
     ```
     bedtools genomecov \
@@ -392,7 +399,7 @@ module purge
 
 module load rgi/6.0.2
 
-```
+```  
 
 ```
     # Perform RGI analysis
