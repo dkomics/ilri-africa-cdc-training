@@ -124,12 +124,14 @@ interactive -w compute05
     3. Right click on the genome FASTA and select 'copy link'.
     4. Change into the ```genome``` directory using the command
     ```cd ../../genome```.
-    5. Use ```wget``` to fetch the files as follows:
+    5. Use ```wget``` to fetch the files as follows:    
+
             ```
             wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz
            
             ```
-    6. Retrieve the feature annotation file GFF using ```wget``` command as follows:
+    6. Retrieve the feature annotation file GFF using ```wget``` command as follows:    
+
             ```
              wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.gff.gz
             ```
