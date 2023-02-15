@@ -3,3 +3,4 @@ docs/
 bacteria/data/*/*
 metagenomics/data/*/*
 slurm*
+*.sh.swp
