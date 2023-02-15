@@ -1,3 +1,4 @@
 docs/
 *.fastq.gz
 bacteria/data/*/*
+metagenomics/data/*/*
