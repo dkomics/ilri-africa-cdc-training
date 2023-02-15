@@ -95,6 +95,7 @@ interactive -w compute05
     cd $USER/ilri-africa-cdc-training
     ```
 2. The `<directories to soft-link>` directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
+
     ```
     ln -s /var/scratch/global/ilri-africa-cdc-training/[sd]* .
     ```
@@ -182,7 +183,6 @@ interactive -w compute05
     ```
     bwa index E-coli-genome.fasta
 
-    mv *.ann *.amb *.sa *.bwt *.pac  bwa/
     ```
 
 #### ***Quality assessment***
@@ -234,17 +234,21 @@ The preceeding step will guide us on the possible filtering and trimming operati
 
 Generate consensus genome sequences  
 
+```
+module load spades/3.15
+```
+
 1. Change into the `spades` directory
     ```
     cd /var/scratch/$USER/ilri-africa-cdc-training/results/spades/
     ```
 
-2. Runt `Spades` to perform genome assembly
+2. Run `Spades` to perform genome assembly
     ``` 
     spades.py -k 27 \
-	-1 ./data/fastp/SRR292770_1.trim.fastq.gz \
-	-2 ./data/fastp/SRR292770_2.trim.fastq.gz \
-	-o ./data/spades/ \
+	-1 /var/scratch/$USER/ilri-africa-cdc-training/data/raw_data/SRR292862_1.trim.fastq.gz \
+	-2 /var/scratch/$USER/ilri-africa-cdc-training/data/raw_data/SRR292862_2.trim.fastq.gz \
+	-o ./ \
 	-t 8 \
 	-m 384
     ```
@@ -255,20 +259,28 @@ Generate consensus genome sequences
 
 1. ##### ***Genome contiguity***  
 
+```
+module load quast/5.0.2
+```
+
     ```
     quast.py \
-    /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+    /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta \
     -t 8 \
-    -o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/quast
+    -o /var/scratch/${USER}/ilri-africa-cdc-training/results/quast
     ```
 
 2. ##### ***Genome completeness***  
 
+```
+module load BUSCO/5.2.2
+```
+
     ```
     busco \
-    -i /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
+    -i /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta \
     -m genome \
-    -o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/busco \
+    -o /var/scratch/${USER}/ilri-africa-cdc-training/results/busco \
     -l bacteria \
     -c 8
     ```
@@ -278,10 +290,14 @@ Generate consensus genome sequences
 
 #### ***Genome annotation***  
 
+```
+module load prokka/1.11
+```
+
     ```
     prokka \
-    /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta \
-    --outdir /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/prokka \
+    /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta \
+    --outdir /var/scratch/${USER}/ilri-africa-cdc-training/results/prokka \
     --cpus 8 \
     --mincontiglen 200 \
     --centre XXX \
@@ -290,49 +306,63 @@ Generate consensus genome sequences
 
 #### ***Organism identification***  
 
+```
+module load blast/2.12.0+
+```
+
     ```
-    ./blob_blast.sh \
-    /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta
+    bash /var/scratch/kmwangi/ilri-africa-cdc-training/scripts/blob_blast.sh \
+    /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta
     ```
 
 1. ##### ***BLAST***  
 
     ```
-    # run the scipt, note that it will automatically use nohup since it will take about 30 minutes to run
-    ./blob_blast.sh /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta
+    # run the script, note that it will automatically use nohup since it will take about 30 minutes to run
+    bash /var/scratch/kmwangi/ilri-africa-cdc-training/scripts/blob_blast.sh \
+    /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta
 
     # view the reuslts, the last column is the species identification
-    tabview /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta.vs.nt.cul5.1e5.megablast.out
+    tabview /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta.vs.nt.cul5.1e5.megablast.out
     ```
 
 #### ***Genome clean-up***  
 
+```
+module load bwa/0.7.4
+module load samtools/1.9
+```
+
 1. ##### ***Read mapping***  
     ```
-    fasta=/home/kmwangi/AfricaCDC_training/ilri-africa-cdc-training/bacteria/ecoli_genome/Escherichia_coli_str._K-12_genome.fasta
-    forward=/var/scratch/global/gkibet/ilri-africa-cdc-training/bacteria/data/fastp/SRR292770_1.trim.fastq.gz
-    reverse=/var/scratch/global/gkibet/ilri-africa-cdc-training/bacteria/data/fastp/SRR292770_1.trim.fastq.gz
+    fasta=/var/scratch/kmwangi/ilri-africa-cdc-training/genome/E-coli-genome.fasta
+    forward=/var/scratch/gkibet/ilri-africa-cdc-training/results/fastp/SRR292862_1.trim.fastq.gz
+    reverse=/var/scratch/gkibet/ilri-africa-cdc-training/results/fastp/SRR292862_1.trim.fastq.gz
 
     # Step 1: Index your reference genome. This is a requirement before read mapping.
     bwa index $fasta
 
     # Step 2: Map the reads and construct a SAM file.
-    bwa mem -t 8 $fasta $forward $reverse > /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/raw_mapped.sam
+    bwa mem -t 8 $fasta $forward $reverse > /var/scratch/${USER}/ilri-africa-cdc-training/results/bwa/raw_mapped.sam
 
     # Step 3: Remove sequencing reads that did not match to the assembly and convert the SAM to a BAM.
-    samtools view -@ 8 -Sb  /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/raw_mapped.sam \
-    | samtools sort -@ 8 -o /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam
+    samtools view -@ 8 -Sb  /var/scratch/${USER}/ilri-africa-cdc-training/results/bwa/raw_mapped.sam \
+    | samtools sort -@ 8 -o /var/scratch/${USER}/ilri-africa-cdc-training/results/bwa/sorted_mapped.bam
 
     # Step 4: Index the new bam file
-    samtools index /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam
+    samtools index /var/scratch/${USER}/ilri-africa-cdc-training/results/bwa/sorted_mapped.bam
     ```
 
 2. ##### ***Construct a coverage table***  
 
+```
+module load bedtools/2.29.0
+```
+
     ```
     bedtools genomecov \
-    -ibam /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/sorted_mapped.bam \
-    > /var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/bwa/coverage.out
+    -ibam /var/scratch/${USER}/ilri-africa-cdc-training/results/bwa/sorted_mapped.bam \
+    > /var/scratch/${USER}/ilri-africa-cdc-training/results/bwa/coverage.out
     ```
 
 3. ##### ***Non-target contig removal***  
@@ -358,10 +388,17 @@ Generate consensus genome sequences
 #### ***AMR identification***  
 
 ```
+module purge
+
+module load rgi/6.0.2
+
+```
+
+```
     # Perform RGI analysis
 
-    rgi_output=/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/rgi
-    contigs_file=/var/scratch/global/${USER}/ilri-africa-cdc-training/bacteria/data/spades/contigs.fasta
+    rgi_output=/var/scratch/${USER}/ilri-africa-cdc-training/results/rgi
+    contigs_file=/var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta
 
     rgi main --input_sequence $contigs_file \
         --output_file $rgi_output \
