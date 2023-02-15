@@ -242,9 +242,9 @@ The preceeding step will guide us on the possible filtering and trimming operati
 
 Generate consensus genome sequences  
 
-    ```
-    module load spades/3.15
-    ```
+```
+module load spades/3.15
+```
 
 1. Change into the `spades` directory
     ```
@@ -298,30 +298,30 @@ Generate consensus genome sequences
 
 #### ***Genome annotation***  
 
-    ```
-    module load prokka/1.11
-    ```
+```
+module load prokka/1.11
+```  
 
-    ```
-    prokka \
-    /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta \
-    --outdir /var/scratch/${USER}/ilri-africa-cdc-training/results/prokka \
-    --cpus 8 \
-    --mincontiglen 200 \
-    --centre XXX \
-    --force
-    ```
+```
+prokka \
+/var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta \
+--outdir /var/scratch/${USER}/ilri-africa-cdc-training/results/prokka \
+--cpus 8 \
+--mincontiglen 200 \
+--centre XXX \
+--force
+```
 
 #### ***Organism identification***  
 
-    ```
-    module load blast/2.12.0+
-    ```
+```
+module load blast/2.12.0+
+```
 
-    ```
-    bash /var/scratch/kmwangi/ilri-africa-cdc-training/scripts/blob_blast.sh \
-    /var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta
-    ```
+```
+bash /var/scratch/kmwangi/ilri-africa-cdc-training/scripts/blob_blast.sh \
+/var/scratch/${USER}/ilri-africa-cdc-training/results/spades/contigs.fasta
+```
 
 1. ##### ***BLAST***  
 
@@ -336,10 +336,10 @@ Generate consensus genome sequences
 
 #### ***Genome clean-up***  
 
-    ```
-    module load bwa/0.7.4
-    module load samtools/1.9
-    ```
+```
+module load bwa/0.7.4
+module load samtools/1.9
+```
 
 1. ##### ***Read mapping***  
     ```
