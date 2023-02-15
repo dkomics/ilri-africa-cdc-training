@@ -91,66 +91,48 @@ interactive -w compute05
 1. We then change into the `compute05` `scratch` directory to create our project directory. Using the option`-p` (parent) `mkdir` will create any missing intermediate directories.
     ```
     cd /var/scratch/
-    mkdir -p $USER/AfricaCDC_training
-    cd $USER/AfricaCDC_training
+    mkdir -p $USER/ilri-africa-cdc-training
+    cd $USER/ilri-africa-cdc-training
     ```
 2. The `<directories to soft-link>` directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
     ```
-    ln -s /var/scratch/global/AfricaCDC_training/[adps]* .
+    ln -s /var/scratch/global/ilri-africa-cdc-training/[sd]* .
     ```
 3. We will create the directories `data`, `results` and `genome` to store raw data in ```fastq``` format, output and reference genomes respectively. Intermediate output files per `tool/software` will be created within the `results` directory. We will exploit the bash array data structure to create all the directories at once.
     ```
-    mkdir data genome results
-    mkdir -p results/{fastqc,fastp,kraken,samtools,ivar,snpeff,pangolin,nextclade,multiqc,bowtie2,bedtools}
+    mkdir -p data genome results
+    mkdir -p results/{fastqc,fastp,spades,quast,busco,prokka,bwa,rgi}
     ```
 4. Change into the `data` directory, from where we will retrieve our ```fastq``` files.
     ```
-    cd data
+    cd data/raw_data
     ls
     ```
 #### ***Data retrieval and integrity checks***
 1. While there are specialised tools for data retieval from nucleotide sequence databases, universal `Unix` command (`wget`) can be used to download data over internet.
     ```
-    wget --no-check-certificate <path to compressed data>
+    # data already downloaded. Skip running these lines
+    #wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292770/SRR292770_1.fastq.gz
+    #wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292770/SRR292770_2.fastq.gz
     ```
-2. After downloading your data, say from a sequencing facility site, it is often good practice to verify that your data was not intentionally/accidentally tampered with. To do this, your data service provider will likely accompany your data with a file containing a verification code: `checksum_file` (***will be provided***). The `md5sum` command, using the `-c` (check) tag, allows for checking the integrity of a file downloaded or acquired from a different source.
-    ```
-    wget --no-check-certificate <path to md5 checksum file of the compressed data>
-    ls
-    md5sum -c <md5 checksum file of the compressed data>
-    ```
-3. Next, we will unzip the file using `tar` with the `-xf` (extract, file; respectively) tags, which tells `tar` extract the given file.
-    ```
-    tar -xf <compressed data>
-    ls
-    ```
-4.  Download *E. coli* reference genome and the genome annotation file.
+2.  Download *E. coli* reference genome and the genome annotation file.
 
     We will retrieve *E. coli* reference genome and the annotation from [NCBI](https://www.ncbi.nlm.nih.gov/).
     1. On a web browser, open the link [NCBI](https://www.ncbi.nlm.nih.gov/).
     2. Type '*E. coli*' on the search box and select 'Genome' database.
-    3. Select the Genbank hyperlink.
-    4. Select the genome version.
-    5. Right click on the genome FASTA and select 'copy link'.
-    6. Change into the ```genome``` directory using the command
-    ```cd ../genome```.
-    7. Use ```wget``` to fetch the file.
-    8. Retrieve the feature annotation file GFF using ```wget``` command.
-    9. Dowload the md5checksum using `wget` command and check for integrity of your reference genome (FASTA) and annotation (GFF) files.
-
+    3. Right click on the genome FASTA and select 'copy link'.
+    4. Change into the ```genome``` directory using the command
+    ```cd ../../genome```.
+    5. Use ```wget``` to fetch the file.
+    6. Retrieve the feature annotation file GFF using ```wget``` command.
+    7. Rename the `FASTA` and `GFF` files
         ```
-        echo "$(grep *GCA_009858895.3_ASM985889v3_genomic.fna.gz* md5checksums.txt | cut -f1 -d' ') GCA_009858895.3_ASM985889v3_genomic.fna.gz" | md5sum -c -
-        echo "$(grep *GCA_009858895.3_ASM985889v3_genomic.gff.gz* md5checksums.txt | cut -f1 -d' ') GCA_009858895.3_ASM985889v3_genomic.gff.gz" | md5sum -c -
+        mv GCF_000005845.2_ASM584v2_genomic.fna.gz E-coli-genome.fasta.gz
+        mv GCF_000005845.2_ASM584v2_genomic.gff.gz E-coli.gff.gz
         ```
-
-    11. If integrity check of the files has passed (`OK`), Uncompress the ```.gz``` files
-       ```
-       gunzip *.gz
-       ```
-    12. Rename the `FASTA` and `GFF` files
+    8. Uncompress the `gz` files
         ```
-        mv 
-        mv 
+        gunzip *.gz
         ```
 
 ## Analysis
@@ -182,21 +164,25 @@ interactive -w compute05
 1. While still in the `genome` directory, we will index the reference sequence using samtools' `faidx`. Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for samtools' operations.
 
     ```
-    samtools faidx <E-coli>.fasta
+    module load samtools/1.9
+
+    samtools faidx E-coli-genome.fasta
     ```
-    The above command generates the index for reference genome with the name `<E-coli>.fasta.fai`.
+    The above command generates the index for reference genome with the name `E-coli-genome.fasta.fai`.
 2. We can take a sneak-view of the generated file and manipulate it for fun, say, to extract the genome size of reference fasta. This can be extracted from the `faidx`-indexed genome file using the ```cut``` command. The ```-f``` specifies the field(s) of interest.
     ```
-    cut -f 1,2 <E-coli>.fasta.fai > <E-coli>.fasta.sizes
+    cut -f 1,2 E-coli-genome.fasta.fai > E-coli-genome.fasta.sizes
     ```
 3. In order to allow easy access of genome regions during read mapping we will index the reference genome using ```bwa index``` command.
 
     ```
-    mkdir /var/scratch/$USER/AfricaCDC_training/genome/bwa
+    mkdir /var/scratch/$USER/ilri-africa-cdc-training/genome/bwa
     ```
 
     ```
-    bwa index $fasta
+    bwa index E-coli-genome.fasta
+
+    mv *.ann *.amb *.sa *.bwt *.pac  bwa/
     ```
 
 #### ***Quality assessment***
@@ -205,15 +191,15 @@ interactive -w compute05
 
 1. Change into the results ```fastqc``` directory
     ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/fastqc/
+    cd /var/scratch/$USER/ilri-africa-cdc-training/results/fastqc/
     ```
 2. Run ```fastqc```
     ```
     fastqc \
         -t 1 \
         -o . \
-        /var/scratch/$USER/AfricaCDC_training/data/E-coli_R1.fastq.gz \
-        /var/scratch/$USER/AfricaCDC_training/data/E-coli_R2.fastq.gz
+        /var/scratch/$USER/ilri-africa-cdc-training/data/raw_data/SRR292862_1.fastq.gz \
+        /var/scratch/$USER/ilri-africa-cdc-training/data/raw_data/SRR292862_2.fastq.gz
     ```
     ***Optional***
         Run step 3. above for the other 2 samples.
@@ -224,7 +210,7 @@ The preceeding step will guide us on the possible filtering and trimming operati
 
 1. Change into the output ```fastp``` directory.
     ```
-    cd /var/scratch/$USER/AfricaCDC_training/results/fastp/
+    cd /var/scratch/$USER/ilri-africa-cdc-training/results/fastp/
     ```
 
 2. Run ```fastp```. `i,I` (input(s)) are for read1, read2; respectively. `o,O` (output(s)) are for the respective read1, read2; respectively. The `2>` construct redirects the standard error channel for saving as a log file.
@@ -232,13 +218,13 @@ The preceeding step will guide us on the possible filtering and trimming operati
     ```
     fastp \
         -w 1 \
-        -i /var/scratch/$USER/AfricaCDC_training/data/E-coli_R1.fastq.gz \
-        -I /var/scratch/$USER/AfricaCDC_training/data/E-coli_R2.fastq.gz \
-        -o E-coli_R1.trim.fastq.gz \
-        -O E-coli_R2.trim.fastq.gz \
-        -h E-coli.fastp.html \
-        -j E-coli.fastp.json \
-        2> E-coli.fastp.log
+        -i /var/scratch/$USER/ilri-africa-cdc-training/data/raw_data/SRR292862_1.fastq.gz \
+        -I /var/scratch/$USER/ilri-africa-cdc-training/data/raw_data/SRR292862_2.fastq.gz \
+        -o SRR292862_1.trim.fastq.gz \
+        -O SRR292862_2.trim.fastq.gz \
+        -h SRR292862.fastp.html \
+        -j SRR292862.fastp.json \
+        2> SRR292862.fastp.log
     ```
 
     ***Optional***
@@ -246,9 +232,15 @@ The preceeding step will guide us on the possible filtering and trimming operati
 
 #### ***Consensus genome assembly***  
 
-Generate consensus genome sequences
+Generate consensus genome sequences  
 
+1. Change into the `spades` directory
     ```
+    cd /var/scratch/$USER/ilri-africa-cdc-training/results/spades/
+    ```
+
+2. Runt `Spades` to perform genome assembly
+    ``` 
     spades.py -k 27 \
 	-1 ./data/fastp/SRR292770_1.trim.fastq.gz \
 	-2 ./data/fastp/SRR292770_2.trim.fastq.gz \
