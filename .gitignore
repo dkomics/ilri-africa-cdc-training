@@ -1,7 +1,7 @@
 docs/
 *.fastq.gz
 bacteria/data/*/*
-metagenomics/data/*/*
+viralMetagen/data/*/*
 slurm*
 *.sh.swp
 *.sif
