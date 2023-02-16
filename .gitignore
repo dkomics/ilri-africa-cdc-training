@@ -4,3 +4,4 @@ bacteria/data/*/*
 metagenomics/data/*/*
 slurm*
 *.sh.swp
+*.sif
