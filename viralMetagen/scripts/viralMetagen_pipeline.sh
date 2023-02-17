@@ -14,8 +14,6 @@ mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowt
 ## Data from this project: Open-Source Genomic Analysis of Shiga-Toxin–Producing E. coli O104:H4 (https://www.nejm.org/doi/full/10.1056/NEJMoa1107643)
 wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
 wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/sample01/sample01_R1.fastq.gz -P ./data/fastq
-#wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/sample01/sample01_R2.fastq.gz -P ./data/fastq
 
 ### Setting variables for in put
 ##PROJDIR=$PWD
@@ -39,8 +37,9 @@ module load snpeff/4.1g
 module load bcftools/1.13
 
 ## Step 3
-### Copying the data fastq
-cp /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/fastq/sample01_R* ./fastq/
+### Copying the data fastq and databases
+cp /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/fastq/sample01_R* ./data/fastq/
+cp /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/database/ ./data/databse
 
 ## Step 4
 ### Assessing Read Quality using fastqc before quality trimming
@@ -331,13 +330,66 @@ done
 ## Annotation of Variants - SnpEff and SnpSift
 
 ## How to build a SnpEff Database:
+# Building a snpEff Database:
 
+mkdir -p ./data/database/snpEff/H1N1/
+cp ./data/database/refseq/influenzaA.gff ./data/database/snpEff/H1N1/genes.gff
+cp ./data/database/refseq/influenzaA.fna ./data/database/snpEff/H1N1/sequences.fa
+echo -e "# Influenza A virus genome, version influezaA\nH1N1.genome: H1N1" > ./data/database/snpEff/H1N1/snpEff.config
+#Alternative 01 - Build
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar build \\
+	-config ./data/database/snpEff/H1N1/snpEff.config \\
+	-dataDir ./../ \\
+	-gff3 \\
+	-v H1N1
 
+# Alternative 02 - Download Pre-built database:
+# Check databases for right target
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar databases > viralMetagen/data/database/snpEff/snpeff.databases.txt
+# Download target
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar download -v <genome_version>
+
+## Annotate the variants VCF file with snpEff
 for varFile in $(find ./data/ivar/variants -name "*.vcf.gz")
 do
-	fileName=`basename -- "$varFile"`
+	fileName01=`basename -- "$varFile"`
+	fileName=${fileName01%.*}
 	outName=${fileName%.*}
-	java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar
+	java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar \
+		-config ./data/database/snpEff/H1N1/snpEff.config \
+		-dataDir ./../ \
+		-v H1N1 ${varFile} > ./data/ivar/variants/${outName}.ann.vcf
+
+	# Rename summary.html and genes.txt
+	mv ./snpEff_summary.html ./data/ivar/variants/${outName}.ann.summary.html
+	mv ./snpEff_genes.txt ./data/ivar/variants//${outName}.ann.genes.txt
+	
+	#Compress vcf
+	bgzip -c ./data/ivar/variants/${outName}.ann.vcf > ./data/ivar/variants/${outName}.ann.vcf.gz
+	#Create tabix index - Samtools
+	tabix -p vcf -f ./data/ivar/variants/${outName}.ann.vcf.gz
+	#Generate VCF files
+	bcftools stats ./data/ivar/variants/${outName}.ann.vcf.gz > ./data/ivar/variants/${outName}.ann.stats.txt
 done
 
-
+## Filter the most significant variants using snpSift
+for varFile in $(find ./data/ivar/variants -name "*.ann.vcf.gz")
+do
+	fileName01=`basename -- "$varFile"`
+	fileName=${fileName01%.*}
+	outName=${fileName%.*}
+	java -Xmx4g -jar /export/apps/snpeff/4.1g/SnpSift.jar \
+		extractFields \
+		-s "," \
+		-e "." \
+		${varFile} \
+		"ANN[*].GENE" "ANN[*].GENEID" \
+		"ANN[*].IMPACT" "ANN[*].EFFECT" \
+		"ANN[*].FEATURE" "ANN[*].FEATUREID" \
+		"ANN[*].BIOTYPE" "ANN[*].RANK" "ANN[*].HGVS_C" \
+		"ANN[*].HGVS_P" "ANN[*].CDNA_POS" "ANN[*].CDNA_LEN" \
+		"ANN[*].CDS_POS" "ANN[*].CDS_LEN" "ANN[*].AA_POS" \
+		"ANN[*].AA_LEN" "ANN[*].DISTANCE" "EFF[*].EFFECT" \
+		"EFF[*].FUNCLASS" "EFF[*].CODON" "EFF[*].AA" "EFF[*].AA_LEN" \
+		> ./data/ivar/variants/${outName}.snpsift.txt
+done
