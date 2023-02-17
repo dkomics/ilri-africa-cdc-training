@@ -121,8 +121,25 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 
 **Tip:** *How do you Build or access a centrifuge Database?*
 ---
+#### Alterantive 01
+Download NCBI Taxonomy to ./taxonomy/
+```
+centrifuge-download -o taxonomy taxonomy
+```
+Download All complete archaea,bacteria,viral to `./library/`. Downloads from ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq availabble domains are: archaea,bacteria,viral,plasmid,fungi,vertebrate_mammalian,vertebrate_other,protozoa,plasmid,plant,metagenomes,mitochondrion,invertebrate,...
+```
+centrifuge-download -o library \
+	-m \
+	-d "archaea,bacteria,viral,plasmid,fungi" refseq > seqid2taxid.map
+```
+#### Alternative 02
+Build a database - Preffered alternative
+```
+wget https://zenodo.org/record/3732127/files/h+p+v+c.tar.gz?download=1
+tar -xvzf hpvc.tar.gz 
+cd ../../../
+```
 ---
-
 ### Visualise the Taxonomic classification results with krona tools
 Convert centrifuge report to kraken-like report
 ```
@@ -143,6 +160,12 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 
 **Tip:** *How do you Build or access a centrifuge Database?*
 ---
+#Build krona db
+```
+mkdir ./data/database/krona
+apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
+	ktUpdateTaxonomy.sh ./data/database/krona/taxonomy
+```
 ---
 
 ## Step 8: Filter Host Genome in preparation for genome assembly
@@ -165,6 +188,36 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 ```
 **Tip:** *How do you build or access a host genome database - kraken2*
 ---
+#### Alteranive 01: Build host genome database
+Download genome (human)
+```
+kraken2-build --download-library human \
+	--db ./ \
+	--threads 4
+```
+Downloading NCBI tax
+```
+kraken2-build --download-taxonomy \
+	--db ./
+```
+Build database
+```
+kraken2-build --build \
+	--db ./ \
+       	--threads 4
+```
+Removing intermediate files to save space
+```
+kraken2-build --clean \
+	--db ./
+```
+
+#### Alternative 02: Download prebuilt database
+```
+curl -L -o ./kraken2_human_db.tar.gz https://ndownloader.figshare.com/files/23567780
+tar -xzvf kraken2_human_db.tar.gz
+cd ../../../
+```
 ---
 
 ## Lets Focus on the target pathogenic virus species: H1N1 - Influenza A Virus
@@ -348,6 +401,34 @@ done
 ```
 **Tip:** *How do you build a SnpEff Databse?*
 ---
+#### Alternative 01 - Build a snpEff Database:
+Set up reference genome and annotation and snpEff.config file
+```
+mkdir -p ./data/database/snpEff/H1N1/
+cp ./data/database/refseq/influenzaA.gff ./data/database/snpEff/H1N1/genes.gff
+cp ./data/database/refseq/influenzaA.fna ./data/database/snpEff/H1N1/sequences.fa
+echo -e "# Influenza A virus genome, version influezaA\nH1N1.genome: H1N1" > ./data/database/snpEff/H1N1/snpEff.config
+```
+Build the databse
+```
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar build \\
+	-config ./data/database/snpEff/H1N1/snpEff.config \\
+	-dataDir ./../ \\
+	-gff3 \\
+	-v H1N1
+```
+
+#### Alternative 02 - Download Pre-built database:
+Check databases for right target
+```
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar databases > viralMetagen/data/database/snpEff/snpeff.databases.txt
+less -S viralMetagen/data/database/snpEff/snpeff.databases.txt
+```
+
+Download target
+```
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar download -v <genome_version>
+```
 ---
 
 ## Step 20: Filter the most significant variants using snpSift
