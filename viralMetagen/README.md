@@ -50,9 +50,9 @@ cp /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/databas
 ---
 <details close>
   <summary>Tip</summary>
-  Downloading data from SRA matich the SRR23143759_1
-  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
-  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq
+  Downloading data from SRA matich the SRR23143759_1<br>
+  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq<br>
+  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq<br>
 </details>
 
 ---
