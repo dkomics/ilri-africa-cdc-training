@@ -2,7 +2,7 @@
 title: viralMetagen.md
 tags: ["Viral Genomics", "H1N1", "segmented viral genome", "Bioinformatics", "Metadata", "Linux", "Analysis", "Tutorial"]
 ---
-# **Building capacity Afica Pathogen Genomics: Influenza A Virus - Segmented Virus**
+# **Building capacity Africa Pathogen Genomics: Influenza A Virus - Segmented Virus**
 ---
 ###### ***Trainers***: [John Juma](https://github.com/ajodeh-juma), [Kennedy Mwangi](https://github.com/wanjauk) & [Gilbert Kibet](https://github.com/kibet-gilbert)
 ---
@@ -19,8 +19,8 @@ interactive -w compute06 -c 8 -J metagen -p batch
 
 ## Step 1 : Preparing the project directory:
 ```
-mkdir -p ilri-africa-cdc-training/metagenomics/{data,scripts}
-cd ilri-africa-cdc-training/metagenomics/
+mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
+cd ilri-africa-cdc-training/viralMetagen/
 mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff}
 ```
 
@@ -41,9 +41,9 @@ module load bcftools/1.13
 ```
 ## Step 3: Copying the data fastq and databases
 ```
-cp /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/fastq/sample01_R* ./data/fastq/
-cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/database/ ./data/databse
-cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/scripts/* ./scripts/
+cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
+cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/ ./data/databse
+cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
 
 ```
 
@@ -69,7 +69,7 @@ fastqc -t 4 \
 
 You can proceed and copy fastqc output files to local laptop --- Run this command on your laptop not HPC
 ```
-# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/metagenomics/data/fastqc/*.html ./
+# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 ```
 
 ## Step 5: Quality Trimming fastq files with fastp and Trims adapter sequences
@@ -99,7 +99,7 @@ fastqc -t 4 \
 
  Copy the trimmed fastqc output files to local laptop --- Run this command on your laptop not HPC
 ```
-# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/metagenomics/data/fastqc/*.html ./
+# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 ```
 
 ## Step 7 (Optional): Taxonomic Classification of Reads

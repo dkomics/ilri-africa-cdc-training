@@ -6,8 +6,8 @@ interactive -w compute06 -c 8 -J metagen -p batch
 
 ## Step 1
 ## Preparing the project directory:
-mkdir -p ilri-africa-cdc-training/metagenomics/{data,scripts}
-cd ilri-africa-cdc-training/metagenomics/
+mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
+cd ilri-africa-cdc-training/viralMetagen/
 mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff}
 
 ## Downloading data from SRA matich the SRA039136 
@@ -38,8 +38,8 @@ module load bcftools/1.13
 
 ## Step 3
 ### Copying the data fastq and databases
-cp /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/fastq/sample01_R* ./data/fastq/
-cp /var/scratch/global/gkibet/ilri-africa-cdc-training/metagenomics/data/database/ ./data/databse
+cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
+cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/ ./data/databse
 
 ## Step 4
 ### Assessing Read Quality using fastqc before quality trimming
@@ -49,7 +49,7 @@ fastqc -t 4 \
 	./data/fastq/sample01_R2.fastq.gz
 
 ## Copying files to local laptop --- Run this command on your laptop not HPC
-# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/metagenomics/data/fastqc/*.html ./
+# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 
 ## Step 5
 ### Quality Trimming fastq files with fastp and Trims adapter sequences
@@ -76,7 +76,7 @@ fastqc -t 4 \
 	./data/fastp/sample01_R2.trim.fastq.gz
 
 ## Copying files to local laptop --- Run this command on your laptop not HPC
-# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/metagenomics/data/fastqc/*.html ./
+# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 
 ## Step 7
 ## Taxonomic Classification of Reads
