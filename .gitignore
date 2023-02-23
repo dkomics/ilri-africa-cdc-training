@@ -1,7 +1,7 @@
 # artic-ont
-artic-ont/data/*
-artic-ont/output/*
-artic-ont-viral/genomes/*
+data/*
+output/*
+genomes/*
 *.DS_Store
 *.idea
 docs/
@@ -11,4 +11,3 @@ viralMetagen/data/*/*
 slurm*
 *.sh.swp
 *.sif
-
