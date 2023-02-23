@@ -1,5 +1,14 @@
-artic-ont-viral/data/
-artic-ont-viral/output/
-artic-ont-viral/genomes/
+# artic-ont
+artic-ont/data/*
+artic-ont/output/*
+artic-ont-viral/genomes/*
 *.DS_Store
 *.idea
+docs/
+*.fastq.gz
+bacteria/data/*/*
+viralMetagen/data/*/*
+slurm*
+*.sh.swp
+*.sif
+
