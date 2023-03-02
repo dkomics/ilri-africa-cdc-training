@@ -10,8 +10,8 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
 - [**Building capacity in pathogen genomics in Africa**](#building-capacity-in-pathogen-genomics-in-africa)
           - [***Trainers***: John Juma, Kennedy Mwangi \& Gilbert Kibet](#trainers-john-juma-kennedy-mwangi--gilbert-kibet)
   - [Introduction](#introduction)
-  - [Scope](#scope)
   - [Background](#background)
+  - [Scope](#scope)
   - [Prerequisite](#prerequisite)
     - [Set-Up](#set-up)
     - [Preparations](#preparations)
@@ -24,7 +24,7 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
       - [***Quality assessment***](#quality-assessment)
       - [***Quality and adapter filtering***](#quality-and-adapter-filtering)
       - [***bcftools***](#bcftools)
-      - [***Consensus genome assembly***](#consensus-genome-assembly)
+      - [***Generate consensus genome sequences***](#generate-consensus-genome-sequences)
       - [***Genome assessment***](#genome-assessment)
       - [***Genome annotation***](#genome-annotation)
       - [***Organism identification***](#organism-identification)
@@ -33,19 +33,19 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
 
 
 ## Introduction
-
-
-## Scope
-In this workshop we will tackle, hands-on, the basic principles employed by the numerous bioinformatic pipelines: to generate consensus genome sequences of *E. coli* and identify variants using an actual dataset generated in our facility.
+*E. coli* are ubiquitous bacteria found in the environment including the gut of humans and other animals and consists of numerous types and strains. Most types of *E. coli* are normal inhabitants of the gut of animals and do not cause diseases. However, some of the strains of *E. coli* have acquired genes that enable them to cause disease. These strains are commonly associated with food poisoning leading to diarrhoea and are referred to as diarrheagenic *E. coli* (DEC). Transmission occurs primarily through contaminated food but can also accur via person-to-person transmission, animal contact and water. Shiga toxin-producing *E. coli* (STEC) serotype O157:H7 causes bloody diarrhoea and has previosuly been responsible for outbreaks worldwide.  
 
 > **Note**
 
-> This is part of the initiative fronted by the [Africa CDC](https://africacdc.org/) with generous support from the <add org here> to build capacity in pathogen genomics in Africa.
+> This training workshop was organized by the Africa Centers for Disease Control & Prevention (Africa CDC) jointly with the African Society for Laboratory Medicine (ASLM) and the International Livestock Research Institute (ILRI) in Kenya to build capacity in pathogen genomic surveillance in Africa.
 
 
 ## Background
+In May and June of 2011, an *E. coli* outbreak occured in Germany infecting more than 3,000 people and causing more than 40 deaths. Public health officials set in motion efforts aimed at identifying the strain of *E. coli* involved and its pathogenic potential. Part of these efforts involved sequencing of DNA samples of the isolated strain on the Illumina HiSeq platform.
 
 
+## Scope
+In this workshop we will tackle, hands-on, the basic principles employed to generate consensus genome sequences of *E. coli* that caused the outbreak in Germany, and identify the serotypes involved in outbreaks, virulence factors, and possible anti-microbial resistance genes (AMRs). We will use the genome sequencing data of an isolate from a 16-year-old girl admitted to hospital with bloody diarrhea and abdominal pain.
 
 ## Prerequisite
 
@@ -56,7 +56,7 @@ This module will come after the introductory Linux module and therefore assumes 
 >Once inside the `hpc`, all instances of ```$USER``` will be equivalent to the hpc username that you were assigned, for example `Bio4Info$$`. Your username, by default, is stored in a variable called `USER`. By using it, you will not have to type-in your username, rather, your shell will automatically pick your username which is the value stored in the `USER` variable. The `$` (dollar) character-prefix to a variable name is used to call the value of that variable.
 
 ### Set-Up
-We will use the computer lab at ILRI, which is already equipped with Linux-operating desktop computers. Since we will be working from the remote servers, we will not need special setup for personal laptops. However, toward the end of the program, we can look into access to a Linux server from a Windows PC; or how to install a Linux (sub)system for any interested persons.
+We will use the computer lab at ILRI, which is already equipped with Linux-operating desktop computers. Since we will be working from the remote servers, we will not need special setup for personal laptops. However, toward the end of the program, we can look into access to a Linux server from a Windows PC; or how to install a Linux (sub)system for any interested persons.  
 
 ### Preparations
 
@@ -81,20 +81,20 @@ interactive -w compute05
 
 #### ***Project organisation***
 
-1. We then change into the `compute05` `scratch` directory to create our project directory. Using the option`-p` (parent) `mkdir` will create any missing intermediate directories.
+1. We then change into the `compute05` `scratch` directory to create our project directory. Using the option`-p`, (parent) `mkdir` will create any missing intermediate directories.
     ```
     cd /var/scratch/
     mkdir -p $USER/bacteria-wgs
     cd $USER/bacteria-wgs
     ```
-2. The `<directories to soft-link>` directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
+2. The `databases, scripts` directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
 
     ```
     ln -s /var/scratch/global/bacteria-wgs/[sd]* .
     ```
-3. We will create the directories `data`, `results` and `genome` to store raw data in ```fastq``` format, output and reference genomes respectively. Intermediate output files per `tool/software` will be created within the `results` directory. We will exploit the bash array data structure to create all the directories at once.
+3. We will create the directories `results` and `genome` to store output and reference genomes respectively. Intermediate output files per `tool/software` will be created within the `results` directory. We will exploit the bash array data structure to create all the directories at once.
     ```
-    mkdir -p data genome results
+    mkdir -p genome results
     mkdir -p results/{fastqc,fastp,spades,quast,busco,prokka,bwa,blast,rgi}
     ```
 4. List the contents of the `data/raw_data` directory, from where we will retrieve our ```fastq``` files.
@@ -143,22 +143,25 @@ interactive -w compute05
 
 #### ***Loading modules***
 
-1. Load modules using the `module load <tool-name>`command.
+1. Load modules using the `module load <tool-name>` command.
     ```
     module load fastqc/0.11.7
     module load fastp/0.22.0
-    
     ```
 
-    **Optional**
+    **Optional**  
     The above modules can also be loaded using a single command
     ```
     module load fastqc/0.11.7 fastp/0.22.0 
     ```
-2. To list the loaded modules, type the below command.
+2. To list the loaded modules, type the command below.
     ```
     module list
     ```
+3. To unload the modules, type the command below
+   ```
+   module purge
+   ```
 
 #### ***Prepare the reference genome***
 
@@ -170,7 +173,11 @@ interactive -w compute05
 
     samtools faidx ecoli_k12_substrain_genome.fasta
     ```
-    The above command generates the index for reference genome with the name `ecoli_k12_substrain_genome.fasta.fai`.
+    The above command generates the index for reference genome with the name `ecoli_k12_substrain_genome.fasta.fai`.  
+
+    >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>**  
+    - What is the size of the *E. coli* genome?  
+  
 2. We can take a sneak-view of the generated file and manipulate it for fun, say, to extract the genome size of reference fasta. This can be extracted from the `faidx`-indexed genome file using the ```cut``` command. The ```-f``` specifies the field(s) of interest.
     ```
     cut -f 1,2 ecoli_k12_substrain_genome.fasta.fai > ecoli_k12_substrain_genome.fasta.sizes
@@ -185,7 +192,7 @@ interactive -w compute05
     ```
 
 #### ***Quality assessment***
-[`FastQC`](https://www.youtube.com/watch?v=bz93ReOv87Y)  is a common tool for Illumina read quality checks. The basic statistics from this report include `total sequences`, `sequence length` and `%GC`. Another 10 measures of quality are also graphically represented. Your experimental design will be crirical in interpreting `FastQC` reports. This step is very important for the subsequent data processes, especially at initial optimisation steps.
+[`FastQC`](https://www.youtube.com/watch?v=bz93ReOv87Y)  is a common tool for Illumina read quality checks. The basic statistics from this report include `total sequences`, `sequence length` and `%GC`. Another 10 measures of quality are also graphically represented. Your experimental design will be critical in interpreting `FastQC` reports. This step is very important for the subsequent data processes, especially at initial optimisation steps.
 
 
 1. Change into the results ```fastqc``` directory
@@ -227,9 +234,10 @@ The preceeding step will guide us on the possible filtering and trimming operati
     ```
 
  
-#### ***Consensus genome assembly***  
+#### ***Generate consensus genome sequences***  
 
-Generate consensus genome sequences  
+Note that for genome assembly, the parameters are adjusted accordingly until a desirable draft genome assembly is achieved. 
+  
 
 ```
 module load spades/3.15
@@ -246,7 +254,7 @@ module load spades/3.15
 	-1 /var/scratch/$USER/bacteria-wgs/results/fastp/SRR292862_1.trim.fastq.gz \
 	-2 /var/scratch/$USER/bacteria-wgs/results/fastp/SRR292862_2.trim.fastq.gz \
 	-o ./ \
-	-t 8 \
+	-t 1 \
 	-m 384
     ```
 
