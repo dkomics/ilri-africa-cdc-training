@@ -6,14 +6,23 @@ interactive -w compute06 -c 8 -J metagen -p batch
 
 ## Step 1
 ## Preparing the project directory:
-mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
-cd ilri-africa-cdc-training/viralMetagen/
-mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff}
+cd /path/to/ilri-africa-cdc-training/
+mkdir -p ./viralMetagen/{data,scripts}
+cd ./viralMetagen/
+mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
 
-## Downloading data from SRA matich the SRA039136 
-## Data from this project: Open-Source Genomic Analysis of Shiga-Toxin–Producing E. coli O104:H4 (https://www.nejm.org/doi/full/10.1056/NEJMoa1107643)
+## Accessing data:
+# Data used in this workflow would be data from an Illumina platform sequencer. The library preparation would be that of a metagenomic workflow. The pathogen (Virus/Bacteria) was sequenced directly from a clinical or environmental sample or isolated by culturing in a selective media (Bacteria) or innoculated & cultured in a selective cell line (Viruses)
+
+## We have two datasets:
+### 1. Data from a clinical sample from a H1N1 case in Kenya.
+### 2. Data downloaded from SRA - Accession No# SRA415650 - Data for follow-up Execise session
+## Data from this SRA project: SRP415650 - Influenza A virus Genome sequencing and assembly. Genome sequencing and assembly of Influenza A virus from Washington State USA 2022-2023
+### How SRA data can be accessed:
 wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
 wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq
+
+### The data to be used in this tutirial is from a clinical sample H1N1 case in Kenya.
 
 ### Setting variables for in put
 ##PROJDIR=$PWD
@@ -35,11 +44,17 @@ module load bowtie2/2.5.0
 module load bedtools/2.29.0
 module load snpeff/4.1g
 module load bcftools/1.13
+module load nextclade/2.11.0
+
+### Check if modules have been loaded:
+module list
 
 ## Step 3
 ### Copying the data fastq and databases
 cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
-cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/ ./data/databse
+
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/database/
+#cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/databaseV1
 
 ## Step 4
 ### Assessing Read Quality using fastqc before quality trimming
@@ -51,8 +66,13 @@ fastqc -t 4 \
 ## Copying files to local laptop --- Run this command on your laptop not HPC
 # scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 
+## Example fastqc html output can be found in this links: 
+#sample01_R1_fastqc.html https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1_fastqc.html
+#sample01_R2_fastqc.html https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2_fastqc.html
+
+
 ## Step 5
-### Quality Trimming fastq files with fastp and Trims adapter sequences
+### Quality Trimming fastq files with fastp and Trims adapter sequences and removes duplicate reads
 fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--in2 ./data/fastq/sample01_R2.fastq.gz \
 	--out1 ./data/fastp/sample01_R1.trim.fastq.gz \
@@ -65,7 +85,11 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--qualified_quality_phred 20 \
 	--cut_mean_quality 20 \
 	--length_required 15 \
-	2> ./data/fastp/sample01.fastp.log
+	--thread 4 \
+	--dedup \
+	|& tee ./data/fastp/sample01.fastp.log
+
+### Summary of fastp output can be found in this link: https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html
 
 ## Step 6
 ### Assessing Read Quality after quality trimming
@@ -78,65 +102,14 @@ fastqc -t 4 \
 ## Copying files to local laptop --- Run this command on your laptop not HPC
 # scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 
+## Example fastqc html output can be found in this links:
+#sample01_R1.trim_fastqc.html https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html 
+#sample01_R2.trim_fastqc.html https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2.trim_fastqc.html
+
 ## Step 7
-## Taxonomic Classification of Reads
-
-mkdir data/database/centrifuge/
-cd data/database/centrifuge/
-# Build Database:
-# apptainer pull docker://quay.io/biocontainers/centrifuge:1.0.4_beta--he513fc3_5
-
-## Alterantive 01
-# Download NCBI Taxonomy to ./taxonomy/
-centrifuge-download -o taxonomy taxonomy
-# Download All complete archaea,bacteria,viral to ./library/
-# Downloads from ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq availabble domains are: archaea,bacteria,viral,plasmid,fungi,vertebrate_mammalian,vertebrate_other,protozoa,plasmid,plant,metagenomes,mitochondrion,invertebrate,...
-centrifuge-download -o library \
-	-m \
-	-d "archaea,bacteria,viral,plasmid,fungi" refseq > seqid2taxid.map
-
-## Alternative 02
-# Prepare a database - Preffered alternative
-wget https://zenodo.org/record/3732127/files/h+p+v+c.tar.gz?download=1
-tar -xvzf hpvc.tar.gz 
-cd ../../../
-
-## Step 8
-# Classification
-centrifuge -x ./data/database/centrifuge/hpvc \
-	-1 ./data/fastp/sample01_R1.trim.fastq.gz \
-	-2 ./data/fastp/sample01_R2.trim.fastq.gz \
-	--report-file ./data/centrifuge/sample01-report.txt \
-	-S ./data/centrifuge/sample01-results.txt \
-	-p 8 \
-	--mm 100GB
-
-## Step 9
-#Convert centrifuge report to kraken-like report
-centrifuge-kreport -x ./data/database/hpvc \
-	./data/centrifuge/sample01-results.txt > ./data/centrifuge/sample01-kreport.txt
-
-#Visualization of the taxonomic report using krona
-# Load module
-
-## Step 10
-## Visualizing the classification report
-#Preparing the classification data
-cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/centrifuge/sample01-results.krona
-#Build krona db
-mkdir ./data/database/krona
-apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
-	ktUpdateTaxonomy.sh ./data/database/krona/taxonomy
-
-#Visiualize the report - create a HTML file
-apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
-	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
-	-o ./data/centrifuge/sample01-results.html \
-	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
-
-## Step 11
 ### Filter Host Genome in preparation for genome assembly
 
+### Build the human host genome database
 mkdir ./data/database/host_db
 cd ./data/database/host_db
 ## Alteranive 01
@@ -161,7 +134,7 @@ curl -L -o ./kraken2_human_db.tar.gz https://ndownloader.figshare.com/files/2356
 tar -xzvf kraken2_human_db.tar.gz
 cd ../../../
 
-## Step 12
+## Step 8
 #filtering Host genome seqiuences 
 kraken2 -db ./data/database/host_db/kraken2_human_db \
 	--threads 4 \
@@ -173,6 +146,62 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 	--report-zero-counts \
 	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
 	./data/fastp/sample01_R2.trim.fastq.gz
+
+## Step 9
+## Taxonomic Classification of Reads
+
+mkdir data/database/centrifuge/
+cd data/database/centrifuge/
+# Build Database:
+# apptainer pull docker://quay.io/biocontainers/centrifuge:1.0.4_beta--he513fc3_5
+
+## Alterantive 01
+# Download NCBI Taxonomy to ./taxonomy/
+centrifuge-download -o taxonomy taxonomy
+# Download All complete archaea,bacteria,viral to ./library/
+# Downloads from ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq availabble domains are: archaea,bacteria,viral,plasmid,fungi,vertebrate_mammalian,vertebrate_other,protozoa,plasmid,plant,metagenomes,mitochondrion,invertebrate,...
+centrifuge-download -o library \
+	-m \
+	-d "archaea,bacteria,viral,plasmid,fungi" refseq > seqid2taxid.map
+
+## Alternative 02
+# Prepare a database - Preffered alternative
+wget https://zenodo.org/record/3732127/files/h+p+v+c.tar.gz?download=1
+tar -xvzf hpvc.tar.gz 
+cd ../../../
+
+## Step 10
+# Classification
+centrifuge -x ./data/database/centrifuge/hpvc \
+	-1 ./data/kraken/sample01.unclassified_1.fastq \
+	-2 ./data/kraken/sample01.unclassified_2.fastq \
+	--report-file ./data/centrifuge/sample01-report.txt \
+	-S ./data/centrifuge/sample01-results.txt \
+	-p 8 \
+	--mm 100GB
+
+## Step 11
+#Convert centrifuge report to kraken-like report
+centrifuge-kreport -x ./data/database/hpvc \
+	./data/centrifuge/sample01-results.txt > ./data/centrifuge/sample01-kreport.txt
+
+#Visualization of the taxonomic report using krona
+# Load module
+
+## Step 12
+## Visualizing the classification report
+#Preparing the classification data
+cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/centrifuge/sample01-results.krona
+#Build krona db
+mkdir ./data/database/krona
+apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
+	ktUpdateTaxonomy.sh ./data/database/krona/taxonomy
+
+#Visiualize the report - create a HTML file
+apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
+	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
+	-o ./data/centrifuge/sample01-results.html \
+	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
 
 ## ## Notes
 ## ### Denovo Genome Assembly using Spades
@@ -250,7 +279,7 @@ Rscript ./scripts/plotGenomecov.R ./data/bowtie/sample01.coverage
 
 ## Step 20
 ## Consensus Genome construsction
-# For segmented viruses e.g Influenza A ivar consensus is unable to analyse more than one reference (segment/cromosome) name at once. We need to split by reference:
+# For segmented viruses e.g Influenza A ivar consensus is unable to analyse more than one reference (segment/chromosome) name at once. We need to split by reference:
 bamtools split -in data/bowtie/sample01.sorted.bam \
 	-refPrefix "REF_" \
 	-reference
@@ -280,6 +309,10 @@ do
 		-n N \
 		-p ./data/ivar/consensus/${outName}.consensus
 done
+
+## Merge all segments into one file
+
+cat ./data/ivar/consensus/*.fa >> ./data/ivar/consensus/sample01.consensus.fa
 
 ## Step 22
 ## Loop through seqmented BAM files and conduct Variant Calling from the alignemnts
@@ -393,3 +426,30 @@ do
 		"EFF[*].FUNCLASS" "EFF[*].CODON" "EFF[*].AA" "EFF[*].AA_LEN" \
 		> ./data/ivar/variants/${outName}.snpsift.txt
 done
+
+## Step 25
+## Nextclade Clade assignment:
+
+### Step 25.1
+## Get the reference data
+
+mkdir -p ./data/database/nextclade/
+
+### List available nextclade datasets:
+nextclade dataset list
+
+### Select and Download latest H1N1 datasets
+nextclade dataset get \
+	--name 'flu_h1n1pdm_ha' \
+	--reference 'CY121680' \
+	--output-dir ./data/database/nextclade/
+
+### Perform Clade assignment:
+nextclade run \
+	--input-fasta ./data/ivar/consensus/sample01.consensus.fa \
+	--input-dataset ./data/database/nextclade/ \
+	--output-csv ./data/nextclade/sample01.nextclade.csv \
+	--output-tree ./data/nextclade/sample01.nextclade.auspice.json \
+	--output-dir ./data/nextclade/ \
+	--output-basename ./data/nextclade/sample01.nextclade. \
+	2> ./data/nextclade/sample01.nextclade.log
