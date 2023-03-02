@@ -147,6 +147,9 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
 	./data/fastp/sample01_R2.trim.fastq.gz
 
+### compress (gzip) output fastq files for downstream analysis
+gzip data/kraken/*.fastq
+
 ## Step 9
 ## Taxonomic Classification of Reads
 
