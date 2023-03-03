@@ -75,6 +75,10 @@ module load snpeff/4.1g
 module load bcftools/1.13
 module load nextclade/2.11.0
 ```
+Check if modules have been loaded:
+```
+module list
+```
 ## Step 3: Copying the data fastq and databases
 ```
 cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
