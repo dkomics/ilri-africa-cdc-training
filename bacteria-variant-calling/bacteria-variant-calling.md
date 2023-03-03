@@ -27,14 +27,14 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
 
 
 ## Introduction
-
+*E. coli* are ubiquitous bacteria found in the environment including the gut of humans and other animals and consists of numerous types and strains. Most types of *E. coli* are normal inhabitants of the gut of animals and do not cause diseases. *E. coli* one of the most well-studied model organisms in science. The genetics of *E. coli* are fairly well understood and can be manipulated to study adaptation and evolution.
 
 ## Scope
-In this workshop we will tackle, hands-on, the basic principles employed by the numerous bioinformatic pipelines: to generate consensus genome sequences of *E. coli* and identify variants using an actual dataset generated in our facility.
+In this workshop we will tackle, hands-on, the basic bioinformatics principles employed study assess adaptation in *E. coli*. The data we will use comes from a long-term evolution experiment involving *E. coli* propagated for more than 40,000 generations in a glucose-limited minimal medium but that was supplemented with citrate which *E. coli* cannot metabolize in the aerobic conditions. A citrate using variant of *E. coli* emerged leading to an increase in population size and diversity. The variant also had hypermutability in certain regions of it's genome.
 
 > **Note**
 
-> This is part of the initiative fronted by the [Africa CDC](https://africacdc.org/) with generous support from the <add org here> to build capacity in pathogen genomics in Africa.
+> This training workshop was organized by the Africa Centers for Disease Control & Prevention (Africa CDC) jointly with the African Society for Laboratory Medicine (ASLM) and the International Livestock Research Institute (ILRI) in Kenya to build capacity in pathogen genomic surveillance in Africa.
 
 
 ## Background
@@ -140,26 +140,27 @@ interactive -w compute05
 ## Analysis
 
 #### ***Loading modules***
-
-1. Load modules using the `module load <tool-name>`command.
+1. Load modules using the `module load <tool-name>` command.
     ```
     module load fastqc/0.11.7
     module load trimmomatic/0.39
-    
     ```
 
-    **Optional**
+    **Optional**  
     The above modules can also be loaded using a single command
     ```
-    module load fastqc/0.11.7 trimmomatic/0.39 
+    module load fastqc/0.11.7 trimmomatic/0.39
     ```
-2. To list the loaded modules, type the below command.
+2. To list the loaded modules, type the command below.
     ```
     module list
     ```
+3. To unload the modules, type the command below
+   ```
+   module purge
+   ```
 
 #### ***Prepare the reference genome***
-
 
 1. While still in the `genome` directory, we will index the reference sequence using samtools' `faidx`. Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for samtools' operations.
 
@@ -168,11 +169,19 @@ interactive -w compute05
 
     samtools faidx ecoli_rel606.fasta
     ```
-    The above command generates the index for reference genome with the name `ecoli_rel606.fasta.fai`.
+    The above command generates the index for reference genome with the name `ecoli_rel606.fasta.fai`  
+
+    View the content of the file we just created. 
+    ```
+    less -S ecoli_k12_substrain_genome.fasta.fai
+    ```
 2. We can take a sneak-view of the generated file and manipulate it for fun, say, to extract the genome size of reference fasta. This can be extracted from the `faidx`-indexed genome file using the ```cut``` command. The ```-f``` specifies the field(s) of interest.
     ```
     cut -f 1,2 ecoli_rel606.fasta.fai > ecoli_rel606.fasta.sizes
-    ```
+    ```  
+    >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>**
+    - What is the size of the *E. coli* genome?  
+    
 3. In order to allow easy access of genome regions during read mapping we will index the reference genome using ```bwa index``` command.
 
     ```
@@ -214,9 +223,9 @@ The preceeding step will guide us on the possible filtering and trimming operati
 2. Run ```trimmomatic```. `i,I` (input(s)) are for read1, read2; respectively. `o,O` (output(s)) are for the respective read1, read2; respectively. The `2>` construct redirects the standard error channel for saving as a log file.
 
 ```
-
     cp /export/apps/trimmomatic/0.39/adapters/NexteraPE-PE.fa .
-
+```
+```
     trimmomatic PE \
     /var/scratch/${USER}/bacteria-variant-calling/data/raw_data/SRR2584863_1.fastq.gz \
     /var/scratch/${USER}/bacteria-variant-calling/data/raw_data/SRR2584863_2.fastq.gz \
@@ -225,8 +234,6 @@ The preceeding step will guide us on the possible filtering and trimming operati
     SRR2584863_2.trim.fastq.gz \
     SRR2584863_2un.trim.fastq.gz \
     SLIDINGWINDOW:4:20 MINLEN:25 ILLUMINACLIP:NexteraPE-PE.fa:2:40:15
-
-
 ```
 
  #### ***Align reads to reference genome***   
@@ -335,7 +342,6 @@ Using `tview`.
     samtools tview \
     /var/scratch/${USER}/bacteria-variant-calling/results/bwa/SRR2584863.aligned.sorted.bam \
     /var/scratch/${USER}/bacteria-variant-calling/genome/ecoli_rel606.fasta
-
 ```  
 
 Using `igv`.  

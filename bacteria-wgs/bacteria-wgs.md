@@ -173,15 +173,20 @@ interactive -w compute05
 
     samtools faidx ecoli_k12_substrain_genome.fasta
     ```
-    The above command generates the index for reference genome with the name `ecoli_k12_substrain_genome.fasta.fai`.  
+    The above command generates the index for reference genome with the name `ecoli_k12_substrain_genome.fasta.fai`  
 
-    >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>**  
-    - What is the size of the *E. coli* genome?  
+    View the content of the file we just created. 
+    ```
+    less -S ecoli_k12_substrain_genome.fasta.fai
+    ``` 
   
 2. We can take a sneak-view of the generated file and manipulate it for fun, say, to extract the genome size of reference fasta. This can be extracted from the `faidx`-indexed genome file using the ```cut``` command. The ```-f``` specifies the field(s) of interest.
     ```
     cut -f 1,2 ecoli_k12_substrain_genome.fasta.fai > ecoli_k12_substrain_genome.fasta.sizes
     ```
+    >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>**
+    - What is the size of the *E. coli* genome? 
+    
 3. In order to allow easy access of genome regions during read mapping we will index the reference genome using ```bwa index``` command.
 
     ```
@@ -199,7 +204,11 @@ interactive -w compute05
     ```
     cd /var/scratch/$USER/bacteria-wgs/results/fastqc/
     ```
-2. Run ```fastqc```
+2. Load the `fastqc` tool
+   ```
+   module load fastqc/0.11.7
+   ```
+3. Run ```fastqc```
     ```
     fastqc \
         -t 1 \
@@ -219,7 +228,11 @@ The preceeding step will guide us on the possible filtering and trimming operati
     cd /var/scratch/$USER/bacteria-wgs/results/fastp/
     ```
 
-2. Run ```fastp```. `i,I` (input(s)) are for read1, read2; respectively. `o,O` (output(s)) are for the respective read1, read2; respectively. The `2>` construct redirects the standard error channel for saving as a log file.
+2. Load the `fastp` tool
+   ```
+   module load fastp/0.22.0
+   ```
+3. Run ```fastp```. `i,I` (input(s)) are for read1, read2; respectively. `o,O` (output(s)) are for the respective read1, read2; respectively. The `2>` construct redirects the standard error channel for saving as a log file.
 
     ```
     fastp \
@@ -237,18 +250,17 @@ The preceeding step will guide us on the possible filtering and trimming operati
 ### ***Generate consensus genome sequences***  
 
 Genome assembly refers to the process of putting back together the nucleotide sequences usually using short DNA sequences to create a representation of the original chromosome from which the sequences originated. The goal of genome assembly tools is to create long contiguous pieces of sequence (contigs) from short reads. The contigs are then ordered and oriented in relation to one another to form scaffolds. Genome assembly is a computationally intensive and difficult problem. The assembly tools have parameters that need to be tweaked and have a large effect on the outcome of any assembly. The parameters are adjusted accordingly until a desirable draft genome assembly is achieved. 
-  
-
-```
-    module load spades/3.15
-```
 
 1. Change into the `spades` directory
     ```
     cd /var/scratch/$USER/bacteria-wgs/results/spades/
     ```
 
-2. Run `Spades` to perform genome assembly
+2. Load `Spades`
+   ```
+   module load spades/3.15
+   ```
+3. Run `Spades` to perform genome assembly
     ``` 
     spades.py -k 27 \
 	-1 /var/scratch/$USER/bacteria-wgs/results/fastp/SRR292862_1.trim.fastq.gz \
@@ -278,6 +290,7 @@ Genome assessment entails producing the quality metrics that gauge both the comp
 
 1. #### ***Genome contiguity***  
     Genome contiguity is the length cutoff for the longest contigs that contain 50% of the total genome length. It is often measured as contig N50. We will use QAUST to keep track of the length of each contig and provides basic statistics. However, QUAST has many functionalities.
+
     ```
     module load quast/5.0.2
     ```
@@ -291,9 +304,12 @@ Genome assessment entails producing the quality metrics that gauge both the comp
 
 2. #### ***Genome completeness***  
     Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs). BUSCO makes use of the OrthoDB set of single-copy orthologous that are found in at least 90% of all the organisms in question. Ideally, the sequenced genome should contain most of these highly conserved genes. If your genome doesn't contain a large portion of these single-copy orthologs it may indicate that your genome is not complete. 
+
+    Load `BUSCO`
     ```
     module load BUSCO/5.2.2
-
+    ```
+    ```
     cd /var/scratch/$USER/bacteria-wgs/results/busco 
     ```
 
@@ -385,7 +401,6 @@ less -S /var/scratch/$USER/bacteria-wgs/results/blast/contigs.fasta.vs.nt.cul5.1
 ### ***Identification of virulence factors***
 Virulence factors are properties that enable a microbe to establish itself within a host and contribute to its potential to cause disease (pathogenecity). We will use  the virulence factor database (VFDB) which is an integrated and comprehensive resource for curating information about virulence factors of bacterial pathogens. Briefly, we will blast our contigs against the VFDB to identify sequences carrying known virulence factors.
 ```
-
     blastn \
     -query /var/scratch/$USER/bacteria-wgs/results/spades/contigs.fasta \
     -db /var/scratch/${USER}/bacteria-wgs/databases/VFDB/vfdb_seta_nt \
