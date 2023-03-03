@@ -4,30 +4,30 @@ tags: ["Pathogen genomics", "Genomic surveillance", "Bioinformatics", "Metadata"
 ---
 # **Dengue virus sequence data analysis using the artic workflow**
 ---
-###### ***Trainers***: [John Juma](https://github.com/ajodeh-juma), [Gilbert Kibet](https://github.com/kibet-gilbert) & [Kennedy Mwangi](https://github.com/wanjauk)
+###### ***Trainers***: [John Juma](https://github.com/ajodeh-juma), [Gilbert Kibet](https://github.com/kibet-gilbert) & [Kennedy Mwangi](https://github.com/ousodaniel)
 ---
 
-- [**Dengue virus sequence data analysis using the artic workflow**](#dengue-virus-sequence-data-analysis-using-the-artic-workflow)
-          - [***Trainers***: John Juma, Gilbert Kibet \& Kennedy Mwangi](#trainers-john-juma-gilbert-kibet--kennedy-mwangi)
-  - [Introduction](#introduction)
-  - [Scope](#scope)
-  - [Workflow](#workflow)
-  - [Background](#background)
-  - [Prerequisite](#prerequisite)
-    - [Set-Up](#set-up)
-    - [Preparation](#preparation)
-      - [***Log into the HPC***](#log-into-the-hpc)
-      - [***Project organisation***](#project-organisation)
-      - [***Fetching data from public databases***](#fetching-data-from-public-databases)
-      - [***Quality assessment***](#quality-assessment)
-      - [***Preprocessing size filtering***](#preprocessing-size-filtering)
-      - [***Alignment***](#alignment)
-      - [***Post-processing alignment***](#post-processing-alignment)
-      - [***Variant calling***](#variant-calling)
-      - [***Consensus building***](#consensus-building)
-        - [**VCF file format**](#vcf-file-format)
-      - [***Visualizing alignments with IGV***](#visualizing-alignments-with-igv)
-      - [***Compute coverage***](#compute-coverage)
+- [Introduction](#introduction)
+- [Scope](#scope)
+- [Workflow](#workflow)
+- [Background](#background)
+- [Prerequisite](#prerequisite)
+- [Set-Up](#setup)
+- [Preparations](#preparations)
+    - [Log into the HPC](#log-into-the-HPC)
+    - [Project Organisation](#project-organisation)
+    - [Fetching data from public databases](#fetching-data-from-public-databases)
+- [Analysis](#analysis)
+    - [Loading modules](#loading-modules)
+    - [Prepare the reference genome](#prepare-the-reference-genome)
+    - [Quality assessment](#quality-assessment)
+    - [Preprocessing size filtering](#preprocessing-size-filtering)
+    - [Alignment](#alignment)
+    - [Post-processing alignment](#post-processing-alignment)
+    - [Variant calling](#variant-calling)
+    - [Consensus building](#consensus-building)
+    - [Visualizing alignments with IGV](#visualizing-alignments-with-igv)
+    - [Phylogenetic analysis](#phylogenetic-analysis)
 
 
 ## Introduction
@@ -131,7 +131,7 @@ specified node within the computing cluster using the `-w` flag.
     ```
     mkdir genomes output
     mkdir -p genomes/DENV2
-    mkdir -p output/dataset-002/{fastqc,artic-guppyplex,bwa,minimap2,medaka,bedtools}
+    mkdir -p output/dataset-002/{fastqc,artic-guppyplex,bwa,minimap2,medaka,bedtools,mafft}
     ```  
 4. Clear environment
     ```
@@ -146,6 +146,8 @@ specified node within the computing cluster using the `-w` flag.
     module load artic/1.2.3
     module load bedtools/2.29.0
     module load R/4.2
+    module load mafft/7.475
+    module load iqtree/2.2.0
     ```
 6. Hit the `ENTER` key
 
@@ -756,6 +758,52 @@ arithmetic and interval manipulation tool.
     ```
 4. Copy the output `ERR3790222.genome.coverage.pdf` to your computer and open.
    If unable to copy it to your computer, visualize the file [here](https://hpc.ilri.cgiar.org/~jjuma/ont-artic/output/dataset-002/bedtools/ERR3790222.genome.coverage.pdf)
+
+
+#### ***Phylogenetic analysis***
+
+1. Fetch selected whole genomes of Dengue virus from NCBI given a file
+   containing a list of accessions
+
+   ```
+   bash /var/scratch/$USER/ont-artic/scripts/fetchAuxilliaryGenomes.sh \
+    /var/scratch/$USER/ont-artic/metadata/genome-accessions.txt \
+    /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes
+   ```
+
+2. Change to the output directory ```mafft```
+    ```
+    cd /var/scratch/$USER/ont-artic/output/dataset-002/mafft/
+    ```  
+
+3. Concetanate the Dengue virus 2 reference genome sequence with the downloaded
+   datasets and remove all the characters after the first space
+
+    ```
+    cat /var/scratch/$USER/ont-artic/genomes/DENV2/DENV2.fasta \
+    /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes/*.fasta > all_genomes.fasta
+    ```
+
+    ```
+    awk '/^>/ {$0=$1} 1' all_genomes.fasta > all_genomes_renamed.fasta
+    ```
+
+4. Align the sequences using `MAFFT`
+    ```
+    mafft --thread 1 all_genomes_renamed.fasta > all_genomes.aln.fasta
+    ```
+
+5. Construct ML phylogenetic tree with `IQTREE`
+
+    ```
+    iqtree \
+        -s all_genomes.aln.fasta \
+        -m TEST \
+        -T 1 \
+        -bb 1000 \
+        -redo \
+        --prefix DENV
+    ```
 
 > **Note**
 
