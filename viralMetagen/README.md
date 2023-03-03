@@ -8,13 +8,26 @@ tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
 ---
 
 - [Introduction](#introduction)
+- [Scope of the Tutorial](#scope-of-the-tutorial)
+- [Background](#background)
+- [Accessing the HPC](#Accessing-the-HPC)
 
 ## Introduction
 Of the four types of influenza viruses (A, B, C and D), A and B cause seasonal epidemics in humans [according to the CDC](https://www.cdc.gov/flu/about/viruses/types.htm). C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian Influenza), humans, pigs (swine), horses (equine influenza), canine (canine influenza) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
 
-There are four main subtypes of influenza A viruses - H1N1, H1N2, H3N2 and H3N1 - classified based on two surface proteins: hemagglutinin (H) and neuramidase (N). Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in nature. Because of this, Influenza virus is prone to reassortment - a process where when two subtypes infect the same host concurrently genetic information (in this case segments) are swapped - creating a new subtype.  
+There are four main subtypes of influenza A viruses - H1N1, H1N2, H3N2 and H3N1 - classified based on two surface proteins: hemagglutinin (H) and neuramidase (N). Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in nature. Because of this, Influenza virus is prone to reassortment - a process where when two influenza subtypes infect the same host concurrently, genetic information (in this case segments) are swapped - creating a new subtype.    
 Currently two types Influenza (Flu) viruses (A and B), and two influenza A subtypes (H1N1 and H3N2) are routinely detected in different parts of the world. They are classified as shown in the image:
 ![alt text](https://www.cdc.gov/flu/images/about/influenza-viruses-1200px.jpg?_=72413 "Human Seasonal Influenza Viruses")
+
+## Scope of the Tutorial
+Here we go through the bioinformatics analysis steps taken when analysing metagenomics sequence data. In a minimal way we will identify the microbes present in the sample. After that we will identify our target pathogen and carry out the steps needed to generate the consensus genome, detect the mutations it has and assign it's subtype and clade.  
+
+For this tutorial one needs access to a Unix command line in order to access the HPC. One also needs to be proficient in the linux command line basic commands.
+
+## Background
+In this tutorial we analyse sequences from a clinical sample that were generated in a metagenomics approach, where not significant level of amplification of the target pathogen was done. The data was generated from a NextSeq 550 at [ILRI](www.ilri.org). The sequencing was done in a `paired-end` approach to give two sequence read files `R1` forward reads and `R2` reverse reads.
+
+## Accessing the HPC
 
 Sign in to HPC
 ```
