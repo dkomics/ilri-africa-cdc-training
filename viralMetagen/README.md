@@ -13,33 +13,43 @@ tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
 - [Accessing the HPC](#Accessing-the-HPC)
 
 ## Introduction
-Of the four types of influenza viruses (A, B, C and D), A and B cause seasonal epidemics in humans [according to the CDC](https://www.cdc.gov/flu/about/viruses/types.htm). C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian Influenza), humans, pigs (swine), horses (equine influenza), canine (canine influenza) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
+There are four types of ***influenza viruses*** (A, B, C and D), of which A and B cause seasonal flu epidemics in human populations [according to the CDC](https://www.cdc.gov/flu/about/viruses/types.htm). C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian), humans, pigs (swine), horses (equine), canine (canine) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
 
 There are four main subtypes of influenza A viruses - H1N1, H1N2, H3N2 and H3N1 - classified based on two surface proteins: hemagglutinin (H) and neuramidase (N). Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in nature. Because of this, Influenza virus is prone to reassortment - a process where when two influenza subtypes infect the same host concurrently, genetic information (in this case segments) are swapped - creating a new subtype.    
 Currently two types Influenza (Flu) viruses (A and B), and two influenza A subtypes (H1N1 and H3N2) are routinely detected in different parts of the world. They are classified as shown in the image:
 ![alt text](https://www.cdc.gov/flu/images/about/influenza-viruses-1200px.jpg?_=72413 "Human Seasonal Influenza Viruses")
 
 ## Scope of the Tutorial
-Here we go through the bioinformatics analysis steps taken when analysing metagenomics sequence data. In a minimal way we will identify the microbes present in the sample. After that we will identify our target pathogen and carry out the steps needed to generate the consensus genome, detect the mutations it has and assign it's subtype and clade.  
+We will go through the bioinformatics analysis steps taken when analysing metagenomics sequence data. In a minimal way we will identify the microbes present in the sample. We will then identify our target pathogen and carry out the steps needed to generate the consensus genome, detect the mutations it has and identify the subtype and clade.  
 
-For this tutorial one needs access to a Unix command line in order to access the HPC. One also needs to be proficient in the linux command line basic commands.
+For this tutorial one needs access to a Unix command line in order to access the HPC. One also needs to be proficient in basic linux command line commands.
 
 ## Background
-In this tutorial we analyse sequences from a clinical sample that were generated in a metagenomics approach, where not significant level of amplification of the target pathogen was done. The data was generated from a NextSeq 550 at [ILRI](www.ilri.org). The sequencing was done in a `paired-end` approach to give two sequence read files `R1` forward reads and `R2` reverse reads.
+In this tutorial we analyse sequences from a clinical sample that were generated in a metagenomics approach, where no targeted amplification of the pathogen was done. The data was generated from a NextSeq 550 at [ILRI](www.ilri.org). The sequencing was done in a `paired-end` approach to give two sequence read files `R1` forward reads and `R2` reverse reads.
 
 ## Accessing the HPC
-
-Sign in to HPC
+Sign in to HPC using the following command. You will have been assigned a **username** that looks like `Bio4InfoXX` and a **password**. Replace `<user_name>` in the command with the provided username and click enter. Then enter the password. Note that the password will be typed in the background but will not be visible to you.
 ```
 ssh <user_name>@hpc.ilri.cgiar.org
 ```
-Change to compute06
+There are two nodes to choose from: `compute05`  and `compute06`. If your username (`Bio4InfoXX`) ends with an **Odd Number (1,3,5,7,9)** use `compute05` and if it ends with n **even number (2,4,6,8,0)** use `compute06`. Now let us secure a four of CPUs in one of the HPC nodes.  
+>Compute05
 ```
-## sign in to compute06
-interactive -w compute06 -c 8 -J metagen -p batch
+interactive -w compute06 -c 4 -J metagen -p batch
+```
+>Compute06
+```
+interactive -w compute06 -c 4 -J metagen -p batch
 ```
 
 ## Step 1 : Preparing the project directory:
+To setup a well-structured project directory we need to create some directories to store our data and scripts. We will be conducting our a anlysis from a directory in the `scratch` space of the HPC.
+1. Create a directory using your username in the scratch: 
+```
+mkdir /var/scratch/$USER
+cd /var/scratch/$USER
+```
+2. Create project directories:
 ```
 mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
 cd ilri-africa-cdc-training/viralMetagen/
@@ -80,6 +90,7 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
 </details>
 
 ---
+Swine Flu (H1N1) virus infect both pigs, and is the 
 
 ## Step 4: Assessing Read Quality using fastqc before quality trimming
 ```
