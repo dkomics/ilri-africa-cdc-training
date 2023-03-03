@@ -12,7 +12,7 @@ tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
 - [Background](#background)
 - [Accessing the HPC](#accessing-the-HPC)
 - [Bioinformatics Analysis](#Bioinformatics-Analysis)
-    - [Step 1 : Preparing the project directory](#Step-1-:-Preparing-the-project-directory)
+    - [Step 1 : Preparing the project directory](#Step-1--Preparing-the-project-directory)
 
 ## Introduction
 There are four types of ***influenza viruses*** (A, B, C and D). Influenza A and B cause seasonal flu epidemics in human populations [as reported by CDC](https://www.cdc.gov/flu/about/viruses/types.htm). Influenza C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian), humans, pigs (swine), horses (equine), canine (canine) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
