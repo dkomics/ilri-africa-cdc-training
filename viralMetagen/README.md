@@ -13,9 +13,9 @@ tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
 - [Accessing the HPC](#Accessing-the-HPC)
 
 ## Introduction
-There are four types of ***influenza viruses*** (A, B, C and D), of which A and B cause seasonal flu epidemics in human populations [according to the CDC](https://www.cdc.gov/flu/about/viruses/types.htm). C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian), humans, pigs (swine), horses (equine), canine (canine) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
+There are four types of ***influenza viruses*** (A, B, C and D). Influenza A and B cause seasonal flu epidemics in human populations [as reported by CDC](https://www.cdc.gov/flu/about/viruses/types.htm). Influenza C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian), humans, pigs (swine), horses (equine), canine (canine) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
 
-There are four main subtypes of influenza A viruses - H1N1, H1N2, H3N2 and H3N1 - classified based on two surface proteins: hemagglutinin (H) and neuramidase (N). Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in nature. Because of this, Influenza virus is prone to reassortment - a process where when two influenza subtypes infect the same host concurrently, genetic information (in this case segments) are swapped - creating a new subtype.    
+There are four main subtypes of influenza A viruses - ***H1N1***, ***H1N2***, ***H3N2*** and ***H3N1***. The are subtyped based on two surface proteins: ***hemagglutinin (H)*** and ***neuramidase (N)***. Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in the wild. Because of this, Influenza virus is prone to reassortment - a process that occure when two influenza subtypes infect the same host concurrently and genetic information (in this case segments) is swapped - creating a new subtype.    
 Currently two types Influenza (Flu) viruses (A and B), and two influenza A subtypes (H1N1 and H3N2) are routinely detected in different parts of the world. They are classified as shown in the image:
 ![alt text](https://www.cdc.gov/flu/images/about/influenza-viruses-1200px.jpg?_=72413 "Human Seasonal Influenza Viruses")
 
@@ -28,11 +28,11 @@ For this tutorial one needs access to a Unix command line in order to access the
 In this tutorial we analyse sequences from a clinical sample that were generated in a metagenomics approach, where no targeted amplification of the pathogen was done. The data was generated from a NextSeq 550 at [ILRI](www.ilri.org). The sequencing was done in a `paired-end` approach to give two sequence read files `R1` forward reads and `R2` reverse reads.
 
 ## Accessing the HPC
-Sign in to HPC using the following command. You will have been assigned a **username** that looks like `Bio4InfoXX` and a **password**. Replace `<user_name>` in the command with the provided username and click enter. Then enter the password. Note that the password will be typed in the background but will not be visible to you.
+Sign in to HPC using the following command. You will have been assigned a ***username*** that looks like `Bio4InfoXX` and a ***password***. Replace `<user_name>` in the command with the provided username and click enter. Then enter the password. Note that the password will be typed in the background but will not be visible to you.
 ```
 ssh <user_name>@hpc.ilri.cgiar.org
 ```
-There are two nodes to choose from: `compute05`  and `compute06`. If your username (`Bio4InfoXX`) ends with an **Odd Number (1,3,5,7,9)** use `compute05` and if it ends with n **even number (2,4,6,8,0)** use `compute06`. Now let us secure a four of CPUs in one of the HPC nodes.  
+There are two nodes to choose from: `compute05`  and `compute06`. If your username (`Bio4InfoXX`) ends with an ***Odd Number*** (1,3,5,7,9) use `compute05` and if it ends with n ***even number*** (2,4,6,8,0) use `compute06`. Now let us secure a four of CPUs in one of the HPC nodes.  
 >Compute05
 ```
 interactive -w compute06 -c 4 -J metagen -p batch
