@@ -277,7 +277,7 @@ Genome assembly refers to the process of putting back together the nucleotide se
 Genome assessment entails producing the quality metrics that gauge both the completeness and contiguity of the assembled genome. Good quality metrics ensure that we are confident in the biological insights we obtain from the assembled genome. 
 
 1. #### ***Genome contiguity***  
-    Genome contiguity is the length cutoff for the longest contigs that contain 50% of the total genome length. It is often measured as contig N50.
+    Genome contiguity is the length cutoff for the longest contigs that contain 50% of the total genome length. It is often measured as contig N50. We will use QAUST to keep track of the length of each contig and provides basic statistics. However, QUAST has many functionalities.
     ```
     module load quast/5.0.2
     ```
@@ -290,7 +290,7 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     ```
 
 2. #### ***Genome completeness***  
-    Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs).
+    Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs). BUSCO makes use of the OrthoDB set of single-copy orthologous that are found in at least 90% of all the organisms in question. Ideally, the sequenced genome should contain most of these highly conserved genes. If your genome doesn't contain a large portion of these single-copy orthologs it may indicate that your genome is not complete. 
     ```
     module load BUSCO/5.2.2
 
@@ -307,7 +307,21 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     -f
     ```
 
+    View the short summary
+    ```
+    less -S SRR292862_busco/short_summary.specific.bacteria_odb10.SRR292862_busco.txt
 
+    ```
+
+    View the full table
+    ```
+    less -S SRR292862_busco/run_bacteria_odb10/full_table.tsv
+    ```
+
+    List and view a amino acid of protein sequence
+    ```
+    ls SRR292862_busco/run_bacteria_odb10/busco_sequences/
+    ```
 
 ### ***Genome annotation***  
 
@@ -336,13 +350,6 @@ grep -o "product=.*" L_*.gff | sed 's/product=//g' | sort | uniq -c | sort -nr >
 
 ```
 
-16S sequences
-```
-grep "16S" *.ffn
-
-../../scripts/extract_sequences.sh "16S ribosomal RNA" *.ffn > 16S_sequence.fasta
-
-```
 
 ### ***Organism identification***  
 
