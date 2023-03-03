@@ -28,7 +28,9 @@ For this tutorial one needs access to a Unix command line in order to access the
 In this tutorial we analyse sequences from a clinical sample that were generated in a metagenomics approach, where no targeted amplification of the pathogen was done. The data was generated from a NextSeq 550 at [ILRI](www.ilri.org). The sequencing was done in a `paired-end` approach to give two sequence read files `R1` forward reads and `R2` reverse reads.
 
 ## Accessing the HPC
-Sign in to HPC using the following command. You will have been assigned a ***username*** that looks like `Bio4InfoXX` and a ***password***. Replace `<user_name>` in the command with the provided username and click enter. Then enter the password. Note that the password will be typed in the background but will not be visible to you.
+Sign in to HPC using the following command. You will have been assigned a ***username*** that looks like `Bio4InfoXX` and a ***password***.
+1. Replace `<user_name>` in the command with the provided username and execute (click enter). 
+2. Enter the password and execute. ***Note:*** The password will be typed in the background but will not be visible to you as you type.
 ```
 ssh <user_name>@hpc.ilri.cgiar.org
 ```
@@ -46,17 +48,18 @@ interactive -w compute06 -c 4 -J metagen -p batch
 To setup a well-structured project directory we need to create some directories to store our data and scripts. We will be conducting our a anlysis from a directory in the `scratch` space of the HPC.
 1. Create a directory using your username in the scratch: 
 ```
-mkdir /var/scratch/$USER
+mkdir -p /var/scratch/$USER
 cd /var/scratch/$USER
 ```
 2. Create project directories:
 ```
 mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
-cd ilri-africa-cdc-training/viralMetagen/
-mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff}
+cd ilri-africa-cdc-training/viralMetagen/i
+mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
 ```
 
 ## Step 2: Loading Modules:
+Load programs/tools using the following commands:
 ```
 module load fastqc/0.11.9
 module load fastp/0.22.0
@@ -70,6 +73,7 @@ module load bowtie2/2.5.0
 module load bedtools/2.29.0
 module load snpeff/4.1g
 module load bcftools/1.13
+module load nextclade/2.11.0
 ```
 ## Step 3: Copying the data fastq and databases
 ```
