@@ -199,7 +199,12 @@ interactive -w compute05
 ```
     cd /var/scratch/${USER}/bacteria-variant-calling/results/fastqc/
 ```
-2. Run ```fastqc```
+2. Load the `fastqc` tool
+   ```
+   module load fastqc/0.11.7
+   ```
+
+3. Run ```fastqc```
 ```
     fastqc \
         -t 1 \
@@ -220,7 +225,12 @@ The preceeding step will guide us on the possible filtering and trimming operati
     cd /var/scratch/${USER}/bacteria-variant-calling/results/trimmomatic/
 ```
 
-2. Run ```trimmomatic```. `i,I` (input(s)) are for read1, read2; respectively. `o,O` (output(s)) are for the respective read1, read2; respectively. The `2>` construct redirects the standard error channel for saving as a log file.
+1. Load the `trimmomatic` tool
+   ```
+   module load trimmomatic/0.39
+   ```
+2. Run ```trimmomatic```.  
+   We will use a sliding window of size 4 that will remove bases if their phred score is below 20 and discard any reads that do not have at least 25 bases remaining after this trimming step.
 
 ```
     cp /export/apps/trimmomatic/0.39/adapters/NexteraPE-PE.fa .
@@ -237,12 +247,17 @@ The preceeding step will guide us on the possible filtering and trimming operati
 ```
 
  #### ***Align reads to reference genome***   
+The alignment process consists of choosing an appropriate reference genome to map our reads against and then deciding on an aligner. We will use the BWA-MEM algorithm, which is the latest and is generally recommended for high-quality queries as it is faster and more accurate.
 
 Change directory to the `bwa` results folder
 
 ```
     cd /var/scratch/${USER}/bacteria-variant-calling/results/bwa/
 
+```
+Load the `bwa` tool
+```
+module load bwa/0.7.17
 ```
 
 ```
@@ -253,57 +268,54 @@ Change directory to the `bwa` results folder
     > SRR2584863.aligned.sam
 
 ```
+The SAM file, is a tab-delimited text file that contains information for each individual read and its alignment to the genome. The compressed binary version of SAM is called a BAM file. We use this version to reduce size and to allow for indexing, which enables efficient random access of the data contained within the file.  
 
 Convert the SAM file to BAM format
 
 ```
-samtools view -S -b \
-SRR2584863.aligned.sam \
-> SRR2584863.aligned.bam
-
-
+samtools view -S -b SRR2584863.aligned.sam > SRR2584863.aligned.bam
 ```
 
 Sort the bam file by coordinates
 
 ```
-    samtools sort \
-    -o SRR2584863.aligned.sorted.bam \
-    SRR2584863.aligned.bam 
+samtools sort -o SRR2584863.aligned.sorted.bam SRR2584863.aligned.bam 
 
 ```
-
+SAM/BAM files can be sorted in multiple ways, e.g. by location of alignment on the chromosome, by read name, etc. It is important to be aware that different alignment tools will output differently sorted SAM/BAM, and different downstream tools require differently sorted alignment files as input.
 
 Alignment statistics
 
 ```
-    samtools flagstat SRR2584863.aligned.sorted.bam
+samtools flagstat SRR2584863.aligned.sorted.bam
 
 ```
 
-
 ### Variant calling  
+A variant call is a conclusion that there is a nucleotide difference vs. some reference at a given position in an individual genome or transcriptome, often referred to as a Single Nucleotide Variant (SNV). The call is usually accompanied by an estimate of variant frequency and some measure of confidence.
 
 Change directory to the `vcf` results folder
 
 ```
-    cd /var/scratch/${USER}/bacteria-variant-calling/results/vcf/
+cd /var/scratch/${USER}/bacteria-variant-calling/results/vcf/
 
 ```
 
 Step 1: Calculate the read coverage of positions in the genome  
 
 ```
-    module load bcftools/1.15.1
-
-    bcftools mpileup -O b \
-    -o SRR2584863_raw.bcf \
-    -f /var/scratch/${USER}/bacteria-variant-calling/genome/ecoli_rel606.fasta \
-    /var/scratch/${USER}/bacteria-variant-calling/results/bwa/SRR2584863.aligned.sorted.bam 
+module load bcftools/1.15.1
+```
+```
+bcftools mpileup -O b \
+-o SRR2584863_raw.bcf \
+-f /var/scratch/${USER}/bacteria-variant-calling/genome/ecoli_rel606.fasta \
+/var/scratch/${USER}/bacteria-variant-calling/results/bwa/SRR2584863.aligned.sorted.bam 
 
 ```
 
 Step 2: Detect the single nucleotide variants (SNVs)  
+We have to specify ploidy with the flag --ploidy, which is one for the haploid E. coli. -m allows for multiallelic and rare-variant calling, -v tells the program to output variant sites only (not every site in the genome), and -o specifies where to write the output file: 
 
 ```
     bcftools call \
@@ -318,9 +330,7 @@ Step 2: Detect the single nucleotide variants (SNVs)
 Step 3: Filter and report the SNV variants in variant calling format (VCF)  
 
 ```
-    vcfutils.pl varFilter \
-    SRR2584863_variants.vcf \
-    > SRR2584863_final_variants.vcf
+    vcfutils.pl varFilter SRR2584863_variants.vcf > SRR2584863_final_variants.vcf
 
 ```
 
@@ -338,11 +348,14 @@ Using `tview`.
 ```  
     samtools index \
     /var/scratch/${USER}/bacteria-variant-calling/results/bwa/SRR2584863.aligned.sorted.bam
-
+```
+Let's visualize the aligned reads using `tview` from samtools:
+```
     samtools tview \
     /var/scratch/${USER}/bacteria-variant-calling/results/bwa/SRR2584863.aligned.sorted.bam \
     /var/scratch/${USER}/bacteria-variant-calling/genome/ecoli_rel606.fasta
 ```  
+The first line of output shows the genome coordinates in our reference genome. The second line shows the reference genome sequence. The third line shows the consensus sequence determined from the sequence reads. A `.` indicates a match to the reference sequence, so we can see that the consensus from our sample matches the reference in most locations. That is good! If that was not the case, we should probably reconsider our choice of reference.
 
 Using `igv`.  
 Install IGV
