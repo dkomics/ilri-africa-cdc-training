@@ -45,48 +45,48 @@ interactive -w compute06 -c 4 -J metagen -p batch
 ```
 
 ## Step 1 : Preparing the project directory:
-    To setup a well-structured project directory we need to create some directories to store our data and scripts. We will be conducting our a anlysis from a directory in the `scratch` space of the HPC.
-    1. Create a directory using your username in the scratch: 
-    ```
-    mkdir -p /var/scratch/$USER
-    cd /var/scratch/$USER
-    ```
-    2. Create project directories:
-    ```
-    mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
-    cd ilri-africa-cdc-training/viralMetagen/
-    mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
-    ```
+To setup a well-structured project directory we need to create some directories to store our data and scripts. We will be conducting our a anlysis from a directory in the `scratch` space of the HPC.
+1. Create a directory using your username in the scratch: 
+```
+mkdir -p /var/scratch/$USER
+cd /var/scratch/$USER
+```
+2. Create project directories:
+```
+mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
+cd ilri-africa-cdc-training/viralMetagen/
+mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
+```
 
 ## Step 2: Loading Modules:
-    Load programs/tools using the following commands:
-    ```
-    module load fastqc/0.11.9
-    module load fastp/0.22.0
-    module load krona/2.8.1
-    module load centrifuge/1.0.4
-    module load kraken/2.1.2
-    module load spades/3.15
-    module load quast/5.0.2
-    module load samtools/1.15.1
-    module load bowtie2/2.5.0
-    module load bedtools/2.29.0
-    module load snpeff/4.1g
-    module load bcftools/1.13
-    module load nextclade/2.11.0
-    ```
-    Check if modules have been loaded:
-    ```
-    module list
-    ```
+Load programs/tools using the following commands:
+```
+module load fastqc/0.11.9
+module load fastp/0.22.0
+module load krona/2.8.1
+module load centrifuge/1.0.4
+module load kraken/2.1.2
+module load spades/3.15
+module load quast/5.0.2
+module load samtools/1.15.1
+module load bowtie2/2.5.0
+module load bedtools/2.29.0
+module load snpeff/4.1g
+module load bcftools/1.13
+module load nextclade/2.11.0
+```
+Check if modules have been loaded:
+```
+module list
+```
 ## Step 3: Copying the data fastq and databases
-    During the analysis we will need databases for different steps. We will explain this during each individual step.
-    ```
-    cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
-    cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/ ./data/databse
-    cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
-    
-    ```
+During the analysis we will need databases for different steps. We will explain this during each individual step.
+```
+cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
+cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/ ./data/databse
+cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
+
+```
 
 **Note:** *How did we get the fastq files?*
 
