@@ -10,12 +10,15 @@ tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
 - [Introduction](#introduction)
 - [Scope of the Tutorial](#scope-of-the-tutorial)
 - [Background](#background)
-- [Accessing the HPC](#Accessing-the-HPC)
+- [Accessing the HPC](#accessing-the-HPC)
+- [Bioinformatics Analysis](#Bioinformatics-Analysis)
+    - [Step 1 : Preparing the project directory](step-1-:-preparing-the-project-directory)
 
 ## Introduction
 There are four types of ***influenza viruses*** (A, B, C and D). Influenza A and B cause seasonal flu epidemics in human populations [as reported by CDC](https://www.cdc.gov/flu/about/viruses/types.htm). Influenza C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian), humans, pigs (swine), horses (equine), canine (canine) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
 
-There are four main subtypes of influenza A viruses - ***H1N1***, ***H1N2***, ***H3N2*** and ***H3N1***. The are subtyped based on two surface proteins: ***hemagglutinin (H)*** and ***neuramidase (N)***. Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in the wild. Because of this, Influenza virus is prone to reassortment - a process that occure when two influenza subtypes infect the same host concurrently and genetic information (in this case segments) is swapped - creating a new subtype.    
+There are four main subtypes of influenza A viruses - ***H1N1***, ***H1N2***, ***H3N2*** and ***H3N1***. The are subtyped based on two surface proteins: ***hemagglutinin (H)*** and ***neuramidase (N)***. Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in the wild. Because of this, Influenza virus is prone to reassortment - a process that occure when two influenza subtypes infect the same host concurrently and genetic information (in this case segments) is swapped - creating a new subtype.   
+ 
 Currently two types Influenza (Flu) viruses (A and B), and two influenza A subtypes (H1N1 and H3N2) are routinely detected in different parts of the world. They are classified as shown in the image:
 ![alt text](https://www.cdc.gov/flu/images/about/influenza-viruses-1200px.jpg?_=72413 "Human Seasonal Influenza Viruses")
 
@@ -44,7 +47,11 @@ interactive -w compute06 -c 4 -J metagen -p batch
 interactive -w compute06 -c 4 -J metagen -p batch
 ```
 
-## Step 1 : Preparing the project directory:
+## Bioinformatics Analysis
+
+We will start by seting up the project directory structure and then conduct the analysis stepwise.
+
+### Step 1 : Preparing the project directory
 To setup a well-structured project directory we need to create some directories to store our data and scripts. We will be conducting our a anlysis from a directory in the `scratch` space of the HPC.
 1. Create a directory using your username in the scratch: 
 ```
@@ -58,7 +65,7 @@ cd ilri-africa-cdc-training/viralMetagen/
 mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
 ```
 
-## Step 2: Loading Modules:
+### Step 2: Loading Modules:
 Load programs/tools using the following commands:
 ```
 module load fastqc/0.11.9
@@ -79,7 +86,18 @@ Check if modules have been loaded:
 ```
 module list
 ```
-## Step 3: Copying the data fastq and databases
+### Step 3: Copying the data and databases:
+### Setting up databases
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/database/
+#cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/databaseV1
+
+### Setting up scripts and images
+cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
+1. Copying the data fastq and databases
+```
+cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
+```
+
 During the analysis we will need databases for different steps. We will explain this during each individual step.
 ```
 cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
@@ -101,7 +119,7 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
 ---
 Swine Flu (H1N1) virus infect both pigs, and is the 
 
-## Step 4: Assessing Read Quality using fastqc before quality trimming
+### Step 4: Assessing Read Quality using fastqc before quality trimming
 ```
 fastqc -t 4 \
 	-o ./data/fastqc/ \
@@ -114,7 +132,7 @@ You can proceed and copy fastqc output files to local laptop --- Run this comman
 # scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 ```
 
-## Step 5: Quality Trimming fastq files with fastp and Trims adapter sequences
+### Step 5: Quality Trimming fastq files with fastp and Trims adapter sequences
 ```
 fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--in2 ./data/fastq/sample01_R2.fastq.gz \
@@ -131,7 +149,7 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	2> ./data/fastp/sample01.fastp.log
 ```
 
-## Step 6: Assessing Read Quality after quality trimming
+### Step 6: Assessing Read Quality after quality trimming
 ```
 fastqc -t 4 \
 	-o ./data/fastqc/ \
@@ -144,7 +162,7 @@ fastqc -t 4 \
 # scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
 ```
 
-## Step 7 (Optional): Taxonomic Classification of Reads
+### Step 7 (Optional): Taxonomic Classification of Reads
 To quickly profile the taxonomic composition of the reads present in the sequences you can proceed as follows:
 ```
 mkdir data/database/centrifuge/
@@ -187,7 +205,7 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 ---
 ---
 
-## Step 8: Filter Host Genome in preparation for genome assembly
+### Step 8: Filter Host Genome in preparation for genome assembly
 ```
 mkdir ./data/database/host_db
 cd ./data/database/host_db
@@ -211,7 +229,7 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 
 ## Lets Focus on the target pathogenic virus species: H1N1 - Influenza A Virus
 
-## Step 9: Setting up Reference datasets - reference genome, annotation files
+### Step 9: Setting up Reference datasets - reference genome, annotation files
 Download Genome from NCBI - Genome database - Reference Genome (Influenza A virus (A/New York/392/2004(H3N2)))
 ```
 mkdir -p ./data/database/refseq/
@@ -226,14 +244,14 @@ mv ./data/database/refseq/GCF_000865085.1_ViralMultiSegProj15622_genomic.fna ./d
 mv ././data/database/refseq/GCF_000865085.1_ViralMultiSegProj15622_genomic.gff ./data/database/refseq/influenzaA.gff
 ```
 
-## Step 10: Index reference genome - samtools
+### Step 10: Index reference genome - samtools
 ```
 samtools faidx \
 	./data/database/refseq/influenzaA.fna \
 	--fai-idx ./data/database/refseq/influenzaA.fna.fai
 ```
 
-## Step 11: Index reference genome - bowtie
+### Step 11: Index reference genome - bowtie
 ```
 mkdir ./data/database/bowtie/
 bowtie2-build \
@@ -242,7 +260,7 @@ bowtie2-build \
 	./data/database/bowtie/influenzaA
 ```
 
-## Step 12: Align reads to reference genome
+### Step 12: Align reads to reference genome
 ```
 bowtie2 -x ./data/database/bowtie/influenzaA \
 	-1 ./data/kraken/sample01.unclassified_1.fastq \
@@ -255,7 +273,7 @@ bowtie2 -x ./data/database/bowtie/influenzaA \
 	| samtools view -@ 1 -F4 -bhS -o ./data/bowtie/sample01.trim.dec.bam -
 ```
 
-## Step 13: Sort and Index aligment map
+### Step 13: Sort and Index aligment map
 ```
 samtools sort -@ 4 \
 	-o ./data/bowtie/sample01.sorted.bam \
@@ -265,7 +283,7 @@ samtools sort -@ 4 \
 samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 ```
 
-## Step 13: Coverage computation
+### Step 13: Coverage computation
 ```
 bedtools genomecov \
 	-d \
@@ -273,12 +291,12 @@ bedtools genomecov \
 	> ./data/bowtie/sample01.coverage
 ```
 
-## Step 14: Plot Genome coverage in R
+### Step 14: Plot Genome coverage in R
 ```
 Rscript ./scripts/plotGenomecov.R ./data/bowtie/sample01.coverage
 ```
 
-## Step 15: Consensus Genome construsction
+### Step 15: Consensus Genome construsction
 For segmented viruses e.g Influenza A ivar consensus is unable to analyse more than one reference (segment/cromosome) name at once. We need to split by reference:
 ```
 bamtools split -in data/bowtie/sample01.sorted.bam \
@@ -291,7 +309,7 @@ Renameing output files
 rename 'sorted.REF' 'REF' ./data/bowtie/*
 ```
 
-## Step 16: Loop through segmented BAM files and generate consensus:
+### Step 16: Loop through segmented BAM files and generate consensus:
 ```
 mkdir -p ./data/ivar/consensus/
 for bamFile in $(find ./data/bowtie -name "*.REF_*.bam")
@@ -316,7 +334,7 @@ do
 done
 ```
 
-## Step 17: Loop through seqmented BAM files and conduct Variant Calling from the alignemnts
+### Step 17: Loop through seqmented BAM files and conduct Variant Calling from the alignemnts
 ```
 mkdir -p ./data/ivar/variants/
 for bamFile in $(find ./data/bowtie -name "*.REF_*.bam")
@@ -342,7 +360,7 @@ do
 done
 ```
 
-## Step 18: Coverting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
+### Step 18: Coverting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
 ```
 for varFile in $(find ./data/ivar/variants -name "*.variants.tsv")
 do
@@ -363,7 +381,7 @@ do
 done
 ```
 
-## Step 19: Annotation of Variants - SnpEff and SnpSift
+### Step 19: Annotation of Variants - SnpEff and SnpSift
 Annotate the variants VCF file with snpEff
 ```
 for varFile in $(find ./data/ivar/variants -name "*.vcf.gz")
@@ -392,7 +410,7 @@ done
 ---
 ---
 
-## Step 20: Filter the most significant variants using snpSift
+### Step 20: Filter the most significant variants using snpSift
 ```
 for varFile in $(find ./data/ivar/variants -name "*.ann.vcf.gz")
 do
