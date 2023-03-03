@@ -777,11 +777,12 @@ arithmetic and interval manipulation tool.
     ```  
 
 3. Concetanate the Dengue virus 2 reference genome sequence with the downloaded
-   datasets and remove all the characters after the first space
+   datasets and generated consensus followed by removal of all the characters after the first space
 
     ```
     cat /var/scratch/$USER/ont-artic/genomes/DENV2/DENV2.fasta \
-    /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes/*.fasta > all_genomes.fasta
+    /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes/*.fasta \
+    /var/scratch/$USER/ont-artic/output/dataset-002/medaka/ERR3790222.consensus.fasta > all_genomes.fasta
     ```
 
     ```
@@ -796,7 +797,7 @@ arithmetic and interval manipulation tool.
 5. Construct ML phylogenetic tree with `IQTREE`
 
     ```
-    iqtree \
+    iqtree2 \
         -s all_genomes.aln.fasta \
         -m TEST \
         -T 1 \
