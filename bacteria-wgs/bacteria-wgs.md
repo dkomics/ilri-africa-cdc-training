@@ -141,7 +141,7 @@ interactive -w compute05
 
 ## Analysis
 
-#### ***Loading modules***
+### ***Loading modules***
 
 1. Load modules using the `module load <tool-name>` command.
     ```
@@ -163,7 +163,7 @@ interactive -w compute05
    module purge
    ```
 
-#### ***Prepare the reference genome***
+### ***Prepare the reference genome***
 
 
 1. While still in the `genome` directory, we will index the reference sequence using samtools' `faidx`. Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for samtools' operations.
@@ -191,7 +191,7 @@ interactive -w compute05
 
     ```
 
-#### ***Quality assessment***
+### ***Quality assessment***
 [`FastQC`](https://www.youtube.com/watch?v=bz93ReOv87Y)  is a common tool for Illumina read quality checks. The basic statistics from this report include `total sequences`, `sequence length` and `%GC`. Another 10 measures of quality are also graphically represented. Your experimental design will be critical in interpreting `FastQC` reports. This step is very important for the subsequent data processes, especially at initial optimisation steps.
 
 
@@ -210,7 +210,7 @@ interactive -w compute05
     ***Optional***
         Run step 3. above for the other 2 samples.
 
-#### ***Quality and adapter filtering***
+### ***Quality and adapter filtering***
 The preceeding step will guide us on the possible filtering and trimming operations to subject our data to. Depending on your study design, it is important to minimise noise as much as to zero, if possible. However, the latter case may be practically impossible.
 
 
@@ -234,13 +234,13 @@ The preceeding step will guide us on the possible filtering and trimming operati
     ```
 
  
-#### ***Generate consensus genome sequences***  
+### ***Generate consensus genome sequences***  
 
-Note that for genome assembly, the parameters are adjusted accordingly until a desirable draft genome assembly is achieved. 
+Genome assembly refers to the process of putting back together the nucleotide sequences usually using short DNA sequences to create a representation of the original chromosome from which the sequences originated. The goal of genome assembly tools is to create long contiguous pieces of sequence (contigs) from short reads. The contigs are then ordered and oriented in relation to one another to form scaffolds. Genome assembly is a computationally intensive and difficult problem. The assembly tools have parameters that need to be tweaked and have a large effect on the outcome of any assembly. The parameters are adjusted accordingly until a desirable draft genome assembly is achieved. 
   
 
 ```
-module load spades/3.15
+    module load spades/3.15
 ```
 
 1. Change into the `spades` directory
@@ -258,11 +258,26 @@ module load spades/3.15
 	-m 384
     ```
 
+    View the `contigs.fasta` file
 
-#### ***Genome assessment***  
+    ```
+    less -S contigs.fasta
+    ```
+    View the top 10 headers
+    ```
+    grep '>' contigs.fasta | head
+    ```
 
-1. ##### ***Genome contiguity***  
+>**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>** 
+- How many sequences do you have in your `contigs.fasta` file?
+  
 
+
+### ***Genome assessment***  
+Genome assessment entails producing the quality metrics that gauge both the completeness and contiguity of the assembled genome. Good quality metrics ensure that we are confident in the biological insights we obtain from the assembled genome. 
+
+1. #### ***Genome contiguity***  
+    Genome contiguity is the length cutoff for the longest contigs that contain 50% of the total genome length. It is often measured as contig N50.
     ```
     module load quast/5.0.2
     ```
@@ -274,8 +289,8 @@ module load spades/3.15
     -o /var/scratch/$USER/bacteria-wgs/results/quast
     ```
 
-2. ##### ***Genome completeness***  
-
+2. #### ***Genome completeness***  
+    Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs).
     ```
     module load BUSCO/5.2.2
 
@@ -294,7 +309,7 @@ module load spades/3.15
 
 
 
-#### ***Genome annotation***  
+### ***Genome annotation***  
 
 ```
 module load prokka/1.11
@@ -329,7 +344,7 @@ grep "16S" *.ffn
 
 ```
 
-#### ***Organism identification***  
+### ***Organism identification***  
 
 ```
 module load blast/2.12.0+
@@ -348,7 +363,7 @@ blastn \
 
 ```
 
-#### ***Identification of virulence factors***
+### ***Identification of virulence factors***
 
 ```
 
@@ -362,7 +377,7 @@ blastn \
 ```
 
 
-#### ***AMR identification***  
+### ***AMR identification***  
 
 ```
 module purge
