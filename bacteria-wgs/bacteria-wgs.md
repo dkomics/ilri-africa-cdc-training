@@ -324,7 +324,7 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     ```
 
 ### ***Genome annotation***  
-
+In genome annotation, the goal is to identify and label the features of on a genome sequence.  
 ```
 module load prokka/1.11
 
@@ -347,12 +347,16 @@ prokka \
 Protein abundance
 ```
 grep -o "product=.*" L_*.gff | sed 's/product=//g' | sort | uniq -c | sort -nr > protein_abundances.txt
+```
 
+View protein abundances
+```
+less -S protein_abundances.txt
 ```
 
 
 ### ***Organism identification***  
-
+Here, we will attempt to identify the organism. Although, we know that we are working with *E. coli*, we anticipate to identify the particular _strain_ that we are working with since that is unknown at this point. We will use blastn to search a nucleotide query against a nucleotide reference database available locally.
 ```
 module load blast/2.12.0+
 ```
@@ -369,9 +373,17 @@ blastn \
 -out /var/scratch/$USER/bacteria-wgs/results/blast/contigs.fasta.vs.nt.cul5.1e25.megablast.out
 
 ```
+View the blast results
+```
+less -S /var/scratch/$USER/bacteria-wgs/results/blast/contigs.fasta.vs.nt.cul5.1e25.megablast.out
+```
+
+>**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>** 
+- Which strain of *E. coli* was identified?
+
 
 ### ***Identification of virulence factors***
-
+Virulence factors are properties that enable a microbe to establish itself within a host and contribute to its potential to cause disease (pathogenecity). We will use  the virulence factor database (VFDB) which is an integrated and comprehensive resource for curating information about virulence factors of bacterial pathogens. Briefly, we will blast our contigs against the VFDB to identify sequences carrying known virulence factors.
 ```
 
     blastn \
@@ -383,6 +395,15 @@ blastn \
 
 ```
 
+View the blast output results
+```
+less -S /var/scratch/$USER/bacteria-wgs/results/blast/virulence_factors_blast_VFDB.out
+```
+
+>**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>** 
+Search the blast output to see if we find the following genes:
+- stx1
+- stx2
 
 ### ***AMR identification***  
 
