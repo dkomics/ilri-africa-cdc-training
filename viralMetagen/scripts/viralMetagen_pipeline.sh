@@ -53,8 +53,12 @@ module list
 ### Copying the data fastq and databases
 cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
 
+### Setting up databases
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/database/
 #cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/databaseV1
+
+### Setting up scripts and images
+cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
 
 ## Step 4
 ### Assessing Read Quality using fastqc before quality trimming
@@ -109,12 +113,17 @@ fastqc -t 4 \
 ## Step 7
 ### Filter Host Genome in preparation for genome assembly
 
-### Build the human host genome database
-mkdir ./data/database/host_db
+### Setting up the human host genome database
+mkdir -p ./data/database/host_db
 cd ./data/database/host_db
+cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/host_db/* ./
+cd ../../../
+
 ## Alteranive 01
 ## Build host genome database
 # Download genome (human)
+mkdir -p ./data/database/host_db
+cd ./data/database/host_db
 kraken2-build --download-library human \
 	--db ./ \
 	--threads 4
@@ -128,8 +137,11 @@ kraken2-build --build \
 # Removing intermediate files to save space
 kraken2-build --clean \
 	--db ./
+cd ../../../
 
 ## Alternative 02 - Download prebuilt database
+mkdir -p ./data/database/host_db
+cd ./data/database/host_db
 curl -L -o ./kraken2_human_db.tar.gz https://ndownloader.figshare.com/files/23567780
 tar -xzvf kraken2_human_db.tar.gz
 cd ../../../
@@ -155,20 +167,28 @@ gzip data/kraken/*.fastq
 
 mkdir data/database/centrifuge/
 cd data/database/centrifuge/
+cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/centrifuge/* ./
+cd ../../../
+
 # Build Database:
 # apptainer pull docker://quay.io/biocontainers/centrifuge:1.0.4_beta--he513fc3_5
 
 ## Alterantive 01
 # Download NCBI Taxonomy to ./taxonomy/
+mkdir data/database/centrifuge/
+cd data/database/centrifuge/
 centrifuge-download -o taxonomy taxonomy
 # Download All complete archaea,bacteria,viral to ./library/
 # Downloads from ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq availabble domains are: archaea,bacteria,viral,plasmid,fungi,vertebrate_mammalian,vertebrate_other,protozoa,plasmid,plant,metagenomes,mitochondrion,invertebrate,...
 centrifuge-download -o library \
 	-m \
 	-d "archaea,bacteria,viral,plasmid,fungi" refseq > seqid2taxid.map
+cd ../../../
 
 ## Alternative 02
 # Prepare a database - Preffered alternative
+mkdir data/database/centrifuge/
+cd data/database/centrifuge/
 wget https://zenodo.org/record/3732127/files/h+p+v+c.tar.gz?download=1
 tar -xvzf hpvc.tar.gz 
 cd ../../../
