@@ -54,7 +54,7 @@ cd /var/scratch/$USER
 2. Create project directories:
 ```
 mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
-cd ilri-africa-cdc-training/viralMetagen/i
+cd ilri-africa-cdc-training/viralMetagen/
 mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
 ```
 
