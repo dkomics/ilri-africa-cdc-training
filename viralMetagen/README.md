@@ -1,11 +1,20 @@
 ---
-title: viralMetagen.md
-tags: ["Viral Genomics", "H1N1", "segmented viral genome", "Bioinformatics", "Metadata", "Linux", "Analysis", "Tutorial"]
+title: README.md
+tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", "Linux", "Analysis", "Tutorial"]
 ---
-# **Building capacity Africa Pathogen Genomics: Influenza A Virus - Segmented Virus**
+# **Building capacity in Pathogen Genomics: Influenza A Virus - Metagenomics Approach**
 ---
 ###### ***Trainers***: [John Juma](https://github.com/ajodeh-juma), [Kennedy Mwangi](https://github.com/wanjauk) & [Gilbert Kibet](https://github.com/kibet-gilbert)
 ---
+
+- [Introduction](#introduction)
+
+## Introduction
+Of the four types of influenza viruses (A, B, C and D), A and B cause seasonal epidemics in humans [according to the CDC](https://www.cdc.gov/flu/about/viruses/types.htm). C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian Influenza), humans, pigs (swine), horses (equine influenza), canine (canine influenza) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
+
+There are four main subtypes of influenza A viruses - H1N1, H1N2, H3N2 and H3N1 - classified based on two surface proteins: hemagglutinin (H) and neuramidase (N). Influenza A virus genome is made up of eight segments, H is encoded by segment 4 and N by segment 6. In total there are 18 different hemagglutinin subtypes and 11 different neuraminidase subtypes, with a total of 130 influenza A subtypes so far identified in nature. Because of this, Influenza virus is prone to reassortment - a process where when two subtypes infect the same host concurrently genetic information (in this case segments) are swapped - creating a new subtype.  
+Currently two types Influenza (Flu) viruses (A and B), and two influenza A subtypes (H1N1 and H3N2) are routinely detected in different parts of the world. They are classified as shown in the image:
+![alt text](https://www.cdc.gov/flu/images/about/influenza-viruses-1200px.jpg?_=72413 "Human Seasonal Influenza Viruses")
 
 Sign in to HPC
 ```
