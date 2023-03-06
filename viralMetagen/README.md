@@ -110,13 +110,23 @@ Some of the analysis steps require R and Python scripts. We have them stored in 
 cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
 ```
 
-> **Note:** *You can use data available in NCBI SRA for practice. So how would you get SRA fastq files?*
+> **Note:** *You can use data available in NCBI SRA for practice.*
+> **Quiz:** *How would you get SRA fastq files?*
 
 ---
 <details close>
   <summary>Tip: Downloading data from SRA matich the SRR23143759_1</summary>
-  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq<br>
-  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq<br>
+  <p dir="auto">
+    "Go to NCBI SRA and search for 'Influenza A virus', then check the necessary filters and click on a record that is illumina sequenced in a metagenomics workflow"
+  </p>
+  <div class="snippet-clipboard-content notranslate position-relative overflow-auto">
+    <pre class="notranslate"> 
+      <code>
+        wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
+        wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq
+      </code>
+    </pre>
+  </div>
 </details>
 
 ---
@@ -209,7 +219,7 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 ```
 gzip data/kraken/*.fastq
 ```
-> **Tip:** *How do you build or access a host genome database for kraken2*
+> **Quiz:** *How do you build or access a host genome database for kraken2*
 ---
 <details close>
   <summary>Tip</summary>
