@@ -305,7 +305,7 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	-o ./data/centrifuge/sample01-results.html \
 	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
 ```
-#### Build krona database:
+#### Building krona database:
 Most taxonomic clssification tools use [`NCBI Taxonomy`](https://www.ncbi.nlm.nih.gov/taxonomy). To translate NCBI's taxonomy, a local [taxonomy database](https://github.com/marbl/Krona/wiki/Installing#taxonomy-database) will be needed and can be downloaded from NCBI Taxonomy. 
 ##### Alterantive 01: Manually Download `taxdump.tar.gz` and build.
 NCBI Taxonomy database can be accessed [through`ftp` site](https://ftp.ncbi.nih.gov/pub/taxonomy/) as `taxdump.tar.gz`.
