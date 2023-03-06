@@ -92,7 +92,7 @@ Check if modules have been loaded:
 ```
 module list 
 ```
-### Step 3: Setting up sequence the data and databases
+### Step 3: Setting up sequence data and databases
 1. *Copying the data FASTQ:*   
 The FASTQ files that we will use for this tutorial have been stored in a directory in the HPC accessible to all:`/var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/`. You will need to copy it to the `data/fastq` directory in the `viralMetagen` directory. However, to avoid using so much space you can just create a [`symbolic link`](https://www.futurelearn.com/info/courses/linux-for-bioinformatics/0/steps/201767) to it.
 ```
@@ -114,10 +114,9 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
 
 ---
 <details close>
-  <summary>Tip</summary>
-  Downloading data from SRA matich the SRR23143759_1<br>
-  `wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq`<br>
-  `wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq`<br>
+  <summary>Tip: Downloading data from SRA matich the SRR23143759_1</summary>
+  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq<br>
+  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq<br>
 </details>
 
 ---
@@ -130,7 +129,7 @@ fastqc -t 4 \
 	./data/fastq/sample01_R1.fastq.gz \
 	./data/fastq/sample01_R2.fastq.gz
 ```
-This may take about 7 Minutes. You can proceed and copy fastqc HTML output files to local laptop: 
+This will take about 7 Minutes. You can proceed and copy fastqc HTML output files to local laptop: 
 ```
 mkdir -p ~/viralMetagen
 cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
@@ -151,7 +150,7 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--json ./data/fastp/sample01.fastp.json \
 	--html ./data/fastp/sample01.fastp.html \
 	--failed_out ./data/fastp/sample01_fail.fastq.gz \
-	--thread 10 \
+	--thread 4 \
 	--detect_adapter_for_pe \
 	--qualified_quality_phred 20 \
 	--cut_mean_quality 20 \
@@ -159,11 +158,12 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--dedup \
 	|& tee ./data/fastp/sample01.fastp.log
 ```
-You can proceed and copy the fastp HTML output files to local laptop as follows. Since this may take about 15 minutes, we can proceed and explore the output of the command above in this link: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)
+You can proceed and copy the fastp HTML output files to local laptop as follows.  
+This command may take about 15 minutes to complete, so we can proceed and explore the output of the command above in this link: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)
 ```
 cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastp/*.html ~/viralMetagen/
 ```
-## Then run this command on your laptop not HPC `scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./`
+Then run this command on your laptop not HPC `scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./`
 
 ### Step 6 (Optional): Assessing Read Quality after quality trimming
 After Quality trimming step above we can proceed and check the sequence quality again as described here. Run the command below.
@@ -183,8 +183,41 @@ scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 ```
 > **Discussion:** A report from this step can be found in these links: [sample01_R1.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html) and [sample01_R2.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2.trim_fastqc.html). Let us have a discussion about the results as we wait for the run to complete.
 
-### Step 7 (Optional): Taxonomic Classification of Reads
-To quickly profile the taxonomic composition of the reads present in the sequences you can proceed as follows:
+### Step 7: Filter Host Genome in preparation for genome assembly
+Remember our sequnces come from a human host, and it is **neither legal nor ethical to analyse human sequences without the permision or ethical approval from relevant authorities**. To avoid any such mistakes it is always required that you exlude any human sequences from your reads before futher analysis.
+
+In this step we use **`kraken2` module** and a database of human host genome to filter reads mapping to the human genome. *Ideally we are classifing and removing any classified sequences*
+> 1. Let us first set up the human host database
+```
+mkdir -p ./data/database/host_db
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/host_db/kraken2_human_db ./data/database/host_db/
+```
+> 2. Filtering Host genome sequences 
+```
+kraken2 -db ./data/database/host_db/kraken2_human_db \
+	--threads 4 \
+	--unclassified-out ./data/kraken/sample01.unclassified#.fastq \
+	--classified-out ./data/kraken/sample01.classified#.fastq \
+	--report ./data/kraken/sample01.kraken2.report.txt \
+	--output ./data/kraken/sample01.kraken2.out \
+	--gzip-compressed \
+	--report-zero-counts \
+	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
+	./data/fastp/sample01_R2.trim.fastq.gz
+```
+> 3. Compress the output of kraken. The fastq files generated by kraken2 need to be compressed to a format (gzip) useful in the next downstream step.
+```
+gzip data/kraken/*.fastq
+```
+> **Tip:** *How do you build or access a host genome database for kraken2*
+---
+
+---
+
+### Step 8 (Optional): Taxonomic Classification of Reads
+
+Since we are working with metagenomic sequences it would be fundamental for us to profile the microbes present in our clinical sample. To do this we need to *`BLAST`*  our sequences against a database of curated genomes whose source organisms are known. There are different databases and accompanying tools for this purpose as can be seen in this publication on [Metagenomic taxonomic classification tools](https://doi.org/10.1016/j.cell.2019.07.010)   
+To quickly profile the taxonomic composition of the reads present in the sequences we have chosen to use [**centrifuge**](https://ccb.jhu.edu/software/centrifuge/) which can classify DNA sequences against a database of genomes. You can proceed as follows:
 ```
 mkdir data/database/centrifuge/
 cd data/database/centrifuge/
@@ -223,28 +256,6 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 ```
 
 **Tip:** *How do you Build or access a centrifuge Database?*
----
----
-
-### Step 8: Filter Host Genome in preparation for genome assembly
-```
-mkdir ./data/database/host_db
-cd ./data/database/host_db
-```
-### Filtering Host genome seqiuences 
-```
-kraken2 -db ./data/database/host_db/kraken2_human_db \
-	--threads 4 \
-	--unclassified-out ./data/kraken/sample01.unclassified#.fastq \
-	--classified-out ./data/kraken/sample01.classified#.fastq \
-	--report ./data/kraken/sample01.kraken2.report.txt \
-	--output ./data/kraken/sample01.kraken2.out \
-	--gzip-compressed \
-	--report-zero-counts \
-	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
-	./data/fastp/sample01_R2.trim.fastq.gz
-```
-**Tip:** *How do you build or access a host genome database - kraken2*
 ---
 ---
 
