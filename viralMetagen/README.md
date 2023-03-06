@@ -243,7 +243,7 @@ Since we are working with metagenomic sequences, it would be fundamental for us 
 To quickly profile the taxonomic composition of the reads present in the sequences we chose to work with **[centrifuge](https://ccb.jhu.edu/software/centrifuge/) module**. Centrifuge is a 'rapid and memory-efficient' classification tool for DNA sequences of microbial origin.You can proceed as follows:  
 > 1. set up the reference database:
 ```
-mkdir data/database/centrifuge/
+mkdir -p data/database/centrifuge/
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/centrifuge/* ./data/database/centrifuge/
 ```
 > 2. Classification of reads
@@ -274,24 +274,31 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 
 ---
 #### Visualise the Taxonomic classification results with krona tools
-> 1. Convert centrifuge report to kraken-like report
+> 1. set up the reference krona Taxonomy database:
+```
+mkdir -p data/database/krona/
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
+```
+> 2. Convert centrifuge report to kraken-like report
 ```
 centrifuge-kreport -x ./data/database/hpvc \
-	./data/centrifuge/sample01-results.txt > ./data/centrifuge/sample01-kreport.txt
+	./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
 ```
-> 2. Preparing the classification report data to suitable krona input format
+> 3. Preparing the classification report data to suitable krona input format.
+> **Note:** *Takes about 40 Seconds*
 ```
-cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/centrifuge/sample01-results.krona
+cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-results.krona
 ```
-> 3. Visiualize the report - create a HTML file
+> 4. Visiualize the report - create a HTML file
+> **Note:** *Takes about 3 Minutes*
 ```
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
-	-o ./data/centrifuge/sample01-results.html \
-	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
+	-o ./data/krona/sample01-results.html \
+	./data/krona/sample01-results.krona > ./data/krona/sample01-results.html
 ```
-
-> **Quiz:** *How do you Build a krona Database?*
+> **Discussion:** A HTML report is generated from this step and can be found in this links: [sample01_R1.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html)
+> **Quiz:** *How do you Build a krona Taxonomy Database?*
 ---
 <details close>
   <summary>Tip</summary>
@@ -311,6 +318,7 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 ## Lets Focus on the target pathogenic virus species: H1N1 - Influenza A Virus
 
 ### Step 9: Setting up Reference datasets - reference genome, annotation files
+Based on the taxonomic
 Download Genome from NCBI - Genome database - Reference Genome (Influenza A virus (A/New York/392/2004(H3N2)))
 ```
 mkdir -p ./data/database/refseq/

@@ -251,7 +251,7 @@ to profile the microbes present in our clinical sample. To do this we need to *`
 To quickly profile the taxonomic composition of the reads present in the sequences we chose to work with **[centrifuge](https://ccb.jhu.edu/software/centrifuge/) module**. Centrifuge is a 'rapid and memory-efficient' classification tool for DNA sequences of microbial origin.You can proceed as follows:                 
 > 1. set up the reference database:
 ```
-mkdir data/database/centrifuge/
+mkdir -p data/database/centrifuge/
 cd data/database/centrifuge/
 ```
 > 2. Classification of reads
@@ -267,7 +267,7 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 #### Building centrifuge Database:
 ##### Alterantive 01: Download prebuilt database
 ```
-mkdir data/database/centrifuge/
+mkdir -p data/database/centrifuge/
 cd data/database/centrifuge/
 wget https://zenodo.org/record/3732127/files/h+p+v+c.tar.gz?download=1
 tar -xvzf hpvc.tar.gz
@@ -276,7 +276,7 @@ cd ../../../
 ##### Alternative 02: Build a database from NCBI RefSeq  
 > 1. Download NCBI `Taxonomy` to `./taxonomy/`
 ```
-mkdir data/database/centrifuge/
+mkdir -p data/database/centrifuge/
 cd data/database/centrifuge/
 centrifuge-download -o taxonomy taxonomy
 ```
@@ -289,28 +289,35 @@ centrifuge-download -o library \
 cd ../../../
 ```
 #### Visualise the Taxonomic classification results with krona tools
-> 1. Convert centrifuge report to kraken-like report
+> 1. set up the reference krona Taxonomy database:                             
 ```
-centrifuge-kreport -x ./data/database/hpvc \
-	./data/centrifuge/sample01-results.txt > ./data/centrifuge/sample01-kreport.txt
+mkdir -p data/database/krona/
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
 ```
-> 2. Preparing the classification report data to suitable krona input
+> 2. Convert centrifuge report to kraken-like report                           
 ```
-cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/centrifuge/sample01-results.krona
+centrifuge-kreport -x ./data/database/hpvc \                                   
+        ./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
 ```
-> 3. Visiualize the report - create a HTML file
+> 3. Preparing the classification report data to suitable krona input format.  
+> **Note:** *Takes about 40 Seconds*
 ```
-apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
-	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
-	-o ./data/centrifuge/sample01-results.html \
-	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
+cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-results.krona
+```
+> 4. Visiualize the report - create a HTML file                                
+> **Note:** *Takes about 3 Minutes*
+```
+apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \                   
+        ktImportTaxonomy -tax ./data/database/krona/taxonomy \                 
+        -o ./data/krona/sample01-results.html \
+        ./data/krona/sample01-results.krona > ./data/krona/sample01-results.html
 ```
 #### Building krona database:
 Most taxonomic clssification tools use [`NCBI Taxonomy`](https://www.ncbi.nlm.nih.gov/taxonomy). To translate NCBI's taxonomy, a local [taxonomy database](https://github.com/marbl/Krona/wiki/Installing#taxonomy-database) will be needed and can be downloaded from NCBI Taxonomy. 
 ##### Alterantive 01: Manually Download `taxdump.tar.gz` and build.
 NCBI Taxonomy database can be accessed [through`ftp` site](https://ftp.ncbi.nih.gov/pub/taxonomy/) as `taxdump.tar.gz`.
 ```
-mkdir ./data/database/krona
+mkdir -p ./data/database/krona
 cd ./data/database/krona 
 wget https://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz
 ktUpdateTaxonomy.sh --only-build ./data/database/krona/taxonomy
@@ -319,7 +326,7 @@ cd ../../../
 ##### Alterantive 02: Download build taxonomy database using `updateTaxonomy.sh`
 Krona tools has its own scripts to dowload, build or update a taxonomy database from NCBI Taxonomy. The commands to run the scripts are as follows:
 ```
-mkdir ./data/database/krona
+mkdir -p ./data/database/krona
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
         ktUpdateTaxonomy.sh ./data/database/krona/taxonomy
 ```
