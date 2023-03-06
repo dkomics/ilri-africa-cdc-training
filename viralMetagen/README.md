@@ -13,6 +13,8 @@ tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
 - [Accessing the HPC](#accessing-the-HPC)
 - [Bioinformatics Analysis](#Bioinformatics-Analysis)
     - [Step 1 : Preparing the project directory](#Step-1--Preparing-the-project-directory)
+    - [Step 2: Loading Modules](#Step-2-Loading-Modules)
+    - [Step 3: Copying the data and databases](#Step-3-Copying-the-data-and-databases)
 
 ## Introduction
 There are four types of ***influenza viruses*** (A, B, C and D). Influenza A and B cause seasonal flu epidemics in human populations [as reported by CDC](https://www.cdc.gov/flu/about/viruses/types.htm). Influenza C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian), humans, pigs (swine), horses (equine), canine (canine) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
@@ -40,7 +42,7 @@ ssh <user_name>@hpc.ilri.cgiar.org
 There are two nodes to choose from: `compute05`  and `compute06`. If your username (`Bio4InfoXX`) ends with an ***Odd Number*** (1,3,5,7,9) use `compute05` and if it ends with n ***even number*** (2,4,6,8,0) use `compute06`. Now let us secure a four of CPUs in one of the HPC nodes.  
 >Compute05
 ```
-interactive -w compute06 -c 4 -J metagen -p batch
+interactive -w compute05 -c 4 -J metagen -p batch
 ```
 >Compute06
 ```
@@ -49,23 +51,25 @@ interactive -w compute06 -c 4 -J metagen -p batch
 
 ## Bioinformatics Analysis
 
-We will start by seting up the project directory structure and then conduct the analysis stepwise.
+We will start by setting up the project directory structure and then conduct the analysis stepwise.
 
 ### Step 1 : Preparing the project directory
 To setup a well-structured project directory we need to create some directories to store our data and scripts. We will be conducting our a anlysis from a directory in the `scratch` space of the HPC.
-1. Create a directory using your username in the scratch: 
+1. Create a directory using your username in the scratch:
+> **Note:** In this command we use the UNIX environment variable `$USER` which by default was created to store your `<user_name>` i.e (`Bio4InfoXX`). You can view its value using the command `echo $USER`.  
 ```
 mkdir -p /var/scratch/$USER
 cd /var/scratch/$USER
 ```
 2. Create project directories:
+> **Note:** We create a project directory `viralMetagen` to store all that pertains this tutorial/project. Within `viralMetagen` we created `data` and subdirectories to store our input data and results from different steps. We create `scripts` directory to store scripts/code that we genenrate or need in the analysis.
 ```
 mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
 cd ilri-africa-cdc-training/viralMetagen/
 mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
 ```
 
-### Step 2: Loading Modules:
+### Step 2: Loading Modules
 Load programs/tools using the following commands:
 ```
 module load fastqc/0.11.9
@@ -84,14 +88,14 @@ module load nextclade/2.11.0
 ```
 Check if modules have been loaded:
 ```
-module list
+module list 
 ```
-### Step 3: Copying the data and databases:
-### Setting up databases
+### Step 3: Setting up sequence the data and databases
+1. Setting up databases
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/database/
 #cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/databaseV1
 
-### Setting up scripts and images
+2. Setting up scripts and images
 cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
 1. Copying the data fastq and databases
 ```
