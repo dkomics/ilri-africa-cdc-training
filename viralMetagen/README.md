@@ -115,18 +115,22 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
 
 ---
 <details close>
-  <summary>Tip: Downloading data from SRA matich the SRR23143759_1</summary>
-  <p dir="auto">
-    "Go to NCBI SRA and search for 'Influenza A virus', then check the necessary filters and click on a record that is illumina sequenced in a metagenomics workflow"
-  </p>
-  <div class="snippet-clipboard-content notranslate position-relative overflow-auto">
-    <pre class="notranslate"> 
-      <code>
-        wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
-        wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq
-      </code>
-    </pre>
-  </div>
+  <summary>Tip: Downloading data from SRA: "SRR23143759_1"</summary>
+  <blockquote>
+    <p dir="auto">
+      Go to NCBI SRA and search for 'Influenza A virus'.
+      Check the necessary filters: Public, DNA, genome, paired, Illumina, fastq.
+      Click on a record that is sequenced in a metagenomics workflow
+    </p>
+    <div class="snippet-clipboard-content notranslate position-relative overflow-auto">
+      <pre class="notranslate"> 
+        <code>
+          wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
+          wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq
+        </code>
+      </pre>
+    </div>
+  </blockquote>
 </details>
 
 ---
