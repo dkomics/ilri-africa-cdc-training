@@ -118,6 +118,7 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
   wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq<br>
   wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq<br>
 </details>
+
 ---
 
 ### Step 4: Assessing Read Quality using fastqc before quality trimming
@@ -216,7 +217,6 @@ gzip data/kraken/*.fastq
   <blockquote>
     <p dir="auto">
       <strong>Solution:</strong>
-      " View this workflow - "
       <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-kraken2-databases"
       ref="nofollow">Building Kraken2 human database</a>
     </p>
