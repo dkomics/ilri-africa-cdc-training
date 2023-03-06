@@ -244,7 +244,7 @@ To quickly profile the taxonomic composition of the reads present in the sequenc
 > 1. set up the reference database:
 ```
 mkdir data/database/centrifuge/
-cd data/database/centrifuge/
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/centrifuge/* ./data/database/centrifuge/
 ```
 > 2. Classification of reads
 ```
@@ -257,7 +257,7 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 	--mm 100GB
 ```
 
-**Tip:** *How do you Build or access a centrifuge Database?*
+> **Quiz:** *How do you Build or access a centrifuge Database?*
 ---
 <details close>
   <summary>Tip</summary>
@@ -273,17 +273,17 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 </details>
 
 ---
-### Visualise the Taxonomic classification results with krona tools
-Convert centrifuge report to kraken-like report
+#### Visualise the Taxonomic classification results with krona tools
+> 1. Convert centrifuge report to kraken-like report
 ```
 centrifuge-kreport -x ./data/database/hpvc \
 	./data/centrifuge/sample01-results.txt > ./data/centrifuge/sample01-kreport.txt
 ```
-Preparing the classification data
+> 2. Preparing the classification report data to suitable krona input format
 ```
 cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/centrifuge/sample01-results.krona
 ```
-Visiualize the report - create a HTML file
+> 3. Visiualize the report - create a HTML file
 ```
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
@@ -291,8 +291,21 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
 ```
 
-**Tip:** *How do you Build or access a centrifuge Database?*
+**Quiz:** *How do you Build a krona Database?*
 ---
+<details close>
+  <summary>Tip</summary>
+  How to build krona Taxonomy Database <br>
+  <blockquote>
+    <p dir="auto">
+      <strong>Solution:</strong>
+      <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-krona-database"
+      ref="nofollow">Building krona Taxonomy database</a>
+    </p>
+  </blockquote>
+  <br>
+</details>
+
 ---
 
 ## Lets Focus on the target pathogenic virus species: H1N1 - Influenza A Virus

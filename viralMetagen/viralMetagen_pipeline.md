@@ -288,27 +288,42 @@ centrifuge-download -o library \
         -d "archaea,bacteria,viral,plasmid,fungi" refseq > seqid2taxid.map
 cd ../../../
 ```
-### Visualise the Taxonomic classification results with krona tools
-Convert centrifuge report to kraken-like report
+#### Visualise the Taxonomic classification results with krona tools
+> 1. Convert centrifuge report to kraken-like report
 ```
 centrifuge-kreport -x ./data/database/hpvc \
 	./data/centrifuge/sample01-results.txt > ./data/centrifuge/sample01-kreport.txt
 ```
-Preparing the classification data
+> 2. Preparing the classification report data to suitable krona input
 ```
 cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/centrifuge/sample01-results.krona
 ```
-Visiualize the report - create a HTML file
+> 3. Visiualize the report - create a HTML file
 ```
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
 	-o ./data/centrifuge/sample01-results.html \
 	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
 ```
-
-**Tip:** *How do you Build or access a centrifuge Database?*
----
----
+#### Build krona database:
+Most taxonomic clssification tools use [`NCBI Taxonomy`](https://www.ncbi.nlm.nih.gov/taxonomy). To translate NCBI's taxonomy, a local [taxonomy database](https://github.com/marbl/Krona/wiki/Installing#taxonomy-database) will be needed and can be downloaded from NCBI Taxonomy. 
+##### Alterantive 01: Manually Download `taxdump.tar.gz` and build.
+NCBI Taxonomy database can be accessed [through`ftp` site](https://ftp.ncbi.nih.gov/pub/taxonomy/) as `taxdump.tar.gz`.
+```
+mkdir ./data/database/krona
+cd ./data/database/krona 
+wget https://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz
+ktUpdateTaxonomy.sh --only-build ./data/database/krona/taxonomy
+cd ../../../
+```
+##### Alterantive 02: Download build taxonomy database using `updateTaxonomy.sh`
+Krona tools has its own scripts to dowload, build or update a taxonomy database from NCBI Taxonomy. The commands to run the scripts are as follows:
+```
+mkdir ./data/database/krona
+apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
+        ktUpdateTaxonomy.sh ./data/database/krona/taxonomy
+```
+> **Note:** For more information on installing krona databases go to [krona wiki](https://github.com/marbl/Krona/wiki/Installing)
 
 ## Lets Focus on the target pathogenic virus species: H1N1 - Influenza A Virus
 
