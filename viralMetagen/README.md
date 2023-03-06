@@ -56,13 +56,13 @@ We will start by setting up the project directory structure and then conduct the
 ### Step 1 : Preparing the project directory
 To setup a well-structured project directory we need to create some directories to store our data and scripts. We will be conducting our a anlysis from a directory in the `scratch` space of the HPC.
 1. Create a directory using your username in the scratch:
-> **Note:** In this command we use the UNIX environment variable `$USER` which by default was created to store your `<user_name>` i.e (`Bio4InfoXX`). You can view its value using the command `echo $USER`.  
+> **Note:** In this command we use the UNIX environment variable `$USER` which by default was created during logging into the HPC to store your `<user_name>` i.e (`Bio4InfoXX`). You can view its value using the command `echo $USER`.  
 ```
 mkdir -p /var/scratch/$USER
 cd /var/scratch/$USER
 ```
 2. Create project directories:
-> **Note:** We create a project directory `viralMetagen` to store all that pertains this tutorial/project. Within `viralMetagen` we created `data` and subdirectories to store our input data and results from different steps. We create `scripts` directory to store scripts/code that we genenrate or need in the analysis.
+> **Note:** We create a project directory `viralMetagen` to store all that pertains to this tutorial/project. Within `viralMetagen` we created `data` and subdirectories to store our input data and results from different analysis steps. We create `scripts` directory to store scripts/code that we genenrate or need in the analysis.
 ```
 mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
 cd ilri-africa-cdc-training/viralMetagen/
@@ -70,7 +70,7 @@ mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowt
 ```
 
 ### Step 2: Loading Modules
-Load programs/tools using the following commands:
+Before any analysis we need to load the modules (Bioinformatics programs or tools) we will use in the differemt analyis steps. We can load all modules ahead of the analysis or during every analysis step as we progress with the analysis. We will load all the modules using the following commands:
 ```
 module load fastqc/0.11.9
 module load fastp/0.22.0
@@ -86,31 +86,29 @@ module load snpeff/4.1g
 module load bcftools/1.13
 module load nextclade/2.11.0
 ```
+> **Note:** `module` is the command used in managing modules. `load` or `list` (see below) are some of it's subcommands. `module load fastqc/0.11.9` will load a tool called `fastqc` and specific version of it `0.11.9` given that we have many versions of `fastqc`.  
+
 Check if modules have been loaded:
 ```
 module list 
 ```
 ### Step 3: Setting up sequence the data and databases
-1. Setting up databases
-ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/database/
-#cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/* ./data/databaseV1
+1. Copying the data FASTQ. The FASTQ files that we will use for this tutorial have been stored in a directory in the HPC accessible to all:`/var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/`. You will need to copy it to the `data/fastq` directory in the `viralMetagen` directory. However, to avoid using so much space you can just create a [`symbolic link`](https://www.futurelearn.com/info/courses/linux-for-bioinformatics/0/steps/201767) to it.
+```
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
+```
+2. Setting up the database directories:   
+During the analysis we will need databases to carry out our analysis at different stages. This will be explained in detail during each individual stage where they are needed. For now we will create the directories where we will store the databases.
+```
+mkdir -p ./data/database{bowtie,centrifuge,hostdb,krona,nextclade,refseq,snpEff}
+```
 
-2. Setting up scripts and images
-cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
-1. Copying the data fastq and databases
+3. Copying scripts and images we may need in the analysis. Some of the analysis steps require R and Python scripts. We have them stored in `/var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts`. We will copy this to `./scripts/` within `viralMetagen` as follows:   
 ```
-cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
-```
-
-During the analysis we will need databases for different steps. We will explain this during each individual step.
-```
-cp /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
-cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/ ./data/databse
 cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
-
 ```
 
-**Note:** *How did we get the fastq files?*
+> **Note:** *You can use data available in NCBI SRA for practice. So how would you get SRA fastq files?*
 
 ---
 <details close>
@@ -121,9 +119,9 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
 </details>
 
 ---
-Swine Flu (H1N1) virus infect both pigs, and is the 
 
 ### Step 4: Assessing Read Quality using fastqc before quality trimming
+
 ```
 fastqc -t 4 \
 	-o ./data/fastqc/ \
