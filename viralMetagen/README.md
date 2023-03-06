@@ -139,10 +139,10 @@ cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html 
 ```
 scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 ```
-> **Discussion:** A report from this step can be found in these links: [sample01_R1](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1_fastqc.html) [sample01_R2](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2_fastqc.html). Let us have a discussion about the results as we wait for the run to complete.
+> **Discussion:** A report from this step can be found in these links: [sample01_R1](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1_fastqc.html) and [sample01_R2](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2_fastqc.html). Let us have a discussion about the results as we wait for the run to complete.
 
 ### Step 5: Quality Trimming fastq files with fastp and Trims adapter sequences
-After accessing the quality, we will proceed and do some Quality Control (QC). With `fastp` module we will trim reads with qualities less than 20 phred score, remove adapters, remove dublicates and remove PhiX if any.
+After accessing the quality, we will proceed and do some Quality Control (QC). With **fastp** module we will trim reads with qualities less than 20 phred score, remove adapters, remove dublicates and remove PhiX if any.
 ```
 fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--in2 ./data/fastq/sample01_R2.fastq.gz \
@@ -159,24 +159,29 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--dedup \
 	|& tee ./data/fastp/sample01.fastp.log
 ```
-You can proceed and copy the fastp HTML output files to local laptop as follows. Since this may take long, we can proceed and explore the output of the command above in this links: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)
+You can proceed and copy the fastp HTML output files to local laptop as follows. Since this may take about 15 minutes, we can proceed and explore the output of the command above in this link: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)
 ```
 cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastp/*.html ~/viralMetagen/
 ```
 ## Then run this command on your laptop not HPC `scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./`
 
-### Step 6: Assessing Read Quality after quality trimming
+### Step 6 (Optional): Assessing Read Quality after quality trimming
+After Quality trimming step above we can proceed and check the sequence quality again as described here. Run the command below.
 ```
 fastqc -t 4 \
 	-o ./data/fastqc/ \
 	./data/fastp/sample01_R1.trim.fastq.gz \
 	./data/fastp/sample01_R2.trim.fastq.gz
 ```
-
- Copy the trimmed fastqc output files to local laptop --- Run this command on your laptop not HPC
+To copy the trimmed fastqc output files to local laptop. Run this commands:
 ```
-# scp username@hpc.ilri.cgiar.org:~/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ./
+cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*trim_fastqc.html ~/viralMetagen/
 ```
+***Run this command on your laptop not HPC***
+```
+scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
+```
+> **Discussion:** A report from this step can be found in these links: [sample01_R1.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html) and [sample01_R2.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2.trim_fastqc.html). Let us have a discussion about the results as we wait for the run to complete.
 
 ### Step 7 (Optional): Taxonomic Classification of Reads
 To quickly profile the taxonomic composition of the reads present in the sequences you can proceed as follows:
