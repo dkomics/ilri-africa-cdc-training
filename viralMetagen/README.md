@@ -215,16 +215,16 @@ gzip data/kraken/*.fastq
   How to build a kraken2 Database <br>
   <blockquote>
     <p dir="auto">
-      <strong>Solution</strong>
-      " View this workflow: ".
+      <strong>Solution:</strong>
+      " View this workflow - "
       <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-kraken2-databases"
       ref="nofollow">Building Kraken2 human database</a>
     </p>
   </blockquote>
   <br>
 </details>
----
 
+---
 ### Step 8 (Optional): Taxonomic Classification of Reads
 
 Since we are working with metagenomic sequences it would be fundamental for us to profile the microbes present in our clinical sample. To do this we need to *`BLAST`*  our sequences against a database of curated genomes whose source organisms are known. There are different databases and accompanying tools for this purpose as can be seen in this publication on [Metagenomic taxonomic classification tools](https://doi.org/10.1016/j.cell.2019.07.010)   
