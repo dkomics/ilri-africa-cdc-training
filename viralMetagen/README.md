@@ -291,7 +291,7 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
 ```
 
-**Quiz:** *How do you Build a krona Database?*
+> **Quiz:** *How do you Build a krona Database?*
 ---
 <details close>
   <summary>Tip</summary>
