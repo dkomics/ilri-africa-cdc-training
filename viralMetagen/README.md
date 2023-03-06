@@ -118,7 +118,6 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
   wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq<br>
   wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq<br>
 </details>
-
 ---
 
 ### Step 4: Assessing Read Quality using fastqc before quality trimming
@@ -211,7 +210,19 @@ gzip data/kraken/*.fastq
 ```
 > **Tip:** *How do you build or access a host genome database for kraken2*
 ---
-
+<details close>
+  <summary>Tip</summary>
+  How to build a kraken2 Database <br>
+  <blockquote>
+    <p dir="auto">
+      <strong>Solution</strong>
+      " View this workflow: ".
+      <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-kraken2-databases"
+      ref="nofollow">Building Kraken2 human database</a>
+    </p>
+  </blockquote>
+  <br>
+</details>
 ---
 
 ### Step 8 (Optional): Taxonomic Classification of Reads
@@ -235,6 +246,11 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 
 **Tip:** *How do you Build or access a centrifuge Database?*
 ---
+<details close>
+  <summary>Tip: Downloading data from SRA matich the SRR23143759_1</summary>
+  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq<br>
+  wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq<br>
+</details>
 ---
 
 ### Visualise the Taxonomic classification results with krona tools
