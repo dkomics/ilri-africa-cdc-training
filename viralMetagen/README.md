@@ -183,7 +183,7 @@ scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 ```
 > **Discussion:** A report from this step can be found in these links: [sample01_R1.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html) and [sample01_R2.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2.trim_fastqc.html). Let us have a discussion about the results as we wait for the run to complete.
 
-### Step 7: Filter Host Genome in preparation for genome assembly
+### Step 7: Filter Host Genome.
 Remember our sequnces come from a human host, and it is **neither legal nor ethical to analyse human sequences without the permision or ethical approval from relevant authorities**. To avoid any such mistakes it is always required that you exlude any human sequences from your reads before futher analysis.
 
 In this step we use **`kraken2` module** and a database of human host genome to filter reads mapping to the human genome. *Ideally we are classifing and removing any classified sequences*
