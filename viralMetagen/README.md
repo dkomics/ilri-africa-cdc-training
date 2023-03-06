@@ -274,14 +274,14 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 
 ---
 #### Visualise the Taxonomic classification results with krona tools
-> 1. set up the reference krona Taxonomy database:
+> 1. Set up the reference krona Taxonomy database:
 ```
 mkdir -p data/database/krona/
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
 ```
 > 2. Convert centrifuge report to kraken-like report
 ```
-centrifuge-kreport -x ./data/database/hpvc \
+centrifuge-kreport -x ./data/database/centrifuge/hpvc \
 	./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
 ```
 > 3. Preparing the classification report data to suitable krona input format.
