@@ -424,29 +424,37 @@ samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
   <summary>Tip: samtools view"</summary>
   <blockquote>
     <p dir="auto">
-      You can view the whole alignment'BAM' file.
+      1. You can view the whole alignment'BAM' file.
     </p>
-      <details close>
-        <pre class="notranslate">
-          <code>
-samtools view ./data/bowtie/sample01.sorted.bam| less -S
-          </code>
-        </pre>
-      </details close>
-    <p dir="auto">
-      You can count the number of reads in the alignment.
-    </p>
-    <p dir="auto">
-      You can count the number of reads mapping to segment 4 hemagglutinin (HA) gene: NC_026433.1
-    </p>
-    <p dir="auto">
-      You can count the number of reads mapping to segment 6 neuraminidase (NA) gene: NC_026434.1 
-    </p>
-      <pre class="notranslate"> 
-        <code>
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq</code>
+    <Answer close>
+      <pre class="notranslate">
+        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
       </pre>
+    </Answer close>
+    <p dir="auto">
+      2. You can count the number of reads in the alignment.
+    </p>
+    <details close>
+      <pre class="notranslate">
+        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
+      </pre>
+    </details close>
+    <p dir="auto">
+      3. You can count the number of reads mapping to segment 4 hemagglutinin (HA) gene: NC_026433.1
+    </p>
+    <details close>
+      <pre class="notranslate">
+        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
+      </pre>
+    </details close>
+    <p dir="auto">
+      4. You can count the number of reads mapping to segment 6 neuraminidase (NA) gene: NC_026434.1 
+    </p>
+    <details close>
+      <pre class="notranslate">
+        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
+      </pre>
+      </details close>
   </blockquote>
 </details>
 
