@@ -425,13 +425,21 @@ samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
   <blockquote>
     <p dir="auto">
       You can view the whole alignment'BAM' file.
-        <details close>
+    </p>
+      <details close>
+        <pre class="notranslate">
           <code>
 samtools view ./data/bowtie/sample01.sorted.bam| less -S
           </code>
-        </details close>
+        </pre>
+      </details close>
+    <p dir="auto">
       You can count the number of reads in the alignment.
+    </p>
+    <p dir="auto">
       You can count the number of reads mapping to segment 4 hemagglutinin (HA) gene: NC_026433.1
+    </p>
+    <p dir="auto">
       You can count the number of reads mapping to segment 6 neuraminidase (NA) gene: NC_026434.1 
     </p>
       <pre class="notranslate"> 
