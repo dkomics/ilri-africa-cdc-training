@@ -430,32 +430,30 @@ samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
       1. You can view the whole alignment'BAM' file.
     </p>
     <details close>
+      <summary>Answer</summary>
         <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
     </details close>
     <p dir="auto">
       2. You can count the number of reads in the alignment.
     </p>
     <details close>
-      <pre class="notranslate">
-        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
-      </pre>
+      <summary>Answer</summary>
+        <code>samtools view ./data/bowtie/sample01.sorted.bam| wc -l</code>
     </details close>
     <p dir="auto">
       3. You can count the number of reads mapping to segment 4 hemagglutinin (HA) gene: NC_026433.1
     </p>
     <details close>
-      <pre class="notranslate">
-        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
-      </pre>
+      <summary>Answer</summary>
+        <code>samtools view ./data/bowtie/sample01.sorted.bam | grep "NC_026433.1" | wc -l</code>
     </details close>
     <p dir="auto">
       4. You can count the number of reads mapping to segment 6 neuraminidase (NA) gene: NC_026434.1 
     </p>
     <details close>
-      <pre class="notranslate">
-        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
-      </pre>
-      </details close>
+      <summary>Answer</summary>
+        <code>samtools view ./data/bowtie/sample01.sorted.bam | grep "NC_026434.1" | wc -l</code>
+    </details close>
   </blockquote>
 </details>
 
