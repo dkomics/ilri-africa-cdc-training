@@ -421,16 +421,17 @@ samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 > **Quiz:** *To `view` the alignment `BAM` file which command will you use?*
 ---
 <details close>
-  <summary>Tip: samtools view"</summary>
+  <summary>Tip!</summary>
   <blockquote>
+    <p dir="auto">
+      <code>samtools view</code>
+    </p>
     <p dir="auto">
       1. You can view the whole alignment'BAM' file.
     </p>
-    <Answer close>
-      <pre class="notranslate">
+    <details close>
         <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
-      </pre>
-    </Answer close>
+    </details close>
     <p dir="auto">
       2. You can count the number of reads in the alignment.
     </p>
