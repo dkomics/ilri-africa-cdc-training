@@ -119,19 +119,21 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
   <summary>Tip</summary>
   <blockquote>
     <p dir="auto">
-      Go to 
+      1. Go to 
       <a href="https://www.ncbi.nlm.nih.gov/"
       ref="nofollow">NCBI</a> and search <code>SRA database</code> for 'Influenza A virus'.
     </p>
     <p dir="auto">
-      Check the necessary filters: <code>Public</code>, <code>DNA</code>, <code>genome</code>, <code>paired end</code>, <code>Illumina</code>, <code>fastq</code>.
+      2. Check the necessary filters: <code>Public</code>, <code>DNA</code>, <code>genome</code>, <code>paired end</code>, <code>Illumina</code>, <code>fastq</code>.
     </p>
     <p dir="auto">
-      Click on a record that is sequenced in a metagenomics workflow
+      3. Click on a record that is sequenced in a metagenomics workflow
     </p>
-      <strong>Example:</strong>Downloading data from SRA: "SRR23143759_1"
+    <details close>
+      <summary><strong>Example:</strong>Downloading data from SRA: "SRR23143759_1"</summary>
         <code>wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq</code>
 	<code>wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq</code>
+    </details close>
   </blockquote>
 </details>
 
