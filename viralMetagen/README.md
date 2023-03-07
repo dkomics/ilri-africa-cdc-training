@@ -85,6 +85,7 @@ module load bedtools/2.29.0
 module load snpeff/4.1g
 module load bcftools/1.13
 module load nextclade/2.11.0
+module load R/4.2
 ```
 > **Note:** `module` is the command used in managing modules. `load` or `list` (see below) are some of it's subcommands. `module load fastqc/0.11.9` will load a tool called `fastqc` and specific version of it `0.11.9` given that we have many versions of `fastqc`.  
 
@@ -401,7 +402,7 @@ bowtie2 -x ./data/database/bowtie/H1N1 \
 ```
 > **Note:** *Takes about 35 minutes*
 
-### Step 13: Sort and Index aligment map
+### Step 12: Sort and Index aligment map
 The alignment of `FASTQ` files above to the reference genome results in a random arrangement of reads in the order which the sequences occurred in the input FASTQ file. In order to perform any analysis of visualize the alingment, the alignment should be sorted in the order with which they occur in the reference genome based on their `alignment coordinates`.   
 > 1. First let us sort our read alignment `BAM` file above by their occurence in refernce genome.
 ```
@@ -417,8 +418,17 @@ Indexing will generate an `index` file with `.bam.bai` extention.
 ```
 samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 ```
-> **Note:** *Takes about 5 Seconds*   
-> **Quiz:** *To `view` the alignment `BAM` file which command will you use?*
+> **Note:** *Takes about 5 Seconds*  
+The 'BAM' viewed with `samtools view` has many columns as shown below:
+```
+NB552490:29:HY2LGBGXK:1:11101:23816:4618        97      NC_026438.1     1      42       16S135M =       39      208     GTCAAATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAGAACCCCGCGCTC AAAAAEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEA/EEEE<EEEEEEEEEEEEEEEE<EEEEEEEEEEEEE/EEEEEEAEEAEEEEEA<//EEAEEEEEEE AS:i:242        XN:i:0  XM:i:4  XO:i:0  XG:i:0  NM:i:4 MD:Z:17A71A17A23A3       YS:i:239        YT:Z:DP
+NB552490:29:HY2LGBGXK:1:11103:24220:6132        97      NC_026438.1     1      42       12S131M1S       =       1       144     AATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAGAACCCCGCG        AAAAAEEEEEEEEEAEEEEEEEEAEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEE<EE/EEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEAEE//AEEAEEE/EEEEEEAAAAEEEEAEEEAEAAEEEEAA</E<EAEEE        AS:i:241        XN:i:0  XM:i:3  XO:i:0  XG:i:0 NM:i:3   MD:Z:17A71A17A23        YS:i:241        YT:Z:DP
+NB552490:29:HY2LGBGXK:1:11103:18290:12161       161     NC_026438.1     1      42       12S113M =       1       125     AATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAG   AAAAAEEEEEEEEEEEEEEEEEEEEE/EAEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/EEEEEAEEEEEEEEE/EEEEEEEEEAEEAEA<EEEEEEEEEEEEEEEEE<EE   AS:i:205        XN:i:0 XM:i:3   XO:i:0  XG:i:0  NM:i:3  MD:Z:17A71A17A5 YS:i:205        YT:Z:DP
+NB552490:29:HY2LGBGXK:1:11104:4973:14511        97      NC_026438.1     1      42       20S123M =       1       143     GCAGGTCAAATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAG AAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEAE AS:i:225        XN:i:0  XM:i:3  XO:i:0  XG:i:0  NM:i:3  MD:Z:17A71A17A15YS:i:225        YT:Z:DP
+NB552490:29:HY2LGBGXK:1:11105:9877:1184 97      NC_026438.1     1       41     16S118M  =       11      134     GTCAAAAATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAG  6AAAAA6EE/AEAEEE/AE/EEEEEEEEEEEEE6EEEEEEEEEE/EE/EEEEEEE/EE/AA6EEAAEEEEAAEEEE//AEEEEA6AEA<6</AEEEEEE//EEEE6E/<AEE/EE/AEEEA<E/AEE/EE/AEE  AS:i:219       XN:i:0   XM:i:3  XO:i:0  XG:i:0  NM:i:3  MD:Z:17A71A17A10        YS:i:180       YT:Z:DP
+```
+This can was earlier explained. The documantation is also available here: [SAM Format](http://samtools.github.io/hts-specs/SAMv1.pdf)   
+> **Quiz:** *To `view` the sorted alignment `BAM` file which command will you use?*
 ---
 <details close>
   <summary>Tip!</summary>
@@ -427,7 +437,7 @@ samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
       <code>samtools view</code>
     </p>
     <p dir="auto">
-      1. You can view the whole alignment'BAM' file.
+      1. You can view the whole alignment 'BAM' file.
     </p>
     <details close>
       <summary>Answer</summary>
@@ -460,20 +470,31 @@ samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 ---
 
 ### Step 13: Coverage computation
+`bedtools genomecov` computes per-base genome coverage when used with `-d` option. It will do this for all our eight segments.  
 ```
 bedtools genomecov \
 	-d \
 	-ibam ./data/bowtie/sample01.sorted.bam \
 	> ./data/bowtie/sample01.coverage
 ```
-> **Note:** *Takes about 40 Seconds*
+> **Note:** *Takes about 2 Seconds*
+The output of this command is a three column file with `chromosome`, `Position` and`depth coverage`. View the ouput with the command below:
+```
+less ./data/bowtie/sample01.coverage
+```
 ### Step 14: Plot Genome coverage in R
+We can plot the coverage using an R script as shown below. The R script was prepared ahead of the analysis and stored in the `scripts` directory.
 ```
 Rscript ./scripts/plotGenomecov.R ./data/bowtie/sample01.coverage
+mv ./test_cov_gene_density.png ./data/bowtie/sample01.genomeCoverage.png
 ```
+The genome coverage of our eight segments can be seen here: [sample01.genomeCoverage](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/bedtools/sample01.genomeCoverage.png)  
 > **Note:** *Takes about 40 Seconds*
+
 ### Step 15: Consensus Genome construsction
-For segmented viruses e.g Influenza A ivar consensus is unable to analyse more than one reference (segment/cromosome) name at once. We need to split by reference:
+We will use `ivar consensus` to construct the consensus genome.  
+Segmented viruses e.g Influenza A virus, are difficult for `ivar consensus` to analyse as it has more than one reference (segment/chromosome). We need to split the alignment file by reference.  
+We use `bamtools split` command to split the `BAM` file.
 ```
 bamtools split -in data/bowtie/sample01.sorted.bam \
 	-refPrefix "REF_" \
