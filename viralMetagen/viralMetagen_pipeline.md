@@ -369,7 +369,7 @@ Follow the following steps to identify and download the data:
   > **Influenza A virus**  
   > **Reference genome:** [Influenza A virus (A/New York/392/2004(H3N2))](https://www.ncbi.nlm.nih.gov/genome/10290?genome_assembly_id=899994)   
  
-Because the Influenza A Virus genome segments rapidly evolves, we will select the most recent reference genome to H1N1. This would be A/California/07/2009(H1N1). Reported in the 2009 epidemic in California.
+Because the Influenza A Virus genome segments rapidly evolves, we will select the most recent reference genome to H1N1. This would be A/California/07/2009(H1N1). Reported in the [2009 pandemic](https://doi.org/10.1371/journal.pone.0013381) in California.
 > 3. Under [Download sequence and annotation from **RefSeq** or **GenBan*k*] select the [RefSeq](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/).
 > 4. Note that there are seven versions of `Influenza_A_virus/latest_assembly_versions`.  
 Select the genome version [ViralMultiSegProj274766](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/).  
