@@ -519,7 +519,12 @@ Renaming output files
 ```
 rename 'sorted.REF' 'REF' ./data/bowtie/*
 ```
-Now we have eight bam files for the eight Influenza A virus segments.
+Now we have eight bam files for the eight Influenza A virus segments.   
+- As we did before, we also need to generate index `.bai` files for these segment `bam` files.   
+- The command that does this for all `bam` files matching the regex `*REF_*.bam` is shown below:
+```
+ls ./data/bowtie/*REF_*.bam | xargs -n1 -P5 samtools index -@ 4
+```
 
 ### Step 16: Loop through segmented BAM files and generate consensus:
 To generate a consensus from the read alignment `BAM` file for one segment `NC_026431.1` we will run the following command:  
