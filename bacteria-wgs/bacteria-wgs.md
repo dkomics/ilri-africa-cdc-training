@@ -341,6 +341,12 @@ Genome assessment entails producing the quality metrics that gauge both the comp
 
 ### ***Genome annotation***  
 In genome annotation, the goal is to identify and label the features of on a genome sequence.  
+
+First, unload the modules to avoid conflict between the loaded dependencies
+```
+module purge
+```
+
 ```
 module load prokka/1.11
 
