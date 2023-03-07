@@ -401,71 +401,141 @@ gunzip ./data/database/refseq/*.gz
 rename 'GCF_001343785.1_ViralMultiSegProj274766_genomic' 'H1N1' ./data/database/refseq/*
 ```
 
-Download Genome from NCBI - Genome database - Reference Genome (Influenza A virus (A/New York/392/2004(H3N2)))
-```
-mkdir -p ./data/database/refseq/
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/865/085/GCF_000865085.1_ViralMultiSegProj15622/GCF_000865085.1_ViralMultiSegProj15622_genomic.fna.gz -P ./data/database/refseq/
-wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/865/085/GCF_000865085.1_ViralMultiSegProj15622/GCF_000865085.1_ViralMultiSegProj15622_genomic.gff.gz -P ./data/database/refseq/
-gunzip data/database/refseq/*.gz
-```
+### Step 10: Indexing the reference genome using samtools and bowtie           
 
-Renaming files
-```
-mv ./data/database/refseq/GCF_000865085.1_ViralMultiSegProj15622_genomic.fna ./data/database/refseq/influenzaA.fna
-mv ././data/database/refseq/GCF_000865085.1_ViralMultiSegProj15622_genomic.gff ./data/database/refseq/influenzaA.gff
-```
-
-### Step 10: Index reference genome - samtools
+> 1. Indexing reference genome `FASTA` using `samtools faidx`.                 
+Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname`, `seqlength`, `first-base offset`, `seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for `samtools`' operations and `bcftools` another tool we will later use.                                
 ```
 samtools faidx \
-	./data/database/refseq/influenzaA.fna \
-	--fai-idx ./data/database/refseq/influenzaA.fna.fai
+        ./data/database/refseq/H1N1.fna \                                      
+        --fai-idx ./data/database/refseq/H1N1.fna.fai                          
 ```
-
-### Step 11: Index reference genome - bowtie
+> **Note:** *Takes less than a second*
+> We can view the product of samtools faidx command using the command below. Press `q` to quit.
 ```
-mkdir ./data/database/bowtie/
+less -s ./data/database/refseq/H1N1.fna.fai                                    
+```
+> 2. Indexing using `bowtie`.
+`bowtie2` will be used in aligning reads to the reference genome. Since our genome has many segments with many nucluotides, there is need to distinctly identify positions in the entire genome by assigning them indices (co-ordinates\*) or rather numbering their positions. To do so run the command below.                
+```
+mkdir -p ./data/database/bowtie/
 bowtie2-build \
-	--threads 4 \
-	./data/database/refseq/influenzaA.fna \
-	./data/database/bowtie/influenzaA
+        --threads 4 \
+        ./data/database/refseq/H1N1.fna \                                      
+        ./data/database/bowtie/H1N1
 ```
+> **Note:** *Takes about 2 Seconds*
+`bowtie2-build` outputs six files `1.bt2`, `.2.bt2`, `.3.bt2`, `.4.bt2`, `.rev.1.bt2`, and `.rev.2.bt2` all constituting the index and are all needed to align reads to the reference which will no longer be needed by bowtie after this indexing. The output is in binary format and can not be visualized like text.        
 
-### Step 12: Align reads to reference genome
+### Step 11: Align reads to reference genome                                   
+As may have been explained earlier, the basis of comparative genomics is *alignment* of reads to the reference genome. Here is where `bowtie2` takes a read and
+*lines up* it's characters to a position in the reference genome with the most similar sequence of nucleotides. This is a very difficult computation problem for a number of reasons:
+- The reference genome can be big. H1N1 genome is relatively small.
+- The reads may not match exactly to its probable locus of origin
+- The reads may have some bad quality quality nucleotides
+All these and others have to be factored in in the alignment process. [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is ultrafast and memory-efficient but other tools exist e.g. [BWA MEM2](https://github.com/kaist-ina/BWA-MEME)
 ```
-bowtie2 -x ./data/database/bowtie/influenzaA \
-	-1 ./data/kraken/sample01.unclassified_1.fastq \
-	-2 ./data/kraken/sample01.unclassified_2.fastq \
-	--threads 1 \
-	--un-conc-gz ./data/bowtie/sample01.unmapped.fastq.gz \
-	--local \
-	--very-sensitive-local \
-	2> ./data/bowtie/sample01.bowtie2.log \
-	| samtools view -@ 1 -F4 -bhS -o ./data/bowtie/sample01.trim.dec.bam -
+bowtie2 -x ./data/database/bowtie/H1N1 \
+        -1 ./data/kraken/sample01.unclassified_1.fastq \
+        -2 ./data/kraken/sample01.unclassified_2.fastq \
+        --threads 1 \
+        --un-conc-gz ./data/bowtie/sample01.unmapped.fastq.gz \
+        --local \
+        --very-sensitive-local \
+        2> ./data/bowtie/sample01.bowtie2.log \
+        | samtools view -@ 1 -F4 -bhS -o ./data/bowtie/sample01.trim.dec.bam -
 ```
+> **Note:** *Takes about 35 minutes*
 
-### Step 13: Sort and Index aligment map
+### Step 12: Sort and Index aligment map
+The alignment of `FASTQ` files above to the reference genome results in a random arrangement of reads in the order which the sequences occurred in the input FASTQ file. In order to perform any analysis and visualize the alingment, the alignment should be sorted in the order which they occur in the reference genome based on their `alignment coordinates`.
+> 1. First let us sort our read alignment `BAM` file above by their occurence in refernce genome.
 ```
 samtools sort -@ 4 \
-	-o ./data/bowtie/sample01.sorted.bam \
-	-T ./data/bowtie/sample01 \
-	./data/bowtie/sample01.trim.dec.bam
-
+        -o ./data/bowtie/sample01.sorted.bam \                                 
+        -T ./data/bowtie/sample01 \
+        ./data/bowtie/sample01.trim.dec.bam                                    
+```
+> **Note:** Takes about 4 seconds.  
+> 2. Then we can now index the genome sorted `BAM` file.  
+- Indexing of the BAM file is required by genome viewers like `IGV`, and also by tools that can be used to extract alignments or information like mutation.
+- Indexing will generate an `index` file with `.bam.bai` extention.
+```
 samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 ```
+> **Note:** *Takes about 5 Seconds*  
+- The 'BAM' viewed with `samtools view` has many columns as shown below:
+```
+NB552490:29:HY2LGBGXK:1:11101:23816:4618        97      NC_026438.1     1      42       16S135M =       39      208     GTCAAATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAGAACCCCGCGCTC AAAAAEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEA/EEEE<EEEEEEEEEEEEEEEE<EEEEEEEEEEEEE/EEEEEEAEEAEEEEEA<//EEAEEEEEEE AS:i:242        XN:i:0  XM:i:4  XO:i:0  XG:i:0  NM:i:4 MD:Z:17A71A17A23A3       YS:i:239        YT:Z:DP                                
+NB552490:29:HY2LGBGXK:1:11103:24220:6132        97      NC_026438.1     1      42       12S131M1S       =       1       144     AATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAGAACCCCGCG        AAAAAEEEEEEEEEAEEEEEEEEAEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEE<EE/EEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEAEE//AEEAEEE/EEEEEEAAAAEEEEAEEEAEAAEEEEAA</E<EAEEE        AS:i:241        XN:i:0  XM:i:3  XO:i:0  XG:i:0 NM:i:3   MD:Z:17A71A17A23        YS:i:241        YT:Z:DP                        
+NB552490:29:HY2LGBGXK:1:11103:18290:12161       161     NC_026438.1     1      42       12S113M =       1       125     AATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAG   AAAAAEEEEEEEEEEEEEEEEEEEEE/EAEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/EEEEEAEEEEEEEEE/EEEEEEEEEAEEAEA<EEEEEEEEEEEEEEEEE<EE   AS:i:205        XN:i:0 XM:i:3   XO:i:0  XG:i:0  NM:i:3  MD:Z:17A71A17A5 YS:i:205        YT:Z:DP        
+NB552490:29:HY2LGBGXK:1:11104:4973:14511        97      NC_026438.1     1      42       20S123M =       1       143     GCAGGTCAAATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAG AAAAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEAE AS:i:225        XN:i:0  XM:i:3  XO:i:0  XG:i:0  NM:i:3  MD:Z:17A71A17A15YS:i:225        YT:Z:DP
+NB552490:29:HY2LGBGXK:1:11105:9877:1184 97      NC_026438.1     1       41     16S118M  =       11      134     GTCAAAAATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAG  6AAAAA6EE/AEAEEE/AE/EEEEEEEEEEEEE6EEEEEEEEEE/EE/EEEEEEE/EE/AA6EEAAEEEEAAEEEE//AEEEEA6AEA<6</AEEEEEE//EEEE6E/<AEE/EE/AEEEA<E/AEE/EE/AEE  AS:i:219       XN:i:0   XM:i:3  XO:i:0  XG:i:0  NM:i:3  MD:Z:17A71A17A10        YS:i:180       YT:Z:DP
+```
+This can was earlier explained. The documantation is also available here: [SAM Format](http://samtools.github.io/hts-specs/SAMv1.pdf)                          
+> **Quiz:** *To `view` the sorted alignment `BAM` file which command will you use?*
+---
+<details close>
+  <summary>Tip!</summary>
+  <blockquote>
+    <p dir="auto">
+      <code>samtools view</code>
+    </p>
+    <p dir="auto">
+      1. You can view the whole alignment 'BAM' file.
+    </p>
+    <details close>
+      <summary>Answer</summary>
+        <code>samtools view ./data/bowtie/sample01.sorted.bam| less -S</code>
+    </details close>
+    <p dir="auto">
+      2. You can count the number of reads in the alignment.
+    </p>
+    <details close>
+      <summary>Answer</summary>
+        <code>samtools view ./data/bowtie/sample01.sorted.bam| wc -l</code>
+    </details close>
+    <p dir="auto">
+      3. You can count the number of reads mapping to segment 4 hemagglutinin (HA) gene: NC_026433.1
+    </p>
+    <details close>
+      <summary>Answer</summary>
+        <code>samtools view ./data/bowtie/sample01.sorted.bam | grep "NC_026433.1" | wc -l</code>
+    </details close>
+    <p dir="auto">
+      4. You can count the number of reads mapping to segment 6 neuraminidase (NA) gene: NC_026434.1
+    </p>
+    <details close>
+      <summary>Answer</summary>
+        <code>samtools view ./data/bowtie/sample01.sorted.bam | grep "NC_026434.1" | wc -l</code>
+    </details close>
+  </blockquote>
+</details>
+
+---
 
 ### Step 13: Coverage computation
+`bedtools genomecov` computes per-base genome coverage when used with `-d` option. It will do this for all our eight segments.                                 
 ```
 bedtools genomecov \
-	-d \
-	-ibam ./data/bowtie/sample01.sorted.bam \
-	> ./data/bowtie/sample01.coverage
+        -d \
+        -ibam ./data/bowtie/sample01.sorted.bam \                              
+        > ./data/bowtie/sample01.coverage                                      
 ```
-
+> **Note:** *Takes about 2 Seconds*
+The output of this command is a three column file with `chromosome`, `Position`
+and`depth coverage`. View the ouput with the command below:                    
+```
+less ./data/bowtie/sample01.coverage
+```
 ### Step 14: Plot Genome coverage in R
+We can plot the coverage using an R script as shown below. The R script was prepared ahead of the analysis and stored in the `scripts` directory.              
 ```
-Rscript ./scripts/plotGenomecov.R ./data/bowtie/sample01.coverage
+Rscript ./scripts/plotGenomeCoverage.R ./data/bowtie/sample01.coverage         
+mv ./test_cov_gene_density.png ./data/bowtie/sample01.genomeCoverage.png       
 ```
+The genome coverage of our eight segments can be seen here: [sample01.genomeCoverage](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/bedtools/sample01.genomeCoverage.png)
+> **Note:** *Takes about 5 Seconds*
 
 ### Step 15: Consensus Genome construsction
 For segmented viruses e.g Influenza A ivar consensus is unable to analyse more than one reference (segment/cromosome) name at once. We need to split by reference:

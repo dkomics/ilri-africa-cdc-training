@@ -373,7 +373,7 @@ rename 'GCF_001343785.1_ViralMultiSegProj274766_genomic' 'H1N1' ./data/database/
 ### Step 10: Indexing the reference genome using samtools and bowtie
 
 > 1. Indexing reference genome `FASTA` using `samtools faidx`.
-Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for `samtools`' operations and `bcftools` another tool we will later use.
+Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname`, `seqlength`, `first-base offset`, `seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for `samtools`' operations and `bcftools` another tool we will later use.
 ```
 samtools faidx \
 	./data/database/refseq/H1N1.fna \
@@ -416,7 +416,7 @@ bowtie2 -x ./data/database/bowtie/H1N1 \
 > **Note:** *Takes about 35 minutes*
 
 ### Step 12: Sort and Index aligment map
-The alignment of `FASTQ` files above to the reference genome results in a random arrangement of reads in the order which the sequences occurred in the input FASTQ file. In order to perform any analysis of visualize the alingment, the alignment should be sorted in the order with which they occur in the reference genome based on their `alignment coordinates`.   
+The alignment of `FASTQ` files above to the reference genome results in a random arrangement of reads in the order which the sequences occurred in the input FASTQ file. In order to perform any analysis and visualize the alingment, the alignment should be sorted in the order which they occur in the reference genome based on their `alignment coordinates`.   
 > 1. First let us sort our read alignment `BAM` file above by their occurence in refernce genome.
 ```
 samtools sort -@ 4 \
@@ -424,15 +424,15 @@ samtools sort -@ 4 \
 	-T ./data/bowtie/sample01 \
 	./data/bowtie/sample01.trim.dec.bam
 ```
-> **Note:** Takes about 4 seconds.
-> 2. Then we can now index the genome sorted `BAM` file.  
-Indexing of the BAM file is required by genome viewers like `IGV`, and also by tools that can be used to extract alignments or information like mutation.  
-Indexing will generate an `index` file with `.bam.bai` extention.
+> **Note:** Takes about 4 seconds.  
+> 2. Then we can now index the genome sorted `BAM` file.   
+- Indexing of the BAM file is required by genome viewers like `IGV`, and also by tools that can be used to extract alignments or information like mutation.  
+- Indexing will generate an `index` file with `.bam.bai` extention.
 ```
 samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 ```
-> **Note:** *Takes about 5 Seconds*  
-The 'BAM' viewed with `samtools view` has many columns as shown below:
+> **Note:** *Takes about 5 Seconds*   
+- The 'BAM' viewed with `samtools view` has many columns as shown below:
 ```
 NB552490:29:HY2LGBGXK:1:11101:23816:4618        97      NC_026438.1     1      42       16S135M =       39      208     GTCAAATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAGAACCCCGCGCTC AAAAAEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEA/EEEE<EEEEEEEEEEEEEEEE<EEEEEEEEEEEEE/EEEEEEAEEAEEEEEA<//EEAEEEEEEE AS:i:242        XN:i:0  XM:i:4  XO:i:0  XG:i:0  NM:i:4 MD:Z:17A71A17A23A3       YS:i:239        YT:Z:DP
 NB552490:29:HY2LGBGXK:1:11103:24220:6132        97      NC_026438.1     1      42       12S131M1S       =       1       144     AATATATTCAATATGGAGAGAATAAAAGAGCTGAGAGATCTAATGTCGCAGTCCCGCACTCGCGAGATACTCACTAAGACCACTGTGGACCATATGGCCATCATCAAAAAGTACACATCGGGAAGGCAAGAGAAGAACCCCGCG        AAAAAEEEEEEEEEAEEEEEEEEAEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEE<EE/EEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEAEE//AEEAEEE/EEEEEEAAAAEEEEAEEEAEAAEEEEAA</E<EAEEE        AS:i:241        XN:i:0  XM:i:3  XO:i:0  XG:i:0 NM:i:3   MD:Z:17A71A17A23        YS:i:241        YT:Z:DP
