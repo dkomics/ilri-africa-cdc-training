@@ -421,6 +421,7 @@ Search the blast output to see if we find the following genes:
 - stx2
 
 ### ***AMR identification***  
+Here, we will use [Resistance Gene Identifier (RGI)](https://card.mcmaster.ca/analyze/rgi) which uses the [Comprehensive Antibiotic Resistance Database (CARD)](https://card.mcmaster.ca/) as a reference to predict antibiotic resistome(s) from protein or nucleotide data based on homology and SNP models. 
 
 ```
 module purge
