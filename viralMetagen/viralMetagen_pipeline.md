@@ -83,6 +83,7 @@ module load samtools/1.15.1
 module load bowtie2/2.5.0
 module load bedtools/2.29.0
 module load bamtools/2.5.1
+module load ivar/1.3.1
 module load snpeff/4.1g
 module load bcftools/1.13
 module load nextclade/2.11.0
