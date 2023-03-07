@@ -121,13 +121,13 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
     <p dir="auto">
       1. Go to 
       <a href="https://www.ncbi.nlm.nih.gov/"
-      ref="nofollow">NCBI</a> and search <code>SRA database</code> for 'Influenza A virus'.
+      ref="nofollow">NCBI</a> and search <code>SRA database</code> for 'H1N1'.
+    </p>
+    <p dir="auto">i
+      2. Check the necessary filters: <code>Access: Public</code>, <code>Source: DNA</code>, <code>Type: genome</code>, <code>Library Layout: paired end</code>, <code>Platform: Illumina</code>, <code>File Type: fastq</code>.
     </p>
     <p dir="auto">
-      2. Check the necessary filters: <code>Public</code>, <code>DNA</code>, <code>genome</code>, <code>paired end</code>, <code>Illumina</code>, <code>fastq</code>.
-    </p>
-    <p dir="auto">
-      3. Click on a record that is sequenced in a metagenomics workflow
+      3. Click on a record that was sequenced in a metagenomics workflow
     </p>
     <details close>
       <summary><strong>Example:</strong>Downloading data from SRA: "SRR23143759_1"</summary>
