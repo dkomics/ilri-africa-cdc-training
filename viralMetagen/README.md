@@ -398,7 +398,7 @@ bowtie2 -x ./data/database/bowtie/H1N1 \
 	2> ./data/bowtie/sample01.bowtie2.log \
 	| samtools view -@ 1 -F4 -bhS -o ./data/bowtie/sample01.trim.dec.bam -
 ```
-> **Note:** *Takes about 10 minutes*
+> **Note:** *Takes about 35 minutes*
 
 ### Step 13: Sort and Index aligment map
 ```
