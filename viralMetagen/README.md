@@ -116,18 +116,22 @@ cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/*
 
 ---
 <details close>
-  <summary>Tip: Downloading data from SRA: "SRR23143759_1"</summary>
+  <summary>Tip</summary>
   <blockquote>
     <p dir="auto">
-      Go to NCBI SRA and search for 'Influenza A virus'.
-      Check the necessary filters: Public, DNA, genome, paired, Illumina, fastq.
+      Go to 
+      <a href="https://www.ncbi.nlm.nih.gov/"
+      ref="nofollow">NCBI</a> and search <code>SRA database</code> for 'Influenza A virus'.
+    </p>
+    <p dir="auto">
+      Check the necessary filters: <code>Public</code>, <code>DNA</code>, <code>genome</code>, <code>paired end</code>, <code>Illumina</code>, <code>fastq</code>.
+    </p>
+    <p dir="auto">
       Click on a record that is sequenced in a metagenomics workflow
     </p>
-      <pre class="notranslate"> 
-        <code>
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
-wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq</code>
-      </pre>
+      <strong>Example:</strong>Downloading data from SRA: "SRR23143759_1"
+        <code>wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq</code>
+	<code>wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq</code>
   </blockquote>
 </details>
 
@@ -485,11 +489,11 @@ less ./data/bowtie/sample01.coverage
 ### Step 14: Plot Genome coverage in R
 We can plot the coverage using an R script as shown below. The R script was prepared ahead of the analysis and stored in the `scripts` directory.
 ```
-Rscript ./scripts/plotGenomecov.R ./data/bowtie/sample01.coverage
+Rscript ./scripts/plotGenomeCoverage.R ./data/bowtie/sample01.coverage
 mv ./test_cov_gene_density.png ./data/bowtie/sample01.genomeCoverage.png
 ```
 The genome coverage of our eight segments can be seen here: [sample01.genomeCoverage](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/bedtools/sample01.genomeCoverage.png)  
-> **Note:** *Takes about 40 Seconds*
+> **Note:** *Takes about 5 Seconds*
 
 ### Step 15: Consensus Genome construsction
 We will use `ivar consensus` to construct the consensus genome.  
@@ -501,7 +505,7 @@ bamtools split -in data/bowtie/sample01.sorted.bam \
 	-reference
 ```
 > **Note:** *Takes about 40 Seconds*
-Renameing output files
+Renaming output files
 ```
 rename 'sorted.REF' 'REF' ./data/bowtie/*
 ```
