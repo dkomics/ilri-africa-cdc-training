@@ -548,6 +548,7 @@ cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar consensus \
 	-n N \
 	-p ./data/ivar/consensus/sample01.REF_NC_026431.1.consensus
 ```
+> **Note:** *This takes approximately 2 seconds*   
 - This has generated a consensus for only one segment: `NC_026431.1`.  
 - The first part of the command runs `samtools mpileup`to generate a TAB-separated text pileup of the `BAM` files. The format is described in [Pileup Formats](http://www.htslib.org/doc/samtools-mpileup.html#Pileup_Format). Here is a snipet:
 ```
@@ -592,7 +593,7 @@ Consensus sequence files for each of the segments have now been generated and st
 Again we will use the `pileup format` of `BAM` to identify mutations in our samplet. For this we start with segment `NC_026431.1`.
 ```
 mkdir -p ./data/ivar/variants/
-cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar consensus \
+cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar variants \
 	-t 0.10 \
 	-q 20 \
 	-m 10 \
@@ -600,11 +601,17 @@ cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar consensus \
 	-r ./data/database/refseq/H1N1.fna \
 	-p ./data/ivar/variants/sample01.REF_NC_026431.1.variants
 ```
+> **Note:** *This takes approximately 2 seconds*   
 - This has generated a file with variants in TSV format for only one segment: `NC_026431.1`.  
 - The `pileup format` is absolutely the same though with the omission the `-aa` flag in `samtools mpileup` command which only switches off the inclusion of all positions in the reference. See [`samtools mpileup` options](http://www.htslib.org/doc/samtools-mpileup.html#OPTIONS)
 - `ivar variants` command calls variants: both single nucleotide variants (SNVs) and indels. `-t 0.10` flag determines the minimum frequency, `-q 20` dictates the minimum quality and `-m 10` the minimum depth.
 - The format of the variant call file is TSV as shown below:
 ```
+REGION  POS     REF     ALT     REF_DP  REF_RV  REF_QUAL        ALT_DP  ALT_RV ALT_QUAL ALT_FREQ        TOTAL_DP        PVAL    PASS    GFF_FEATURE     REF_CODON       REF_AA  ALT_CODON       ALT_AA
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118631.1      GCG    AGCA     A
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118628.1      GCG    AGCA     A
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118630.1      GCG    AGCA     A
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009121769.1      GCG    AGCA     A
 ```
 - To execute this for all eight segments in a single command, we will run the command in a loop each time working on a different segment.  
 
@@ -624,6 +631,7 @@ do
 		-p ./data/ivar/variants/${outName}.variants
 done
 ```
+> **Note:** *This takes approximately 12 seconds*   
 Variant call files for all segments have been generated and stored in `./data/ivar/consensus/`
 
 > **Note:** *Takes about 40 Seconds*
