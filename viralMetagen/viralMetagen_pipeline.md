@@ -357,11 +357,11 @@ wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_
 > 7. Dowload the [md5checksum](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/md5checksums.txt) and check for integrity of your reference genome (FASTA) and annotation (GFF) files.
 ```
 wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/md5checksums.txt -P ./data/database/refseq/
-```
-> Check if the reference genome (FASTA) and annotation (GFF) files were dowloaded fully.
-```
 cd ./data/database/refseq/
 md5sum -c md5checksums.txt | less -S
+```
+> Change directory back to `viralMetagen`.
+```
 cd ../../../
 ```
 > 8. Upon successfull integrity check of the files (`OK`), Decompress the `.gz` files

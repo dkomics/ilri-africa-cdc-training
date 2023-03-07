@@ -340,11 +340,11 @@ wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_
 > 7. Dowload the [md5checksum](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/md5checksums.txt) and check for integrity of your reference genome (FASTA) and annotation (GFF) files.
 ```
 wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/md5checksums.txt -P ./data/database/refseq/
-```
-> Check if the reference genome (FASTA) and annotation (GFF) files were dowloaded fully.
-```
 cd ./data/database/refseq/
 md5sum -c md5checksums.txt | less -S
+```
+> Change directory back to `viralMetagen`.
+```
 cd ../../../
 ```
 > 8. Upon successfull integrity check of the files (`OK`), Decompress the `.gz` files
@@ -356,10 +356,11 @@ gunzip ./data/database/refseq/*.gz
 rename 'GCF_001343785.1_ViralMultiSegProj274766_genomic' 'H1N1' ./data/database/refseq/*
 ```
 ### Step 10: Index reference genome - samtools
+
 ```
 samtools faidx \
-	./data/database/refseq/influenzaA.fna \
-	--fai-idx ./data/database/refseq/influenzaA.fna.fai
+	./data/database/refseq/H1N1.fna \
+	--fai-idx ./data/database/refseq/H1N1.fna.fai
 ```
 
 ### Step 11: Index reference genome - bowtie
@@ -367,13 +368,13 @@ samtools faidx \
 mkdir ./data/database/bowtie/
 bowtie2-build \
 	--threads 4 \
-	./data/database/refseq/influenzaA.fna \
-	./data/database/bowtie/influenzaA
+	./data/database/refseq/H1N1.fna \
+	./data/database/bowtie/H1N1
 ```
 
 ### Step 12: Align reads to reference genome
 ```
-bowtie2 -x ./data/database/bowtie/influenzaA \
+bowtie2 -x ./data/database/bowtie/H1N1 \
 	-1 ./data/kraken/sample01.unclassified_1.fastq \
 	-2 ./data/kraken/sample01.unclassified_2.fastq \
 	--threads 1 \
@@ -432,7 +433,7 @@ do
 		--no-BAQ \
 		--max-depth 0 \
 		--min-BQ 0 \
-		--reference ./data/database/refseq/influenzaA.fna \
+		--reference ./data/database/refseq/H1N1.fna \
 		$bamFile \
 		--output ./data/samtools/${outName}.mpileup
 	
@@ -457,7 +458,7 @@ do
 		--no-BAQ \
 		--max-depth 0 \
 		--min-BQ 0 \
-		--reference ./data/database/refseq/influenzaA.fna \
+		--reference ./data/database/refseq/H1N1.fna \
 		$bamFile \
 		--output ./data/samtools/${outName}.var.mpileup
 	
@@ -465,8 +466,8 @@ do
 		-t 0.25 \
 		-q 20 \
 		-m 10 \
-		-g ./data/database/refseq/influenzaA.gff \
-		-r ./data/database/refseq/influenzaA.fna \
+		-g ./data/database/refseq/H1N1.gff \
+		-r ./data/database/refseq/H1N1.fna \
 		-p ./data/ivar/variants/${outName}.variants
 done
 ```
