@@ -333,9 +333,46 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 ```
 > **Note:** For more information on installing krona databases go to [krona wiki](https://github.com/marbl/Krona/wiki/Installing)
 
-## Lets Focus on the target pathogenic virus species: H1N1 - Influenza A Virus
+## Lets Focus on a specific pathogenic virus: H1N1 - Influenza A Virus
 
 ### Step 9: Setting up Reference datasets - reference genome, annotation files
+Based on the taxonomic classification we can tell that we have a high abundance of *H1N1 Influenza A Virus*. To conduct analysis on this virus we will have to download Genome from NCBI - Genome database - Reference Genome (Influenza A virus (A/California/07/2009(H1N1))).
+Follow the following steps to identify and download the data:
+> 1. On a web browser, open the link [NCBI](https://www.ncbi.nlm.nih.gov/).
+> 2. Type 'H1N1' on the search box and select 'Genome' database. On the landing page you will get you will see:
+  > *Influenza A virus*
+  > *Reference genome:* [Influenza A virus (A/New York/392/2004(H3N2))](https://www.ncbi.nlm.nih.gov/genome/10290?genome_assembly_id=899994)
+Because the Influenza A Virus genome segments rapidly evolves, we will select the most recent reference genome to H1N1. This would be A/California/07/2009(H1N1). Reported in the 2009 epidemic in California.
+> 3. Under [Download sequence and annotation from *RefSeq* or *GenBank*] select the [RefSeq](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/).
+> 4. Note that there are seven versons of `Influenza_A_virus/latest_assembly_versions`. Select the genome version [ViralMultiSegProj274766](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/). You can click on `*_assembly_report.txt` to confirm `A/California/07/2009(H1N1)`.
+> 5. Right click on the [\*genomic.fna.gz (FASTA)](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/GCF_001343785.1_ViralMultiSegProj274766_genomic.fna.gz) and select 'copy link' and download using `wget` command as follows:
+```
+mkdir -p ./data/database/refseq/
+wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/GCF_001343785.1_ViralMultiSegProj274766_genomic.fna.gz -P ./data/database/refseq/
+```
+> 6. Download the genome annotation GFF file by right clicking on [\*genomic.gff.gz](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/GCF_001343785.1_ViralMultiSegProj274766_genomic.gff.gz) and copying the link then dowloading uisng `wget` command.
+```
+wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/GCF_001343785.1_ViralMultiSegProj274766_genomic.gff.gz -P ./data/database/refseq/                    
+```
+> 7. Dowload the [md5checksum](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/md5checksums.txt) and check for integrity of your reference genome (FASTA) and annotation (GFF) files.
+```
+wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/md5checksums.txt -P ./data/database/refseq/
+```
+> Check if the reference genome (FASTA) and annotation (GFF) files were dowloaded fully.
+```
+cd ./data/database/refseq/
+md5sum -c md5checksums.txt | less -S
+cd ../../../
+```
+> 8. Upon successfull integrity check of the files (`OK`), Decompress the `.gz` files
+```
+gunzip ./data/database/refseq/*.gz
+```
+> 9. Rename the `FASTA` and `GFF` files
+```
+rename 'GCF_001343785.1_ViralMultiSegProj274766_genomic' 'H1N1' ./data/database/refseq/*
+```
+
 Download Genome from NCBI - Genome database - Reference Genome (Influenza A virus (A/New York/392/2004(H3N2)))
 ```
 mkdir -p ./data/database/refseq/
