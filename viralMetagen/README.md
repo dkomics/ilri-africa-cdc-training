@@ -355,24 +355,38 @@ gunzip ./data/database/refseq/*.gz
 ```
 rename 'GCF_001343785.1_ViralMultiSegProj274766_genomic' 'H1N1' ./data/database/refseq/*
 ```
-### Step 10: Index reference genome - samtools
+### Step 10: Indexing the reference genome using samtools and bowtie
 
+> 1. Indexing reference genome `FASTA` using `samtools faidx`.
+Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for `samtools`' operations and `bcftools` another tool we will later use.
 ```
 samtools faidx \
 	./data/database/refseq/H1N1.fna \
 	--fai-idx ./data/database/refseq/H1N1.fna.fai
 ```
-
-### Step 11: Index reference genome - bowtie
+> **Note:** *Takes less than a second*
+> We can view the product of samtools faidx command using the command below. Press `q` to quit.
 ```
-mkdir ./data/database/bowtie/
+less -s ./data/database/refseq/H1N1.fna.fai
+```
+> 2. Indexing using `bowtie`. 
+`bowtie2` will be used in aligning reads to the reference genome. Since our genome has many segments with many nucluotides, there is need to distinctly identify positions in the entire genome by assigning them indices (co-ordinates\*) or rather numbering their positions. To do so run the command below.
+```
+mkdir -p ./data/database/bowtie/
 bowtie2-build \
 	--threads 4 \
 	./data/database/refseq/H1N1.fna \
 	./data/database/bowtie/H1N1
 ```
+> **Note:** *Takes about 2 Seconds*
+`bowtie2-build` outputs six files `1.bt2`, `.2.bt2`, `.3.bt2`, `.4.bt2`, `.rev.1.bt2`, and `.rev.2.bt2` all constituting the index and are all needed to align reads to the reference which will no longer be needed by bowtie after this indexing. The output is in binary format and can not be visualized like text.
 
-### Step 12: Align reads to reference genome
+### Step 11: Align reads to reference genome
+As may have been explained earlier, the basis of comparative genomics is *alignment* of reads to the reference genome. Here is where `bowtie2` takes a read and *lines up* it's characters to a position in the reference genome with the most similar sequence of nucleotides. This is a very difficult computation problem for a number of reasons:
+- The reference genome can be big. H1N1 genome is relatively small.
+- The reads may not match exactly to its probable locus of origin
+- The reads may have some bad quality quality nucleotides
+All these and others have to be factored in in the alignment process. [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is ultrafast and memory-efficient but other tools exist e.g. [BWA MEM2](https://github.com/kaist-ina/BWA-MEME)
 ```
 bowtie2 -x ./data/database/bowtie/H1N1 \
 	-1 ./data/kraken/sample01.unclassified_1.fastq \
@@ -384,6 +398,7 @@ bowtie2 -x ./data/database/bowtie/H1N1 \
 	2> ./data/bowtie/sample01.bowtie2.log \
 	| samtools view -@ 1 -F4 -bhS -o ./data/bowtie/sample01.trim.dec.bam -
 ```
+> **Note:** *Takes about 10 minutes*
 
 ### Step 13: Sort and Index aligment map
 ```
@@ -394,7 +409,7 @@ samtools sort -@ 4 \
 
 samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 ```
-
+> **Note:** *Takes about 40 Seconds*
 ### Step 13: Coverage computation
 ```
 bedtools genomecov \
@@ -402,12 +417,12 @@ bedtools genomecov \
 	-ibam ./data/bowtie/sample01.sorted.bam \
 	> ./data/bowtie/sample01.coverage
 ```
-
+> **Note:** *Takes about 40 Seconds*
 ### Step 14: Plot Genome coverage in R
 ```
 Rscript ./scripts/plotGenomecov.R ./data/bowtie/sample01.coverage
 ```
-
+> **Note:** *Takes about 40 Seconds*
 ### Step 15: Consensus Genome construsction
 For segmented viruses e.g Influenza A ivar consensus is unable to analyse more than one reference (segment/cromosome) name at once. We need to split by reference:
 ```
@@ -415,12 +430,12 @@ bamtools split -in data/bowtie/sample01.sorted.bam \
 	-refPrefix "REF_" \
 	-reference
 ```
-
+> **Note:** *Takes about 40 Seconds*
 Renameing output files
 ```
 rename 'sorted.REF' 'REF' ./data/bowtie/*
 ```
-
+> **Note:** *Takes about 40 Seconds*
 ### Step 16: Loop through segmented BAM files and generate consensus:
 ```
 mkdir -p ./data/ivar/consensus/
@@ -445,7 +460,7 @@ do
 		-p ./data/ivar/consensus/${outName}.consensus
 done
 ```
-
+> **Note:** *Takes about 40 Seconds*
 ### Step 17: Loop through seqmented BAM files and conduct Variant Calling from the alignemnts
 ```
 mkdir -p ./data/ivar/variants/
@@ -471,7 +486,7 @@ do
 		-p ./data/ivar/variants/${outName}.variants
 done
 ```
-
+> **Note:** *Takes about 40 Seconds*
 ### Step 18: Coverting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
 ```
 for varFile in $(find ./data/ivar/variants -name "*.variants.tsv")
@@ -492,7 +507,7 @@ do
 	bcftools stats ./data/ivar/variants/${outName}.vcf.gz > ./data/ivar/variants/${outName}.stats.txt
 done
 ```
-
+> **Note:** *Takes about 40 Seconds*
 ### Step 19: Annotation of Variants - SnpEff and SnpSift
 Annotate the variants VCF file with snpEff
 ```
@@ -518,6 +533,7 @@ do
 	bcftools stats ./data/ivar/variants/${outName}.ann.vcf.gz > ./data/ivar/variants/${outName}.ann.stats.txt
 done
 ```
+> **Note:** *Takes about 40 Seconds*
 **Tip:** *How do you build a SnpEff Databse?*
 ---
 ---
@@ -545,3 +561,4 @@ do
 		> ./data/ivar/variants/${outName}.snpsift.txt
 done
 ```
+> **Note:** *Takes about 40 Seconds*
