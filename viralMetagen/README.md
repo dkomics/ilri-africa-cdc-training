@@ -295,10 +295,10 @@ cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-
 ```
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
-	-o ./data/krona/sample01-results.html \
-	./data/krona/sample01-results.krona > ./data/krona/sample01-results.html
+	-o ./data/krona/sample01_taxonomy.krona.html \
+	./data/krona/sample01-results.krona 
 ```
-> **Discussion:** A HTML report is generated from this step and can be found in this links: [sample01_R1.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html)
+> **Discussion:** A HTML report is generated from this step and can be found in this links: [sample01_taxonomy.krona.html](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/krona/sample01_taxonomy.krona.html)   
 > **Quiz:** *How do you Build a krona Taxonomy Database?*
 ---
 <details close>

@@ -309,9 +309,10 @@ cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-
 ```
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \                   
         ktImportTaxonomy -tax ./data/database/krona/taxonomy \                 
-        -o ./data/krona/sample01-results.html \
-        ./data/krona/sample01-results.krona > ./data/krona/sample01-results.html
+        -o ./data/krona/sample01_taxonomy.krona.html \
+        ./data/krona/sample01-results.krona 
 ```
+> **Discussion:** A HTML report is generated from this step and can be found in this links: [sample01_taxonomy.krona.html](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/krona/sample01_taxonomy.krona.html)  
 #### Building krona database:
 Most taxonomic clssification tools use [`NCBI Taxonomy`](https://www.ncbi.nlm.nih.gov/taxonomy). To translate NCBI's taxonomy, a local [taxonomy database](https://github.com/marbl/Krona/wiki/Installing#taxonomy-database) will be needed and can be downloaded from NCBI Taxonomy. 
 ##### Alterantive 01: Manually Download `taxdump.tar.gz` and build.
