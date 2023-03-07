@@ -134,7 +134,8 @@ This will take about 7 Minutes. You can proceed and copy fastqc HTML output file
 mkdir -p ~/viralMetagen
 cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
 ```
-***Run this command on your laptop not HPC***
+Say would like to download the results of the `fastqc` command to your local laptop for visualization. You will need to download the `HTML` report to your laptop. Do this by running the following command.
+***Warning!!!:*** ***Run this command on your laptop not HPC***
 ```
 scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 ```

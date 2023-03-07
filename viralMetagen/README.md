@@ -145,7 +145,7 @@ This will take about 7 Minutes. You can proceed and copy fastqc HTML output file
 mkdir -p ~/viralMetagen
 cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
 ```
-Say would like to download the results of the `fastqc` command to your local laptop for visualization. You will need to download the `HTML` report to your laptop. Do this by running the following command.
+Say would like to download the results of the `fastqc` command to your local laptop for visualization. You will need to download the `HTML` report to your laptop. Do this by running the following command.  
 ***Warning!!!:*** ***Run this command on your laptop not HPC***
 ```
 scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
@@ -402,15 +402,48 @@ bowtie2 -x ./data/database/bowtie/H1N1 \
 > **Note:** *Takes about 35 minutes*
 
 ### Step 13: Sort and Index aligment map
+The alignment of `FASTQ` files above to the reference genome results in a random arrangement of reads in the order which the sequences occurred in the input FASTQ file. In order to perform any analysis of visualize the alingment, the alignment should be sorted in the order with which they occur in the reference genome based on their `alignment coordinates`.   
+> 1. First let us sort our read alignment `BAM` file above by their occurence in refernce genome.
 ```
 samtools sort -@ 4 \
 	-o ./data/bowtie/sample01.sorted.bam \
 	-T ./data/bowtie/sample01 \
 	./data/bowtie/sample01.trim.dec.bam
-
+```
+> **Note:** Takes about 4 seconds.
+> 2. Then we can now index the genome sorted `BAM` file.  
+Indexing of the BAM file is required by genome viewers like `IGV`, and also by tools that can be used to extract alignments or information like mutation.  
+Indexing will generate an `index` file with `.bam.bai` extention.
+```
 samtools index -@ 4 ./data/bowtie/sample01.sorted.bam
 ```
-> **Note:** *Takes about 3 Seconds*
+> **Note:** *Takes about 5 Seconds*   
+> **Quiz:** *To `view` the alignment `BAM` file which command will you use?*
+---
+<details close>
+  <summary>Tip: samtools view"</summary>
+  <blockquote>
+    <p dir="auto">
+      You can view the whole alignment'BAM' file.
+        <details close>
+          <code>
+samtools view ./data/bowtie/sample01.sorted.bam| less -S
+          </code>
+        </details close>
+      You can count the number of reads in the alignment.
+      You can count the number of reads mapping to segment 4 hemagglutinin (HA) gene: NC_026433.1
+      You can count the number of reads mapping to segment 6 neuraminidase (NA) gene: NC_026434.1 
+    </p>
+      <pre class="notranslate"> 
+        <code>
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_1.fastq.gz -P ./data/fastq
+wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR231/059/SRR23143759/SRR23143759_2.fastq.gz -P ./data/fastq</code>
+      </pre>
+  </blockquote>
+</details>
+
+---
+
 ### Step 13: Coverage computation
 ```
 bedtools genomecov \
