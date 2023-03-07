@@ -82,6 +82,7 @@ module load quast/5.0.2
 module load samtools/1.15.1
 module load bowtie2/2.5.0
 module load bedtools/2.29.0
+module load bamtools/2.5.1
 module load snpeff/4.1g
 module load bcftools/1.13
 module load nextclade/2.11.0
@@ -522,9 +523,8 @@ bedtools genomecov \
         -ibam ./data/bowtie/sample01.sorted.bam \                              
         > ./data/bowtie/sample01.coverage                                      
 ```
-> **Note:** *Takes about 2 Seconds*
-The output of this command is a three column file with `chromosome`, `Position`
-and`depth coverage`. View the ouput with the command below:                    
+> **Note:** *Takes about 2 Seconds*  
+- The output of this command is a three column file with `chromosome`, `Position` and `depth coverage`. View the ouput with the command below:  
 ```
 less ./data/bowtie/sample01.coverage
 ```
@@ -534,7 +534,7 @@ We can plot the coverage using an R script as shown below. The R script was prep
 Rscript ./scripts/plotGenomeCoverage.R ./data/bowtie/sample01.coverage         
 mv ./test_cov_gene_density.png ./data/bowtie/sample01.genomeCoverage.png       
 ```
-The genome coverage of our eight segments can be seen here: [sample01.genomeCoverage](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/bedtools/sample01.genomeCoverage.png)
+The genome coverage of our eight segments can be seen here: [sample01.genomeCoverage](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/bedtools/sample01.genomeCoverage.png)  
 > **Note:** *Takes about 5 Seconds*
 
 ### Step 15: Consensus Genome construsction

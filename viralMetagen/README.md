@@ -82,6 +82,7 @@ module load quast/5.0.2
 module load samtools/1.15.1
 module load bowtie2/2.5.0
 module load bedtools/2.29.0
+module load bamtools/2.5.1
 module load snpeff/4.1g
 module load bcftools/1.13
 module load nextclade/2.11.0
@@ -490,8 +491,8 @@ bedtools genomecov \
 	-ibam ./data/bowtie/sample01.sorted.bam \
 	> ./data/bowtie/sample01.coverage
 ```
-> **Note:** *Takes about 2 Seconds*
-The output of this command is a three column file with `chromosome`, `Position` and`depth coverage`. View the ouput with the command below:
+> **Note:** *Takes about 2 Seconds*   
+- The output of this command is a three column file with `chromosome`, `Position` and `depth coverage`. View the ouput with the command below:
 ```
 less ./data/bowtie/sample01.coverage
 ```
@@ -509,17 +510,38 @@ We will use `ivar consensus` to construct the consensus genome.
 Segmented viruses e.g Influenza A virus, are difficult for `ivar consensus` to analyse as it has more than one reference (segment/chromosome). We need to split the alignment file by reference.  
 We use `bamtools split` command to split the `BAM` file.
 ```
-bamtools split -in data/bowtie/sample01.sorted.bam \
+bamtools split -in ./data/bowtie/sample01.sorted.bam \
 	-refPrefix "REF_" \
 	-reference
 ```
-> **Note:** *Takes about 40 Seconds*
+> **Note:** *Takes about 5 Seconds*
 Renaming output files
 ```
 rename 'sorted.REF' 'REF' ./data/bowtie/*
 ```
-> **Note:** *Takes about 40 Seconds*
+Now we have eight bam files for the eight Influenza A virus segments.
+
 ### Step 16: Loop through segmented BAM files and generate consensus:
+To generate a consensus from the read alignment `BAM` file for one segment `NC_026431.1` we will run the following command:  
+```
+samtools mpileup -aa \
+	--count-orphans \
+	--no-BAQ \
+	--max-depth 0 \
+	--min-BQ 0 \
+	--reference ./data/database/refseq/H1N1.fna \
+	./data/bowtie/sample01.REF_NC_026431.1.bam \
+	--output ./data/samtools/sample01.REF_NC_026431.1.mpileup
+
+cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar consensus \
+	-t 0.75 \
+	-q 20 \
+	-m 10 \
+	-n N \
+	-p ./data/ivar/consensus/sample01.REF_NC_026431.1.consensus
+```
+- This has generated a consensus for only one segment: `NC_026431.1`.  
+- To this for all eight segments in a single command, we can run the above command in a loop each time working on a different segment. The following command does this using `for` loops.
 ```
 mkdir -p ./data/ivar/consensus/
 for bamFile in $(find ./data/bowtie -name "*.REF_*.bam")
@@ -543,7 +565,10 @@ do
 		-p ./data/ivar/consensus/${outName}.consensus
 done
 ```
+Consensus sequence files for each of the segments have now been generated and stored in `./data/ivar/consensus/`
+
 > **Note:** *Takes about 40 Seconds*
+
 ### Step 17: Loop through seqmented BAM files and conduct Variant Calling from the alignemnts
 ```
 mkdir -p ./data/ivar/variants/
