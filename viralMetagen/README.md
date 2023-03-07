@@ -613,6 +613,30 @@ NC_026431.1     75      G       A       3       1       34      1818    620    3
 NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118630.1      GCG    AGCA     A
 NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009121769.1      GCG    AGCA     A
 ```
+- This can be translated as:  
+
+|Field | Description |
+|----------|:-------------------------------------------|
+|REGION | Region from BAM file |
+|POS | Position on reference sequence |
+|REF | Reference base |
+|ALT | Alternate Base |
+|REF_DP | Ungapped depth of reference base |
+|REF_RV | Ungapped depth of reference base on reverse reads |
+|REF_QUAL | Mean quality of reference base |
+|ALT_DP | Ungapped depth of alternate base |
+|ALT_RV | Ungapped deapth of alternate base on reverse reads |
+|ALT_QUAL | Mean quality of alternate base |
+|ALT_FREQ | Frequency of alternate base |
+|TOTAL_DP | Total depth at position |
+|PVAL | p-value of fisher's exact test |
+|PASS | Result of p-value <= 0.05 |
+|GFF_FEATURE | ID of the GFF feature used for the translation |
+|REF_CODON | Codong using the reference base |
+|REF_AA | Amino acid translated from reference codon |
+|ALT_CODON | Codon using the alternate base |
+|ALT_AA | Amino acid translated from the alternate codon |
+
 - To execute this for all eight segments in a single command, we will run the command in a loop each time working on a different segment.  
 
 ```
@@ -631,10 +655,10 @@ do
 		-p ./data/ivar/variants/${outName}.variants
 done
 ```
-> **Note:** *This takes approximately 12 seconds*   
+> **Note:** *This takes approximately 12 seconds*  
+ 
 Variant call files for all segments have been generated and stored in `./data/ivar/consensus/`
 
-> **Note:** *Takes about 40 Seconds*
 ### Step 18: Converting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
 ```
 for varFile in $(find ./data/ivar/variants -name "*.variants.tsv")
