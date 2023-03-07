@@ -591,24 +591,14 @@ Consensus sequence files for each of the segments have now been generated and st
 ### Step 17: Loop through segmented BAM files and call Variants from the alignemnts
 Again we will use the `pileup format` of `BAM` to identify mutations in our samplet. For this we start with segment `NC_026431.1`.
 ```
-mkdir -p ./data/ivar/consensus/
-samtools mpileup --ignore-overlaps \
-	--count-orphans \
-	--no-BAQ \
-	--max-depth 0 \
-	--min-BQ 0 \
-	--reference ./data/database/refseq/H1N1.fna \
-	--region NC_026431.1 \
-	./data/bowtie/sample01.REF_NC_026431.1.bam \
-	--output ./data/samtools/sample01.REF_NC_026431.1.var.mpileup
-
-cat ./data/samtools/sample01.REF_NC_026431.1.var.mpileup | ivar consensus \
+mkdir -p ./data/ivar/variants/
+cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar consensus \
 	-t 0.10 \
 	-q 20 \
 	-m 10 \
 	-g ./data/database/refseq/H1N1.gff \
 	-r ./data/database/refseq/H1N1.fna \
-	-p ./data/ivar/variants/${outName}.variants
+	-p ./data/ivar/variants/sample01.REF_NC_026431.1.variants
 ```
 - This has generated a file with variants in TSV format for only one segment: `NC_026431.1`.  
 - The `pileup format` is absolutely the same though with the omission the `-aa` flag in `samtools mpileup` command which only switches off the inclusion of all positions in the reference. See [`samtools mpileup` options](http://www.htslib.org/doc/samtools-mpileup.html#OPTIONS)
@@ -625,17 +615,7 @@ do
 	fileName=`basename -- "$bamFile"`
 	outName=${fileName%.*}
 	chrName=${outName##*REF_}
-	samtools mpileup --ignore-overlaps \
-		--count-orphans \
-		--no-BAQ \
-		--max-depth 0 \
-		--min-BQ 0 \
-		--reference ./data/database/refseq/H1N1.fna \
-		--region ${chrName} \
-		$bamFile \
-		--output ./data/samtools/${outName}.var.mpileup
-	
-	cat ./data/samtools/${outName}.var.mpileup | ivar variants \
+	cat ./data/samtools/${outName}.mpileup | ivar variants \
 		-t 0.25 \
 		-q 20 \
 		-m 10 \
