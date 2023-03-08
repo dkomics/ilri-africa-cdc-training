@@ -812,7 +812,7 @@ M1,M2   gene-UJ99_s7gp2,gene-UJ99_s7gp1 MODERATE,MODIFIER       missense_variant
 ```
 - The result of `snpSift extractFields` can be best understood through this [Documantation page](https://pcingola.github.io/SnpEff/ss_extractfields/).
 
-### Step 25: Nextclade Clade assignment
+### Step 21: Nextclade Clade assignment
 [**Nextclade**](https://docs.nextstrain.org/projects/nextclade/en/stable/) is a tool within the [**Nextrain**](https://nextstrain.org/) collection that performs pathogen centered phylogeograhic analysis.
 - It uses sequence differences in Multiple Sequence Alignment to assign to [clades](https://clades.nextstrain.org/). 
 - It also reports suspect quality issues with such sequences.

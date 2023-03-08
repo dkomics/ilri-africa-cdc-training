@@ -6,9 +6,8 @@ interactive -w compute06 -c 8 -J metagen -p batch
 
 ## Step 1
 ## Preparing the project directory:
-cd /path/to/ilri-africa-cdc-training/
-mkdir -p ./viralMetagen/{data,scripts}
-cd ./viralMetagen/
+mkdir -p ilri-africa-cdc-training/viralMetagen/{data,scripts}
+cd /path/to/ilri-africa-cdc-training/viralMetagen/
 mkdir -p ./data/{database,fastq,fastqc,fastp,centrifuge,kraken,spades,quast,bowtie,krona,ivar,samtools,snpeff,nextclade}
 
 ## Accessing data:
@@ -160,11 +159,20 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 	./data/fastp/sample01_R2.trim.fastq.gz
 
 ### compress (gzip) output fastq files for downstream analysis
-gzip data/kraken/*.fastq
+#gzip data/kraken/*.fastq
+bzip2 -fk ./data/kraken/sample01.unclassified_1.fastq ./data/kraken/sample01.unclassified_2.fastq
 
 ## Step 9
 ## Taxonomic Classification of Reads
 
+centrifuge -x ./data/database/centrifuge/hpvc \
+	-1 ./data/kraken/sample01.unclassified_1.fastq \
+	-2 ./data/kraken/sample01.unclassified_2.fastq \
+	--report-file ./data/centrifuge/sample01-report.txt \
+	-S ./data/centrifuge/sample01-results.txt \
+	-p 8 \
+	--mm 100GB
+## Setting up reference database
 mkdir data/database/centrifuge/
 cd data/database/centrifuge/
 cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/centrifuge/* ./
@@ -193,15 +201,6 @@ wget https://zenodo.org/record/3732127/files/h+p+v+c.tar.gz?download=1
 tar -xvzf hpvc.tar.gz 
 cd ../../../
 
-## Step 10
-# Classification
-centrifuge -x ./data/database/centrifuge/hpvc \
-	-1 ./data/kraken/sample01.unclassified_1.fastq \
-	-2 ./data/kraken/sample01.unclassified_2.fastq \
-	--report-file ./data/centrifuge/sample01-report.txt \
-	-S ./data/centrifuge/sample01-results.txt \
-	-p 8 \
-	--mm 100GB
 
 ## Step 11
 #Convert centrifuge report to kraken-like report
@@ -214,8 +213,13 @@ centrifuge-kreport -x ./data/database/hpvc \
 ## Step 12
 ## Visualizing the classification report
 #Preparing the classification data
-cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/centrifuge/sample01-results.krona
+cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-results.krona
 #Build krona db
+#Build krona db
+mkdir ./data/database/krona
+apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
+	ktUpdateTaxonomy.sh ./data/database/krona/taxonomy
+
 mkdir ./data/database/krona
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	ktUpdateTaxonomy.sh ./data/database/krona/taxonomy
@@ -223,8 +227,8 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 #Visiualize the report - create a HTML file
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
-	-o ./data/centrifuge/sample01-results.html \
-	./data/centrifuge/sample01-results.krona > ./data/centrifuge/sample01-results.html
+	-o ./data/krona/sample01_taxonomy.krona.html \
+	./data/krona/sample01-results.krona
 
 ## ## Notes
 ## ### Denovo Genome Assembly using Spades
@@ -469,10 +473,12 @@ nextclade dataset get \
 
 ### Perform Clade assignment:
 nextclade run \
-	--input-fasta ./data/ivar/consensus/sample01.consensus.fa \
+	data/ivar/consensus/sample01.REF_NC_026433.1.consensus.fa \
 	--input-dataset ./data/database/nextclade/ \
 	--output-csv ./data/nextclade/sample01.nextclade.csv \
 	--output-tree ./data/nextclade/sample01.nextclade.auspice.json \
-	--output-dir ./data/nextclade/ \
-	--output-basename ./data/nextclade/sample01.nextclade. \
-	2> ./data/nextclade/sample01.nextclade.log
+	--output-all ./data/nextclade/ \
+	--output-basename sample01.nextclade \
+	|& tee ./data/nextclade/sample01.nextclade.log
+
+
