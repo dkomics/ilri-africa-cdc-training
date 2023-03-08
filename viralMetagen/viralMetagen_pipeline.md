@@ -765,10 +765,10 @@ echo -e "# Influenza A virus genome, version influezaA\nH1N1.genome: H1N1" > ./d
 ```
 - Now build a SnpEff database:
 ```
-java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar build \\
-        -config ./data/database/snpEff/H1N1/snpEff.config \\
-        -dataDir ./../ \\
-        -gff3 \\
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar build \
+        -config ./data/database/snpEff/H1N1/snpEff.config \
+        -dataDir ./../ \
+        -gff3 \
         -v H1N1
 ```
 ##### Alternative 02 - Download Pre-built database:
