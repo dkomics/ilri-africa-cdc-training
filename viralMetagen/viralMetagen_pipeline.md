@@ -32,7 +32,7 @@ Tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
     - [Step 16: Loop through segmented BAM files and generate consensus](#Step-16-Loop-through-segmented-BAM-files-and-generate-consensus)
     - [Step 17: Loop through segmented BAM files and call Variants from the alignemnts](#Step-17-Loop-through-segmented-BAM-files-and-call-Variants-from-the-alignemnts)
     - [Step 18: Converting variant files from tsv to vcf (Variant Call Format) - needed in downstream steps](#Step-18-Converting-variant-files-from-tsv-to-vcf-Variant Call Format---needed-in-downstream-steps)
-    - [Step 19: Annotation of Variants - SnpEff and SnpSift](#Step-19-Annotation-of-Variants-SnpEff-and-SnpSift)
+    - [Step 19: Annotation of Variants - SnpEff and SnpSift](#Step-19-Annotation-of-Variants---SnpEff-and-SnpSift)
     - [Step 20: Filter the most significant variants using snpSift](#Step-20-Filter-the-most-significant-variants-using-snpSift)
     - [Step 21: Nextclade Clade assignment](#Step-21-Nextclade-Clade-assignment)
 
