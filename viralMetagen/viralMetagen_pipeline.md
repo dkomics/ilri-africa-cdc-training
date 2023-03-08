@@ -538,90 +538,195 @@ mv ./test_cov_gene_density.png ./data/bowtie/sample01.genomeCoverage.png
 The genome coverage of our eight segments can be seen here: [sample01.genomeCoverage](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/bedtools/sample01.genomeCoverage.png)  
 > **Note:** *Takes about 5 Seconds*
 
-### Step 15: Consensus Genome construsction
-For segmented viruses e.g Influenza A ivar consensus is unable to analyse more than one reference (segment/cromosome) name at once. We need to split by reference:
+### Step 15: Consensus Genome construsction                                    
+We will use `ivar consensus` to construct the consensus genome.                
+Segmented viruses e.g Influenza A virus, are difficult for `ivar consensus` to analyse as it has more than one reference (segment/chromosome). We need to split
+the alignment file by reference.
+We use `bamtools split` command to split the `BAM` file.                       
 ```
-bamtools split -in data/bowtie/sample01.sorted.bam \
-	-refPrefix "REF_" \
-	-reference
+bamtools split -in ./data/bowtie/sample01.sorted.bam \                         
+        -refPrefix "REF_" \
+        -reference
 ```
-
-Renameing output files
+> **Note:** *Takes about 5 Seconds*
+Renaming output files
 ```
-rename 'sorted.REF' 'REF' ./data/bowtie/*
+rename 'sorted.REF' 'REF' ./data/bowtie/*                                      
+```
+Now we have eight bam files for the eight Influenza A virus segments.          
+- As we did before, we also need to generate index `.bai` files for these segment `bam` files.
+- The command that does this for all `bam` files matching the regex `*REF_*.bam` is shown below:
+```
+ls ./data/bowtie/*REF_*.bam | xargs -n1 -P5 samtools index -@ 4                
 ```
 
 ### Step 16: Loop through segmented BAM files and generate consensus:
+To generate a consensus from the read alignment `BAM` file for one segment `NC_026431.1` we will run the following command:
+```
+mkdir -p ./data/ivar/consensus/
+samtools mpileup -aa \
+        --count-orphans \
+        --no-BAQ \
+        --max-depth 0 \
+        --min-BQ 0 \
+        --reference ./data/database/refseq/H1N1.fna \
+        --region NC_026431.1 \
+        ./data/bowtie/sample01.REF_NC_026431.1.bam \
+        --output ./data/samtools/sample01.REF_NC_026431.1.mpileup
+
+cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar consensus \
+        -t 0.75 \
+        -q 20 \
+        -m 10 \
+        -n N \
+        -p ./data/ivar/consensus/sample01.REF_NC_026431.1.consensus
+sed -i '/^>/s/Consensus_\(.*\).consensus_threshold.*/\1/' ./data/ivar/consensus/sample01.REF_NC_026431.1.consensus.fa
+```
+> **Note:** *This takes approximately 2 seconds*
+- This has generated a consensus for only one segment: `NC_026431.1`.
+- The first part of the command runs `samtools mpileup`to generate a TAB-separated text pileup of the `BAM` files. The format is described in [Pileup Formats](http://www.htslib.org/doc/samtools-mpileup.html#Pileup_Format). Here is a snipet:
+```
+NC_026431.1     1       A       718     ^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^K.^K.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^M.^K.^M.^M.^M.^M.^M.^M.^K.^K.^M.^K.^M.^M.^M.^E.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^J.^J.^M.^M.^M.^M.^M.^M.^M.^J.^M.^M.^M.^K.^M.^K.^M.^K.^M.^M.^M.^K.^M.^M.^M.^K.^K.^M.^M.^J.^M.^M.^M.^M.^K.^K.^K.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^J.^M.^K.^M.^K.^M.^M.^E.^M.^M.^M.^J.^K.^M.^M.^M.^M.^K.^K.^M.^M.^M.^J.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^K.^M.^M.^K.^K.^M.^M.^M.^M.^E.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^E.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^M.^K.^K.^M.^M.^M.^M.^M.^K.^K.^M.^M.^M.^M.^M.^K.^J.^M.^K.^M.^M.^K.^M.^J.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^K.^M.^K.^M.^M.^K.^K.^K.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^K.^K.^K.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^K.^K.^M.^M.^M.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^K.^M.^K.^M.^K.^M.^M.^K.^M.^K.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^K.^M.^K.^M.^J.^K.^K.^K.^M.^M.^M.^M.^M.^M.^K.^J.^K.^M.^M.^M.^M.^K.^E.^K.^K.^M.^M.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^K.^M.^J.^K.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^K.^M.^M.^K.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^E.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^K.^K.^M.^M.^M.^M.^M.^M.^K.^M.^M.^9.^M.^E.^E.^M.^K.^K.^M.^M.^M.^M.^M.^M.^M.^K.^K.^M.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^K,^M,^K,^M,^K,^K,^M,^M,^K,^K,^K,^K,^M,^K,^M,^E,^M,^K,^K,^M,^M,^M,^M,^M,^K,^M,^M,^J,^J,^M,^J,^K,^K,^K,^K,^M,^K,^M,^K,^K,^M,^M,^M,^K,^M,^M,^K,^J,^K,^K,^E,^M,^J,^K,^K,^K,^M,^J,^M,^M,^K,^K,^K,^E,^M,^K,^M,^E,^M,^K,^K,^K,^M,^M,^K,^K,^M,^J,^K,^M,^K,^J,^M,^M,^K,^M,^K,^M,^K,^K,^K,^K,^M,^K,^M,^K,^K,^K,^M,^K,^M,^M,^K,^M,^M,^K,^K,^K,^M,^M,^K,^K,^M,^K,^K,^M,^K,^K,^M,^M,^K,^K,^K,^M,^M,^K,^M,^K,^M,^J,^K,^K,^K,^M,^M,^K,^E,^K,^K,^K,^M,^K,^J,^K,^M,^M,^M,^M,^M,^K,^K,^K,^M,^M,^M,^M,^M,^K,^E,^K,^M,^K,^K,^K,^M,^K,^9,^M,^E,^E,^K,^K,^M,^K,^K,^K,^K,^M,^M,^K,^M,^M,^M,^K,      E/EAEE666EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEE/EEEEEEEAEEEEEEAAEEEAEEEEEEEEEEEE/EEEEEEEEEEEE/EEEEEEAEEEAEEEEEEEEEEEEE/EEEEEEEEEEEAEEEEEEEEEAEEAEEEEEEEEEEEEEEAEEEEEEAA/EAEEE/EEEEEEEEEEEEEEEEEEEEEEEEEE6EEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEAEEEEEE/EE6EEEE/EEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEAEEEEE/EEEEEEEEEEE/EEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/EEEEEEEEEE6AEEEEEEAEEEEEEE6E6EEEEEEEEEEEAEEEEEEEEEEEEEEAEEEEEEEEEE/EE/EEEEEEEEE6EEEAEAEEAEEEAEEAEEE6EEEEEEEEEEEEEE/EEEEEEEEAEEEEEEEEEEEEAEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEAEAA6/EEAEEEEEEEEE6AEEEEEAA/EEEA/EEAEEE6E6/AAAEEEA/EAEEAEEEEEEAAEEAEE<AEEEE<EEEEEEAAEEEEEEEEEEEE<E<AEEEEAEE/E/EEEEEEEAAEEEEEEAEEAEEEEEEAEEE/EEAEEEEEEAEEEEEEEAE/EAEAEE/EAEEAEE
+NC_026431.1     2       T       745     ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M,^M,^M,^M,^M,^J,^M, EAEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEAEAEEEAEEEEEEEEEEEEEEEEAEEEEEEEEEEE/EEEEEEEAEEEAEEAEEEEEEAEEEEEAE/EEAEEEEEEEEEEEEEEEEEEEEE/EEEEEEEEEEEAEEAEEEEEEEAEAEEEEEEEAEEEEEEEEEE/EEEEEEEEEEEEEAEEEEEEEE6/EEEEEE/EAEEEEEEEEEEEEEEEEEEEEEEEAEEEEAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/EEEEEEEEEEEEEEEEEEEEEEEAE/EEEEEEEEEEEEEEEEEEAE/EE/EEEEEEEAEEEEEEEE/EEEEEEEEEEEEEEEEEEEAEEEEEEEEEEAEEEEAEEEEEEEE/EEEEAE/EEEEEE/EEEEEEEEEE/EEEAEEEEEEEEEEEEEEEEEEEEEAEEE/EEE6EE/EEEEEAEEEEEEEEEAEEEEEEAEEAA/EE/EAEEEEEEE/EAAEEEAEAEEE<EEEAEE<AEAEEEAEEEA/AAEE/EEEEEEEEEAEEEEEEEE<AEEEEEEAEAEEEEEEEEEEEAE<EE<AEEEEAEEEEEEEEEEEEEEAE<<EEEE<EEEAEEEEEAEAEEEAE<EEEEEEEEAE/EEEEEE<EEAE/E/AAAAAAAA!EAAAAA!AAA!EeEaA<e
+NC_026431.1     3       G       768     ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,....................,,,,,,,^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M,^M,^M,^M,^K,^M,  EAEAEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEE/E6EEEEEEEEEEEE6EEEEEEEEEEEEEEEEEAEAEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEE6EEEEEEEEEAAEEEEEEEEEEEEEEEEEE6EAEEEE6EEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEE/EEEEEEEEE6EEEEAEEEEEEEEEEEEEEEEAEAEEEEEEEEEEEEEEEEEEEEEEEEEE6EEEEEEEAEEEEEE/EEEEEEEEEEEEEEEEE6EAEAEEEEEEEE6EEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/EEEEEEEEEEEEEEEAEEAEEEEEEEEEEEEEEEEEEEEEE/EAEEEEEEEEEEEEEEEEEEEEE6EEEEEE/EEEEEEEEEEEEEEEEEEEAEEEEEA/EEEEEEEEEEEEEEEEEEE66EEEE/EEEEEEEEEEEEEEEEEEEAEEEEAEEEEEEEEEEEEEEEEEEEEEE6<EEEAEAEEEEEEEEAEEAEEAAEAEEEEEE<EEE/E</EEEEEEA/EEEE<EEAEEEEEEAEEE<EEEEEAEEEE/E6EEAEE/EEEEEAEEEAEEEEEEEE6EEEEEEEEAEEEEEEEEEEEEEEEEEEEEAEAAE<EEEEE/AEEEEEEEEEAEAEEEEEEEAEAEAAAAAAAA6!EAAAAA!AAA!EeEeEEeAAAAAAAAA!AAAAAAA</<aEA
+NC_026431.1     4       A       769     ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,....................,,,,,,,.................,,,,,,^M,     EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/AEEEEEEEEEEEEEEE6E6EEEEEEEEE/EEEEEEEEEEEEEEEEEEEEAEEEEEEEAEEEEEEEEEEEEEEEEEEEEEE/EEEEEEAEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEAEEEEEEEEEEAEEAEEEEEEEEEEEEEE/EEEAEEEEEEEEEEEEEEEEEEAEAEEEEEEEE6EEEEEEEEEE/EEEE6E/EEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEE6EEEEEEEEEEEEEEEEEEEEEAEEEEEEAEEEEEEAEEEAEEEE6EEEEEEEEEEEEEEEAEEEEAEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEAEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEAEEEE/EEEEEEEEEEEEE/E/EEE/EEEEEEEEEEEEEE/EEEEEAEEEEEEEEEEEEEEEEEEEEE6EEEEEEEEEEEEEEEEEEEEAEEEEAEEEA//EEEAEEEEAAEAEAEEEEEEAAEEEEEEE<AAEE<E6AEEAEEAA/EEEEEEEEEEAEAE<EEEEEEEEE/EAEAEE<EAEEAEEEEEEEEAE/EAEEEAEEAEAEEEEAEEAAEEE/EAEEAEEAEEEEEAAE<EEEEEEAE<EEEEEEEEAEEE/EEEEEAEEEAEEAAAAAAAA!EAAAAA!AAA!EeEeE<eAAAAAAAAA!AA/A/AAAAASE/A
+```
+- The second part runs `ivar consensus` to convert the `pileup` format to a consensus sequence. The minimum quality accepted is `-q 20`, minimum frequncy of the consensus call is `-t 0.75`, minimum depth is `-m 10` and any position that does not meet the minimum requirements are assinged an `N` i.e `-n N`.            
+- The `sed -i` command removes some reduntant phrases from the `FASTA` file header. Changing it from `>Consensus_sample01.REF_NC_026433.1.consensus_threshold_0.75_quality_20` to `>sample01.REF_NC_026433.1`.                                 
+
+- To execute this for all eight segments in a single command, we can run the above command in a loop each time working on a different segment. The following command does this using `for` loops.
 ```
 mkdir -p ./data/ivar/consensus/
 for bamFile in $(find ./data/bowtie -name "*.REF_*.bam")
 do
-	fileName=`basename -- "$bamFile"`
-	outName=${fileName%.*}
-	samtools mpileup -aa \
-		--count-orphans \
-		--no-BAQ \
-		--max-depth 0 \
-		--min-BQ 0 \
-		--reference ./data/database/refseq/influenzaA.fna \
-		$bamFile \
-		--output ./data/samtools/${outName}.mpileup
-	
-	cat ./data/samtools/${outName}.mpileup | ivar consensus \
-		-t 0.75 \
-		-q 20 \
-		-m 10 \
-		-n N \
-		-p ./data/ivar/consensus/${outName}.consensus
+        fileName=`basename -- "$bamFile"`
+        outName=${fileName%.*}
+        chrName=${outName##*REF_}
+        samtools mpileup -aa \
+                --count-orphans \
+                --no-BAQ \
+                --max-depth 0 \
+                --min-BQ 0 \
+                --reference ./data/database/refseq/H1N1.fna \
+                --region ${chrName} \
+                $bamFile \
+                --output ./data/samtools/${outName}.mpileup
+
+        cat ./data/samtools/${outName}.mpileup | ivar consensus \
+                -t 0.75 \
+                -q 20 \
+                -m 10 \
+                -n N \
+                -p ./data/ivar/consensus/${outName}.consensus
+        sed -i '/^>/s/Consensus_\(.*\).consensus_threshold.*/\1/' ./data/ivar/consensus/${outName}.consensus.fa
 done
 ```
+> **Note:** *Takes about 15 Seconds*
+- Consensus sequence files for each of the segments have now been generated and stored in `./data/ivar/consensus/`
+- Merge all consensus files for all segments into one file
+```
+cat ./data/ivar/consensus/*.fa >> ./data/ivar/consensus/sample01.consensus.fa
+```
 
-### Step 17: Loop through seqmented BAM files and conduct Variant Calling from the alignemnts
+### Step 17: Loop through segmented BAM files and call Variants from the alignemnts
+Again we will use the `pileup format` of `BAM` to identify mutations in our samplet. For this we start with segment `NC_026431.1`.
+```
+mkdir -p ./data/ivar/variants/
+cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar variants \
+        -t 0.10 \
+        -q 20 \
+        -m 10 \
+        -g ./data/database/refseq/H1N1.gff \
+        -r ./data/database/refseq/H1N1.fna \
+        -p ./data/ivar/variants/sample01.REF_NC_026431.1.variants
+```
+> **Note:** *This takes approximately 2 seconds*
+- This has generated a file with variants in TSV format for only one segment: `NC_026431.1`.
+- The `pileup format` is absolutely the same though with the omission the `-aa` flag in `samtools mpileup` command which only switches off the inclusion of all positions in the reference. See [`samtools mpileup` options](http://www.htslib.org/doc/samtools-mpileup.html#OPTIONS)
+- `ivar variants` command calls variants: both single nucleotide variants (SNVs) and indels. `-t 0.10` flag determines the minimum frequency, `-q 20` dictates the minimum quality and `-m 10` the minimum depth.
+- The format of the variant call file is TSV as shown below:
+```
+REGION  POS     REF     ALT     REF_DP  REF_RV  REF_QUAL        ALT_DP  ALT_RV ALT_QUAL ALT_FREQ        TOTAL_DP        PVAL    PASS    GFF_FEATURE     REF_CODON       REF_AA  ALT_CODON       ALT_AA
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118631.1      GCG    AGCA     A
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118628.1      GCG    AGCA     A
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118630.1      GCG    AGCA     A
+NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009121769.1      GCG    AGCA     A
+```
+- This can be translated [according `ivar` manual](https://andersen-lab.github.io/ivar/html/manualpage.html) as:
+
+|Field | Description |
+|----------|:-------------------------------------------|                      
+|REGION | Region from BAM file |
+|POS | Position on reference sequence |
+|REF | Reference base |
+|ALT | Alternate Base |
+|REF_DP | Ungapped depth of reference base |
+|REF_RV | Ungapped depth of reference base on reverse reads |
+|REF_QUAL | Mean quality of reference base |
+|ALT_DP | Ungapped depth of alternate base |
+|ALT_RV | Ungapped deapth of alternate base on reverse reads |
+|ALT_QUAL | Mean quality of alternate base |
+|ALT_FREQ | Frequency of alternate base |
+|TOTAL_DP | Total depth at position |
+|PVAL | p-value of fisher's exact test |
+|PASS | Result of p-value <= 0.05 |
+|GFF_FEATURE | ID of the GFF feature used for the translation |
+|REF_CODON | Codong using the reference base |
+|REF_AA | Amino acid translated from reference codon |
+|ALT_CODON | Codon using the alternate base |
+|ALT_AA | Amino acid translated from the alternate codon |
+
+- To execute this for all eight segments in a single command, we will run the command in a loop each time working on a different segment.
+
 ```
 mkdir -p ./data/ivar/variants/
 for bamFile in $(find ./data/bowtie -name "*.REF_*.bam")
 do
-	fileName=`basename -- "$bamFile"`
-	outName=${fileName%.*}
-	samtools mpileup --ignore-overlaps \
-		--count-orphans \
-		--no-BAQ \
-		--max-depth 0 \
-		--min-BQ 0 \
-		--reference ./data/database/refseq/influenzaA.fna \
-		$bamFile \
-		--output ./data/samtools/${outName}.var.mpileup
-	
-	cat ./data/samtools/${outName}.var.mpileup | ivar variants \
-		-t 0.25 \
-		-q 20 \
-		-m 10 \
-		-g ./data/database/refseq/influenzaA.gff \
-		-r ./data/database/refseq/influenzaA.fna \
-		-p ./data/ivar/variants/${outName}.variants
+        fileName=`basename -- "$bamFile"`
+        outName=${fileName%.*}
+        chrName=${outName##*REF_}
+        cat ./data/samtools/${outName}.mpileup | ivar variants \
+                -t 0.25 \
+                -q 20 \
+                -m 10 \
+                -g ./data/database/refseq/H1N1.gff \
+                -r ./data/database/refseq/H1N1.fna \
+                -p ./data/ivar/variants/${outName}.variants
 done
 ```
+> **Note:** *This takes approximately 12 seconds*
 
-### Step 18: Coverting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
+Variant call files for all segments have been generated and stored in `./data/ivar/consensus/`
+
+
+### Step 18: Converting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
+The standard used often for reporting and analysing variant calls is [**`Variant Call Format`**](https://samtools.github.io/hts-specs/VCFv4.1.pdf) in short **`VCF`**
+We will therefore convert our variant `TSV` to `VCF`. Below we use a python script to perform this: `python3 ./scripts/ivar_variants_to_vcf.py`
 ```
 for varFile in $(find ./data/ivar/variants -name "*.variants.tsv")
 do
-	fileName=`basename -- "$varFile"`
-	outName=${fileName%.*}
-	python3 ./scripts/ivar_variants_to_vcf.py \
-		$varFile \
-		./data/ivar/variants/${outName}.vcf \
-		--pass_only \
-		--allele_freq_thresh 0.75 > ./data/ivar/variants/${outName}.counts.log
+        fileName=`basename -- "$varFile"`
+        outName=${fileName%.*}
+        python3 ./scripts/ivar_variants_to_vcf.py \
+                $varFile \
+                ./data/ivar/variants/${outName}.vcf \
+                --pass_only \
+                --allele_freq_thresh 0.75 > ./data/ivar/variants/${outName}.counts.log
 
-	#Compress
-	bgzip -c ./data/ivar/variants/${outName}.vcf > ./data/ivar/variants/${outName}.vcf.gz
-	#Create tabix index - Samtools
-	tabix -p vcf -f ./data/ivar/variants/${outName}.vcf.gz
-	#Generate VCF files
-	bcftools stats ./data/ivar/variants/${outName}.vcf.gz > ./data/ivar/variants/${outName}.stats.txt
+        #Compress
+        bgzip -c ./data/ivar/variants/${outName}.vcf > ./data/ivar/variants/${outName}.vcf.gz
+        #Create tabix index - Samtools
+        tabix -p vcf -f ./data/ivar/variants/${outName}.vcf.gz
+        #Generate VCF files
+        bcftools stats ./data/ivar/variants/${outName}.vcf.gz > ./data/ivar/variants/${outName}.stats.txt
 done
 ```
+- You will note that we also compressed the resulting `VCF` file to `.vcf.gz` using `bgzip -c`. This is to prepare it for follow-up analysis.
+- Also we index the compressed `.vcf.gz` using `tabix -p` command.
+- `bcftools stats` generates some summary statistics from each indexed `vcf.gz` that be used later in `MALTIQC` analysis.
+
+> **Note:** *Takes about 4 Seconds*
+
 
 ### Step 19: Annotation of Variants - SnpEff and SnpSift
 Annotate the variants VCF file with snpEff
@@ -648,9 +753,37 @@ do
 	bcftools stats ./data/ivar/variants/${outName}.ann.vcf.gz > ./data/ivar/variants/${outName}.ann.stats.txt
 done
 ```
-**Tip:** *How do you build a SnpEff Databse?*
----
----
+#### Building SnpEff Database:
+##### Alternative 01 - Build Database from `GFF` and `FNA`  
+- Set up the Genome Feature File `GFF` and Reference Genome `fna`  
+- Create a [`snpEff.config`](https://pcingola.github.io/SnpEff/examples/#step-1-build-database) file in the [right format](https://pcingola.github.io/SnpEff/se_build_db/#add-a-genome-to-the-configuration-file).
+```
+mkdir -p ./data/database/snpEff/H1N1/
+cp ./data/database/refseq/H1N1.gff ./data/database/snpEff/H1N1/genes.gff
+cp ./data/database/refseq/H1N1.fna ./data/database/snpEff/H1N1/sequences.fa
+echo -e "# Influenza A virus genome, version influezaA\nH1N1.genome: H1N1" > ./data/database/snpEff/H1N1/snpEff.config
+```
+- Now build a SnpEff database:
+```
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar build \\
+        -config ./data/database/snpEff/H1N1/snpEff.config \\
+        -dataDir ./../ \\
+        -gff3 \\
+        -v H1N1
+```
+##### Alternative 02 - Download Pre-built database:
+- Check all pre-built databases (over 20,000) for pathogen of interest.
+```
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar databases > ./data/database/snpEff/snpeff.databases.txt
+```
+View the list of available databases:
+```
+less -S ./data/database/snpEff/snpeff.databases.txt
+```
+- Get the genome version and download target
+```
+java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar download -v <genome_version>
+```
 
 ### Step 20: Filter the most significant variants using snpSift
 ```

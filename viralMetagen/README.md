@@ -547,6 +547,7 @@ cat ./data/samtools/sample01.REF_NC_026431.1.mpileup | ivar consensus \
 	-m 10 \
 	-n N \
 	-p ./data/ivar/consensus/sample01.REF_NC_026431.1.consensus
+sed -i '/^>/s/Consensus_\(.*\).consensus_threshold.*/\1/' ./data/ivar/consensus/sample01.REF_NC_026431.1.consensus.fa
 ```
 > **Note:** *This takes approximately 2 seconds*   
 - This has generated a consensus for only one segment: `NC_026431.1`.  
@@ -558,6 +559,7 @@ NC_026431.1     3       G       768     ........................................
 NC_026431.1     4       A       769     ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,....................,,,,,,,.................,,,,,,^M,     EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/AEEEEEEEEEEEEEEE6E6EEEEEEEEE/EEEEEEEEEEEEEEEEEEEEAEEEEEEEAEEEEEEEEEEEEEEEEEEEEEE/EEEEEEAEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEAEEEEEEEEEEAEEAEEEEEEEEEEEEEE/EEEAEEEEEEEEEEEEEEEEEEAEAEEEEEEEE6EEEEEEEEEE/EEEE6E/EEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEE6EEEEEEEEEEEEEEEEEEEEEAEEEEEEAEEEEEEAEEEAEEEE6EEEEEEEEEEEEEEEAEEEEAEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEAEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEAEEEE/EEEEEEEEEEEEE/E/EEE/EEEEEEEEEEEEEE/EEEEEAEEEEEEEEEEEEEEEEEEEEE6EEEEEEEEEEEEEEEEEEEEAEEEEAEEEA//EEEAEEEEAAEAEAEEEEEEAAEEEEEEE<AAEE<E6AEEAEEAA/EEEEEEEEEEAEAE<EEEEEEEEE/EAEAEE<EAEEAEEEEEEEEAE/EAEEEAEEAEAEEEEAEEAAEEE/EAEEAEEAEEEEEAAE<EEEEEEAE<EEEEEEEEAEEE/EEEEEAEEEAEEAAAAAAAA!EAAAAA!AAA!EeEeE<eAAAAAAAAA!AA/A/AAAAASE/A
 ```
 - The second part runs `ivar consensus` to convert the `pileup` format to a consensus sequence. The minimum quality accepted is `-q 20`, minimum frequncy of the consensus call is `-t 0.75`, minimum depth is `-m 10` and any position that does not meet the minimum requirements are assinged an `N` i.e `-n N`.  
+- The `sed -i` command removes some reduntant phrases from the `FASTA` file header. Changing it from `>Consensus_sample01.REF_NC_026433.1.consensus_threshold_0.75_quality_20` to `>sample01.REF_NC_026433.1`.
 
 - To execute this for all eight segments in a single command, we can run the above command in a loop each time working on a different segment. The following command does this using `for` loops.
 ```
@@ -583,11 +585,16 @@ do
 		-m 10 \
 		-n N \
 		-p ./data/ivar/consensus/${outName}.consensus
+	sed -i '/^>/s/Consensus_\(.*\).consensus_threshold.*/\1/' ./data/ivar/consensus/${outName}.consensus.fa
 done
 ```
-Consensus sequence files for each of the segments have now been generated and stored in `./data/ivar/consensus/`
+> **Note:** *Takes about 15 Seconds* 
+- Consensus sequence files for each of the segments have now been generated and stored in `./data/ivar/consensus/`  
+- Merge all consensus files for all segments into one file
+```
+cat ./data/ivar/consensus/*.fa >> ./data/ivar/consensus/sample01.consensus.fa
+```
 
-> **Note:** *Takes about 15 Seconds*
 
 ### Step 17: Loop through segmented BAM files and call Variants from the alignemnts
 Again we will use the `pileup format` of `BAM` to identify mutations in our samplet. For this we start with segment `NC_026431.1`.
@@ -683,17 +690,19 @@ done
 ```
 - You will note that we also compressed the resulting `VCF` file to `.vcf.gz` using `bgzip -c`. This is to prepare it for follow-up analysis.  
 - Also we index the compressed `.vcf.gz` using `tabix -p` command.  
-- `bcftools stats` generates some statistics from each indexed `vcf.gz` to be used later in `MALTIQC` analysis.
+- `bcftools stats` generates some summary statistics from each indexed `vcf.gz` that be used later in `MALTIQC` analysis.
 
-> **Note:** *Takes about 40 Seconds*
+> **Note:** *Takes about 4 Seconds*
+
 ### Step 19: Annotation of Variants - SnpEff and SnpSift
-Annotate the variants VCF file with snpEff
+We can now annotate the variants in the compressed `vcf.gz` file with snpEff
 ```
 for varFile in $(find ./data/ivar/variants -name "*.vcf.gz")
 do
 	fileName01=`basename -- "$varFile"`
 	fileName=${fileName01%.*}
 	outName=${fileName%.*}
+	#SnpEff - annotation
 	java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar \
 		-config ./data/database/snpEff/H1N1/snpEff.config \
 		-dataDir ./../ \
@@ -711,9 +720,27 @@ do
 	bcftools stats ./data/ivar/variants/${outName}.ann.vcf.gz > ./data/ivar/variants/${outName}.ann.stats.txt
 done
 ```
-> **Note:** *Takes about 40 Seconds*
-**Tip:** *How do you build a SnpEff Databse?*
+> **Note:** *Takes about 40 Seconds*  
+- [`SnpEff`](https://pcingola.github.io/SnpEff/se_introduction/) annotates the variants and predicts the effects of mutations to amino acid sequences.
+- An annotated VCF output file will look like this:
+```
+```
+- The `ANN` field is added by SnpEff and has [the annotation information](https://pcingola.github.io/SnpEff/se_inputoutput/#ann-field-vcf-output-files).
+- The `EFF` field has [the predicted effects](https://pcingola.github.io/SnpEff/se_inputoutput/#eff-field-vcf-output-files) of the mutation.
+> **Quiz:** *How do you build a SnpEff Databse?*  
 ---
+<details close>
+  <summary>Tip</summary>
+  How to build SnpEff Annotation Database
+  <blockquote>
+    <p dir="auto">
+      <strong>Solution:</strong>
+      <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-snpeff-database"
+      ref="nofollow">Building krona Taxonomy database</a>
+    </p>
+  </blockquote>
+</details>
+
 ---
 
 ### Step 20: Filter the most significant variants using snpSift
