@@ -14,7 +14,27 @@ Tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
 - [Bioinformatics Analysis](#Bioinformatics-Analysis)
     - [Step 1 : Preparing the project directory](#Step-1--Preparing-the-project-directory)
     - [Step 2: Loading Modules](#Step-2-Loading-Modules)
-    - [Step 3: Copying the data and databases](#Step-3-Copying-the-data-and-databases)
+    - [Step 3: Setting up sequence data and databases](#Step-3-Setting-up-sequence-data-and-databases)
+    - [Step 4: Assessing Read Quality using fastqc before quality trimming](#Step-4-Assessing-Read-Quality-using-fastqc-before-quality-trimming)
+    - [Step 5: Quality Trimming fastq files with fastp and Trims adapter sequences](#Step-5-Quality-Trimming-fastq-files-with-fastp-and-Trims-adapter-sequences)
+    - [Step 6 (Optional): Assessing Read Quality after quality trimming](#Step-6-Optional-Assessing-Read-Quality-after-quality-trimming)
+    - [Step 7: Filter Host Genome Reads](#Step-7-Filter-Host-Genome-Reads)
+    - [Step 8 (Optional): Taxonomic Classification of Reads](#Step-8-Optional-Taxonomic-Classification-of-Reads)
+    - [Visualise the Taxonomic classification results with krona tools](#Visualise-the-Taxonomic-classification-results-with-krona-tools)
+  - [Lets Focus on a specific pathogenic virus: H1N1 - Influenza A Virus](#Lets-Focus-on-a-specific-pathogenic-virus-H1N1-Influenza-A-Virus)
+    - [Step 9: Downloading the Reference data - reference genome and annotation files](#Step-9-Downloading-the-Reference-data-reference-genome-and-annotation files)
+    - [Step 10: Indexing the reference genome using samtools and bowtie](#Step-10-Indexing-the-reference-genome-using-samtools-and-bowtie)
+    - [Step 11: Align reads to reference genome](#Step-11-Align-reads-to-reference-genome)
+    - [Step 12: Sort and Index aligment map](#Step-12-Sort-and-Index-aligment-map)
+    - [Step 13: Coverage computation](#Step-13-Coverage-computation)
+    - [Step 14: Plot Genome coverage in R](#Step-14-Plot-Genome-coverage-in-R)
+    - [Step 15: Consensus Genome construsction](#Step-15-Consensus-Genome-construsction)
+    - [Step 16: Loop through segmented BAM files and generate consensus](#Step-16-Loop-through-segmented-BAM-files-and-generate-consensus)
+    - [Step 17: Loop through segmented BAM files and call Variants from the alignemnts](#Step-17-Loop-through-segmented-BAM-files-and-call-Variants-from-the-alignemnts)
+    - [Step 18: Converting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps](#Step-18-Converting-variant-files-from-tsv-to-vcf-Variant Call Format-needed-in-downstream-steps)
+    - [Step 19: Annotation of Variants - SnpEff and SnpSift](#Step-19-Annotation-of-Variants-SnpEff-and-SnpSift)
+    - [Step 20: Filter the most significant variants using snpSift](#Step-20-Filter-the-most-significant-variants-using-snpSift)
+    - [Step 21: Nextclade Clade assignment](#Step-21-Nextclade-Clade-assignment)
 
 ## Introduction
 There are four types of ***influenza viruses*** (A, B, C and D). Influenza A and B cause seasonal flu epidemics in human populations [as reported by CDC](https://www.cdc.gov/flu/about/viruses/types.htm). Influenza C causes mild illness and D infects cattle but has not been detected in humans. Influenza A virus infects birds (avian), humans, pigs (swine), horses (equine), canine (canine) and bats. It is the only one known to cause pandemics (global epidemics), a result of it's ability to mutate quickly and spread efficiently through populations with no or little immunity against it.   
@@ -96,18 +116,18 @@ Check if modules have been loaded:
 module list 
 ```
 ### Step 3: Setting up sequence data and databases
-1. *Copying the data FASTQ:*   
+1. **Copying the data FASTQ:**   
 The FASTQ files that we will use for this tutorial have been stored in a directory in the HPC accessible to all:`/var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/`. You will need to copy it to the `data/fastq` directory in the `viralMetagen` directory. However, to avoid using so much space you can just create a [`symbolic link`](https://www.futurelearn.com/info/courses/linux-for-bioinformatics/0/steps/201767) to it.
 ```
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastq/sample01_R* ./data/fastq/
 ```
-2. *Setting up the database directories:*   
+2. **Setting up the database directories:**   
 During the analysis we will need databases to carry out our analysis at different stages. This will be explained in detail during each individual stage where they are needed. For now we will create the directories where we will store the databases.
 ```
 mkdir -p ./data/database{bowtie,centrifuge,hostdb,krona,nextclade,refseq,snpEff}
 ```
 
-3. *Copying scripts and images:*   
+3. **Copying scripts and images:**   
 Some of the analysis steps require R and Python scripts. We have them stored in `/var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts`. We will copy this to `./scripts/` within `viralMetagen` as follows:   
 ```
 cp -r /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/scripts/* ./scripts/
