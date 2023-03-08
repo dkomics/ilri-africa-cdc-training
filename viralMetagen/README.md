@@ -851,11 +851,11 @@ Now execute nextclade analysis on your sequences.
 nextclade run \
         --input-fasta data/ivar/consensus/sample01.REF_NC_026433.1.consensus.fa \
         --input-dataset ./data/database/nextclade/ \
-        --output-csv ./data/nextclade/sample01.nextclade.csv \
-        --output-tree ./data/nextclade/sample01.nextclade.auspice.json \
+        --output-csv ./data/nextclade/sample01.REF_NC_026433.1.nextclade.csv \
+        --output-tree ./data/nextclade/sample01.REF_NC_026433.1.nextclade.auspice.json \
         --output-dir ./data/nextclade/ \
-        --output-basename ./data/nextclade/sample01.nextclade. \
-        2> ./data/nextclade/sample01.nextclade.log
+        --output-basename ./data/nextclade/sample01.REF_NC_026433.1.nextclade. \
+        2> ./data/nextclade/sample01.REF_NC_026433.1.nextclade.log
 ```                                                    
 - The outcome of this analysis will be stored in `./data/nextclade/`  
 > 3. Visualization: The output of Nextclade includes a phylogenetic tree in `.json` format. This tree can be visualized in [Auspice](https://auspice.us/).  
