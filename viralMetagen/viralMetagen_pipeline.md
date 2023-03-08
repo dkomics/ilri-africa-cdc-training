@@ -648,7 +648,7 @@ done
 cat ./data/ivar/consensus/*.fa >> ./data/ivar/consensus/sample01.consensus.fa
 ```
 
-### Step 17: Loop through segmented BAM files and call Variants from the alignemnts
+### Step 17: Loop through segmented BAM files and call Variants from the alignments
 Again we will use the `pileup format` of `BAM` to identify mutations in our samplet. For this we start with segment `NC_026431.1`.
 ```
 mkdir -p ./data/ivar/variants/
@@ -672,7 +672,7 @@ NC_026431.1     75      G       A       3       1       34      1818    620    3
 NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118630.1      GCG    AGCA     A
 NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009121769.1      GCG    AGCA     A
 ```
-- This can be translated [according `ivar` manual](https://andersen-lab.github.io/ivar/html/manualpage.html) as:
+- This can be translated [according to `ivar` manual](https://andersen-lab.github.io/ivar/html/manualpage.html) as:
 
 |Field | Description |
 |----------|:-------------------------------------------|                      
@@ -716,7 +716,7 @@ done
 ```
 > **Note:** *This takes approximately 12 seconds*
 
-Variant call files for all segments have been generated and stored in `./data/ivar/consensus/`
+Variant call files for all segments have been generated and stored in `./data/ivar/variants/`
 
 
 ### Step 18: Converting variant files from tsv to vcf (Variant Call Format) - needed in downstream steps
