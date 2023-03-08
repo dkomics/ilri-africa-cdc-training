@@ -854,7 +854,7 @@ nextclade run \
         --output-tsv ./data/nextclade/sample01.REF_NC_026433.1.nextclade.csv \
         --output-tree ./data/nextclade/sample01.REF_NC_026433.1.nextclade.auspice.json \
         --output-all ./data/nextclade/ \
-        --output-basename ./data/nextclade/sample01.REF_NC_026433.1.nextclade \
+        --output-basename sample01.REF_NC_026433.1.nextclade \
         |& tee ./data/nextclade/sample01.REF_NC_026433.1.nextclade.log
 ```                                                    
 - The outcome of this analysis will be stored in `./data/nextclade/`  
@@ -862,11 +862,11 @@ nextclade run \
 
 - First let us download the the `.json` file from the HPC:
 ```
-cp ./data/nextclade/sample01.nextclade.auspice.json ~/
+cp ./data/nextclade/*.nextclade.json ~/
 ```
 - In your local computer use `scp` to copy the file to any desired destination:
 ```
-scp <user_name>@hpc.ilri.cgiar.org:~/*.json <destination_folder>
+scp <user_name>@hpc.ilri.cgiar.org:~/*.nextclade.json <destination_folder>
 ```
 - Open [Auspice](https://auspice.us/).  
 - Drag and drop the `.json` file in the [Auspice](https://auspice.us/).  
