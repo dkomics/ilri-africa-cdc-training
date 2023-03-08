@@ -613,7 +613,7 @@ NC_026431.1     75      G       A       3       1       34      1818    620    3
 NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009118630.1      GCG    AGCA     A
 NC_026431.1     75      G       A       3       1       34      1818    620    34       0.998353        1821    0       TRUE    cds-YP_009121769.1      GCG    AGCA     A
 ```
-- This can be translated as:  
+- This can be translated [according `ivar` manual](https://andersen-lab.github.io/ivar/html/manualpage.html) as:  
 
 |Field | Description |
 |----------|:-------------------------------------------|
@@ -660,6 +660,8 @@ done
 Variant call files for all segments have been generated and stored in `./data/ivar/consensus/`
 
 ### Step 18: Converting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
+The standard used often for reporting and analysing variant calls is [**`Variant Call Format`**](https://samtools.github.io/hts-specs/VCFv4.1.pdf) in short **`VCF`**
+We will therefore convert our variant `TSV` to `VCF`. Below we use a python script to perform this: `python3 ./scripts/ivar_variants_to_vcf.py`
 ```
 for varFile in $(find ./data/ivar/variants -name "*.variants.tsv")
 do
@@ -679,6 +681,10 @@ do
 	bcftools stats ./data/ivar/variants/${outName}.vcf.gz > ./data/ivar/variants/${outName}.stats.txt
 done
 ```
+- You will note that we also compressed the resulting `VCF` file to `.vcf.gz` using `bgzip -c`. This is to prepare it for follow-up analysis.  
+- Also we index the compressed `.vcf.gz` using `tabix -p` command.  
+- `bcftools stats` generates some statistics from each indexed `vcf.gz` to be used later in `MALTIQC` analysis.
+
 > **Note:** *Takes about 40 Seconds*
 ### Step 19: Annotation of Variants - SnpEff and SnpSift
 Annotate the variants VCF file with snpEff
