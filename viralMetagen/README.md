@@ -695,7 +695,13 @@ done
 > **Note:** *Takes about 4 Seconds*
 
 ### Step 19: Annotation of Variants - SnpEff and SnpSift
-We can now annotate the variants in the compressed `vcf.gz` file with snpEff
+1. Set up the SnpEff database first:
+```
+mkdir -p ./data/database/snpEff/
+cp -rf /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/snpEff/ ./data/database/snpEff/
+```
+2. We can now annotate the variants in the compressed `vcf.gz` file with snpEff
+
 ```
 for varFile in $(find ./data/ivar/variants -name "*.vcf.gz")
 do
