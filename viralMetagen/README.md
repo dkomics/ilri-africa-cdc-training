@@ -851,7 +851,7 @@ Now execute nextclade analysis on your sequences.
 nextclade run \
 	data/ivar/consensus/sample01.REF_NC_026433.1.consensus.fa \
         --input-dataset ./data/database/nextclade/H1N1/ \
-        --output-tsv ./data/nextclade/sample01.REF_NC_026433.1.nextclade.csv \
+        --output-tsv ./data/nextclade/sample01.REF_NC_026433.1.nextclade.tsv \
         --output-tree ./data/nextclade/sample01.REF_NC_026433.1.nextclade.auspice.json \
         --output-all ./data/nextclade/ \
         --output-basename sample01.REF_NC_026433.1.nextclade \
@@ -862,11 +862,11 @@ nextclade run \
 
 - First let us download the the `.json` file from the HPC:
 ```
-cp ./data/nextclade/*.nextclade.json ~/
+cp ./data/nextclade/*.nextclade.auspice.json ~/
 ```
 - In your local computer use `scp` to copy the file to any desired destination:
 ```
-scp <user_name>@hpc.ilri.cgiar.org:~/*.nextclade.json <destination_folder>
+scp <user_name>@hpc.ilri.cgiar.org:~/*.nextclade.auspice.json <destination_folder>
 ```
 - Open [Auspice](https://auspice.us/).  
 - Drag and drop the `.json` file in the [Auspice](https://auspice.us/).  
