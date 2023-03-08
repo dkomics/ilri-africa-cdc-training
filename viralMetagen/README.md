@@ -712,24 +712,48 @@ do
 	java -Xmx4g -jar /export/apps/snpeff/4.1g/snpEff.jar \
 		-config ./data/database/snpEff/H1N1/snpEff.config \
 		-dataDir ./../ \
-		-v H1N1 ${varFile} > ./data/ivar/variants/${outName}.ann.vcf
+		-v H1N1 ${varFile} > ./data/ivar/variants/${outName}.snpeff.vcf
 
 	# Rename summary.html and genes.txt
-	mv ./snpEff_summary.html ./data/ivar/variants/${outName}.ann.summary.html
-	mv ./snpEff_genes.txt ./data/ivar/variants//${outName}.ann.genes.txt
+	mv ./snpEff_summary.html ./data/ivar/variants/${outName}.snpeff.summary.html
+	mv ./snpEff_genes.txt ./data/ivar/variants//${outName}.snpeff.genes.txt
 	
 	#Compress vcf
-	bgzip -c ./data/ivar/variants/${outName}.ann.vcf > ./data/ivar/variants/${outName}.ann.vcf.gz
+	bgzip -c ./data/ivar/variants/${outName}.snpeff.vcf > ./data/ivar/variants/${outName}.snpeff.vcf.gz
 	#Create tabix index - Samtools
-	tabix -p vcf -f ./data/ivar/variants/${outName}.ann.vcf.gz
+	tabix -p vcf -f ./data/ivar/variants/${outName}.snpeff.vcf.gz
 	#Generate VCF files
-	bcftools stats ./data/ivar/variants/${outName}.ann.vcf.gz > ./data/ivar/variants/${outName}.ann.stats.txt
+	bcftools stats ./data/ivar/variants/${outName}.snpeff.vcf.gz > ./data/ivar/variants/${outName}.snpeff.stats.txt
 done
 ```
-> **Note:** *Takes about 40 Seconds*  
+> **Note:** *Takes about 35 Seconds*  
 - [`SnpEff`](https://pcingola.github.io/SnpEff/se_introduction/) annotates the variants and predicts the effects of mutations to amino acid sequences.
 - An annotated VCF output file will look like this:
 ```
+##fileformat=VCFv4.2
+##source=iVar
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##FILTER=<ID=PASS,Description="Result of p-value <= 0.05">
+##FILTER=<ID=FAIL,Description="Result of p-value > 0.05">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=REF_DP,Number=1,Type=Integer,Description="Depth of reference base">
+##FORMAT=<ID=REF_RV,Number=1,Type=Integer,Description="Depth of reference base on reverse reads">
+##FORMAT=<ID=REF_QUAL,Number=1,Type=Integer,Description="Mean quality of reference base">
+##FORMAT=<ID=ALT_DP,Number=1,Type=Integer,Description="Depth of alternate base">
+##FORMAT=<ID=ALT_RV,Number=1,Type=Integer,Description="Deapth of alternate base on reverse reads">
+##FORMAT=<ID=ALT_QUAL,Number=1,Type=String,Description="Mean quality of alternate base">
+##FORMAT=<ID=ALT_FREQ,Number=1,Type=String,Description="Frequency of alternate base">
+##SnpEffVersion="4.1g (build 2015-05-17), by Pablo Cingolani"
+##SnpEffCmd="SnpEff  H1N1 ./data/ivar/variants/sample01.REF_NC_026431.1.variants.vcf.gz "
+##INFO=<ID=ANN,Number=.,Type=String,Description="Functional annotations: 'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID | Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c | HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length | Distance | ERRORS / WARNINGS / INFO' ">
+##INFO=<ID=LOF,Number=.,Type=String,Description="Predicted loss of function effects for this variant. Format: 'Gene_Name | Gene_ID | Number_of_transcripts_in_gene | Percent_of_transcripts_affected' ">
+##INFO=<ID=NMD,Number=.,Type=String,Description="Predicted nonsense mediated decay effects for this variant. Format: 'Gene_Name | Gene_ID | Number_of_transcripts_in_gene | Percent_of_transcripts_affected' ">
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  ./data/ivar/variants/sample01.REF_NC_026431.1.variants
+NC_026431.1     75      .       G       A       .       PASS    DP=1821;ANN=A|synonymous_variant|LOW|M1|gene-UJ99_s7gp2|transcript|Transcript_gene-UJ99_s7gp2|Coding|1/1|c.75G>A|p.Ala25Ala|75/759|75/759|25/252||,A|intron_variant|MODIFIER|M2|gene-UJ99_s7gp1|transcript|Transcript_gene-UJ99_s7gp1|Coding|1/1|c.26+49G>A||||||       GT:REF_DP:REF_RV:REF_QUAL:ALT_DP:ALT_RV:ALT_QUAL:ALT_FREQ       1:3:1:34:1818:620:34:0.998353
+NC_026431.1     102     .       A       G       .       PASS    DP=2365;ANN=G|synonymous_variant|LOW|M1|gene-UJ99_s7gp2|transcript|Transcript_gene-UJ99_s7gp2|Coding|1/1|c.102A>G|p.Gly34Gly|102/759|102/759|34/252||,G|intron_variant|MODIFIER|M2|gene-UJ99_s7gp1|transcript|Transcript_gene-UJ99_s7gp1|Coding|1/1|c.26+76A>G||||||    GT:REF_DP:REF_RV:REF_QUAL:ALT_DP:ALT_RV:ALT_QUAL:ALT_FREQ       1:0:0:0:2363:886:34:0.999154
+NC_026431.1     124     .       C       A       .       PASS    DP=3004;ANN=A|missense_variant|MODERATE|M1|gene-UJ99_s7gp2|transcript|Transcript_gene-UJ99_s7gp2|Coding|1/1|c.124C>A|p.Leu42Ile|124/759|124/759|42/252||,A|intron_variant|MODIFIER|M2|gene-UJ99_s7gp1|transcript|Transcript_gene-UJ99_s7gp1|Coding|1/1|c.26+98C>A|||||| GT:REF_DP:REF_RV:REF_QUAL:ALT_DP:ALT_RV:ALT_QUAL:ALT_FREQ       1:0:0:0:3003:1236:35:0.999667
+NC_026431.1     238     .       G       A       .       PASS    DP=2161;ANN=A|missense_variant|MODERATE|M1|gene-UJ99_s7gp2|transcript|Transcript_gene-UJ99_s7gp2|Coding|1/1|c.238G>A|p.Val80Ile|238/759|238/759|80/252||,A|intron_variant|MODIFIER|M2|gene-UJ99_s7gp1|transcript|Transcript_gene-UJ99_s7gp1|Coding|1/1|c.26+212G>A||||||        GT:REF_DP:REF_RV:REF_QUAL:ALT_DP:ALT_RV:ALT_QUAL:ALT_FREQ      1:2:1:36:2159:1189:35:0.999075
+NC_026431.1     258     .       G       A       .       PASS    DP=1863;ANN=A|synonymous_variant|LOW|M1|gene-UJ99_s7gp2|transcript|Transcript_gene-UJ99_s7gp2|Coding|1/1|c.258G>A|p.Gly86Gly|258/759|258/759|86/252||,A|intron_variant|MODIFIER|M2|gene-UJ99_s7gp1|transcript|Transcript_gene-UJ99_s7gp1|Coding|1/1|c.26+232G>A||||||   GT:REF_DP:REF_RV:REF_QUAL:ALT_DP:ALT_RV:ALT_QUAL:ALT_FREQ       1:1:1:32:1862:1087:34:0.999463
 ```
 - The `ANN` field is added by SnpEff and has [the annotation information](https://pcingola.github.io/SnpEff/se_inputoutput/#ann-field-vcf-output-files).
 - The `EFF` field has [the predicted effects](https://pcingola.github.io/SnpEff/se_inputoutput/#eff-field-vcf-output-files) of the mutation.
@@ -748,8 +772,13 @@ done
 </details>
 
 ---
+- `snpEff` also generates summary HTML files stored in `./data/ivar/variants/sample01.REF_NC_*.variants.ann.summary.html`.
+- Here are the summary HTML files for all [the eight segments](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/snpEff/).
 
 ### Step 20: Filter the most significant variants using snpSift
+**[`SnpSift`]**(https://pcingola.github.io/SnpEff/ss_introduction/) is a toolbox with many utilities: `filter`,`annotate`, `caseControl`, `extractFields`, `intervals` and a few others. 
+- This tutorial uses `extractFields` operation to 'Extract fields from a VCF file to a TXT (tab separated) format'.  
+- Run the following command to get the most relevant fields.
 ```
 for varFile in $(find ./data/ivar/variants -name "*.ann.vcf.gz")
 do
