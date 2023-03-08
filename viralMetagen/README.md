@@ -853,7 +853,7 @@ nextclade run \
         --input-dataset ./data/database/nextclade/ \
         --output-csv ./data/nextclade/sample01.REF_NC_026433.1.nextclade.csv \
         --output-tree ./data/nextclade/sample01.REF_NC_026433.1.nextclade.auspice.json \
-        --output-dir ./data/nextclade/ \
+        --output-all ./data/nextclade/ \
         --output-basename ./data/nextclade/sample01.REF_NC_026433.1.nextclade. \
         2> ./data/nextclade/sample01.REF_NC_026433.1.nextclade.log
 ```                                                    
