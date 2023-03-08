@@ -819,7 +819,8 @@ M1,M2   gene-UJ99_s7gp2,gene-UJ99_s7gp1 MODERATE,MODIFIER       missense_variant
 - There are both [web-](https://clades.nextstrain.org/) and [command-line-interfaces](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli.html) for *nextclade*.   
 To run it in the command-line, we need some reference files: `genome`, `feature map`, `origin tree`, `primers` if used and `quality configurations`. Luckily, for H1N1 and a few other viral pathogens, these files have already been created and can be easily retrieved using the same tool. Otherwise, you will have to create/retrieve accordingly.  
 
-> 1. Get the reference data
+> 1. Get the reference data  
+
 - Check the list of available nextclade datasets:
 ```
 mkdir -p ./data/database/nextclade/
@@ -836,14 +837,40 @@ nextclade dataset get \
         --reference 'CY121680' \
         --output-dir ./data/database/nextclade/
 ```
-> 2. Perform Clade assignment:
+> **Note** *This command takes approximately 10 seconds to complete*  
+- You have now downloaded Nextclade reference data for this analysis.  
+- View the dataset using `ls ./data/database/nextclade/`  
+- Nextclade datasets are updated regularly and it is advisable to rerun tje download command before any analysis. This will ensure usage of up-to-date datasets.
+
+> 2. Perform Clade assignment:  
+
+Now execute nextclade analysis on your sequences. 
+- If you paid attention to the `./data/database/nextclade/nextcladelist.txt` tje you will remamber seeing a dataset name like `flu_h1n1pdm_ha`. The `ha` in the name stands for `hemagglutinin (H)`. This is because Nextclade analysis only relys on the `hemagglutinin (H)` segment alone. That is `REF_NC_026433.1`.
+- Proceed with your analysis providing the consensus matching `REF_NC_026433.1`.
 ```
 nextclade run \
-        --input-fasta ./data/ivar/consensus/sample01.consensus.fa \
+        --input-fasta data/ivar/consensus/sample01.REF_NC_026433.1.consensus.fa \
         --input-dataset ./data/database/nextclade/ \
         --output-csv ./data/nextclade/sample01.nextclade.csv \
         --output-tree ./data/nextclade/sample01.nextclade.auspice.json \
         --output-dir ./data/nextclade/ \
         --output-basename ./data/nextclade/sample01.nextclade. \
         2> ./data/nextclade/sample01.nextclade.log
-```                                                     
+```                                                    
+- The outcome of this analysis will be stored in `./data/nextclade/`  
+> 3. Visualization: The output of Nextclade includes a phylogenetic tree in `.json` format. This tree can be visualized in [Auspice](https://auspice.us/).  
+
+- First let us download the the `.json` file from the HPC:
+```
+cp ./data/nextclade/sample01.nextclade.auspice.json ~/
+```
+- In your local computer use `scp` to copy the file to any desired destination:
+```
+scp <user_name>@hpc.ilri.cgiar.org:~/*.json <destination_folder>
+```
+- Open [Auspice](https://auspice.us/).  
+- Drag and drop the `.json` file in the [Auspice](https://auspice.us/).  
+- Now edit the tree.  
+  - In `Dataset` click the drop down arrow and select `ncov`, below it select `open` and below it select `global`.  
+  - In `Color By` click the drop down arrow and select `clade`.  
+  - Do any other adjustments as you wish.   
