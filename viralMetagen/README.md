@@ -21,7 +21,7 @@ Tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
     - [Step 7: Filter Host Genome Reads](#Step-7-Filter-Host-Genome-Reads)
     - [Step 8 (Optional): Taxonomic Classification of Reads](#Step-8-Optional-Taxonomic-Classification-of-Reads)
     - [Visualise the Taxonomic classification results with krona tools](#Visualise-the-Taxonomic-classification-results-with-krona-tools)
-  - [Lets Focus on a specific pathogenic virus: H1N1 - Influenza A Virus](#Lets-Focus-on-a-specific-pathogenic-virus-H1N1-Influenza-A-Virus)
+- [Lets Focus on a specific pathogenic virus: H1N1 - Influenza A Virus](#Lets-Focus-on-a-specific-pathogenic-virus-H1N1-Influenza-A-Virus)
     - [Step 9: Downloading the Reference data - reference genome and annotation files](#Step-9-Downloading-the-Reference-data-reference-genome-and-annotation files)
     - [Step 10: Indexing the reference genome using samtools and bowtie](#Step-10-Indexing-the-reference-genome-using-samtools-and-bowtie)
     - [Step 11: Align reads to reference genome](#Step-11-Align-reads-to-reference-genome)
@@ -31,7 +31,7 @@ Tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", 
     - [Step 15: Consensus Genome construsction](#Step-15-Consensus-Genome-construsction)
     - [Step 16: Loop through segmented BAM files and generate consensus](#Step-16-Loop-through-segmented-BAM-files-and-generate-consensus)
     - [Step 17: Loop through segmented BAM files and call Variants from the alignemnts](#Step-17-Loop-through-segmented-BAM-files-and-call-Variants-from-the-alignemnts)
-    - [Step 18: Converting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps](#Step-18-Converting-variant-files-from-tsv-to-vcf-Variant Call Format-needed-in-downstream-steps)
+    - [Step 18: Converting variant files from tsv to vcf (Variant Call Format) - needed in downstream steps](#Step-18-Converting-variant-files-from-tsv-to-vcf-Variant Call Format-needed-in-downstream-steps)
     - [Step 19: Annotation of Variants - SnpEff and SnpSift](#Step-19-Annotation-of-Variants-SnpEff-and-SnpSift)
     - [Step 20: Filter the most significant variants using snpSift](#Step-20-Filter-the-most-significant-variants-using-snpSift)
     - [Step 21: Nextclade Clade assignment](#Step-21-Nextclade-Clade-assignment)
@@ -687,7 +687,7 @@ done
  
 Variant call files for all segments have been generated and stored in `./data/ivar/consensus/`
 
-### Step 18: Converting variant files from .tsv to vcf (Variant Call Format) - needed in downstream steps
+### Step 18: Converting variant files from tsv to vcf (Variant Call Format) - needed in downstream steps
 The standard used often for reporting and analysing variant calls is [**`Variant Call Format`**](https://samtools.github.io/hts-specs/VCFv4.1.pdf) in short **`VCF`**
 We will therefore convert our variant `TSV` to `VCF`. Below we use a python script to perform this: `python3 ./scripts/ivar_variants_to_vcf.py`
 ```
