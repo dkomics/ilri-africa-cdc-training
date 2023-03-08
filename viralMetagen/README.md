@@ -551,7 +551,7 @@ sed -i '/^>/s/Consensus_\(.*\).consensus_threshold.*/\1/' ./data/ivar/consensus/
 ```
 > **Note:** *This takes approximately 2 seconds*   
 - This has generated a consensus for only one segment: `NC_026431.1`.  
-- The first part of the command runs `samtools mpileup`to generate a TAB-separated text pileup of the `BAM` files. The format is described in [Pileup Formats](http://www.htslib.org/doc/samtools-mpileup.html#Pileup_Format). Here is a snipet:
+- The first part of the command runs `samtools mpileup`to generate a TAB-separated text pileup of the `BAM` files. The format is described in [Pileup Formats](http://www.htslib.org/doc/samtools-mpileup.html#Pileup_Format). Here is a snippet:
 ```
 NC_026431.1     1       A       718     ^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^K.^K.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^M.^K.^M.^M.^M.^M.^M.^M.^K.^K.^M.^K.^M.^M.^M.^E.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^J.^J.^M.^M.^M.^M.^M.^M.^M.^J.^M.^M.^M.^K.^M.^K.^M.^K.^M.^M.^M.^K.^M.^M.^M.^K.^K.^M.^M.^J.^M.^M.^M.^M.^K.^K.^K.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^J.^M.^K.^M.^K.^M.^M.^E.^M.^M.^M.^J.^K.^M.^M.^M.^M.^K.^K.^M.^M.^M.^J.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^K.^M.^M.^K.^K.^M.^M.^M.^M.^E.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^E.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^K.^M.^M.^K.^K.^M.^M.^M.^M.^M.^K.^K.^M.^M.^M.^M.^M.^K.^J.^M.^K.^M.^M.^K.^M.^J.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^K.^M.^K.^M.^M.^K.^K.^K.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^K.^K.^K.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^K.^K.^M.^M.^M.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^K.^M.^K.^M.^K.^M.^M.^K.^M.^K.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^K.^M.^K.^M.^J.^K.^K.^K.^M.^M.^M.^M.^M.^M.^K.^J.^K.^M.^M.^M.^M.^K.^E.^K.^K.^M.^M.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^K.^M.^J.^K.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^K.^M.^M.^K.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^E.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^K.^K.^M.^M.^M.^M.^M.^M.^K.^M.^M.^9.^M.^E.^E.^M.^K.^K.^M.^M.^M.^M.^M.^M.^M.^K.^K.^M.^M.^M.^K.^M.^M.^M.^K.^M.^M.^M.^M.^M.^K.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^K,^M,^K,^M,^K,^K,^M,^M,^K,^K,^K,^K,^M,^K,^M,^E,^M,^K,^K,^M,^M,^M,^M,^M,^K,^M,^M,^J,^J,^M,^J,^K,^K,^K,^K,^M,^K,^M,^K,^K,^M,^M,^M,^K,^M,^M,^K,^J,^K,^K,^E,^M,^J,^K,^K,^K,^M,^J,^M,^M,^K,^K,^K,^E,^M,^K,^M,^E,^M,^K,^K,^K,^M,^M,^K,^K,^M,^J,^K,^M,^K,^J,^M,^M,^K,^M,^K,^M,^K,^K,^K,^K,^M,^K,^M,^K,^K,^K,^M,^K,^M,^M,^K,^M,^M,^K,^K,^K,^M,^M,^K,^K,^M,^K,^K,^M,^K,^K,^M,^M,^K,^K,^K,^M,^M,^K,^M,^K,^M,^J,^K,^K,^K,^M,^M,^K,^E,^K,^K,^K,^M,^K,^J,^K,^M,^M,^M,^M,^M,^K,^K,^K,^M,^M,^M,^M,^M,^K,^E,^K,^M,^K,^K,^K,^M,^K,^9,^M,^E,^E,^K,^K,^M,^K,^K,^K,^K,^M,^M,^K,^M,^M,^M,^K,      E/EAEE666EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEE/EEEEEEEAEEEEEEAAEEEAEEEEEEEEEEEE/EEEEEEEEEEEE/EEEEEEAEEEAEEEEEEEEEEEEE/EEEEEEEEEEEAEEEEEEEEEAEEAEEEEEEEEEEEEEEAEEEEEEAA/EAEEE/EEEEEEEEEEEEEEEEEEEEEEEEEE6EEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEAEEEEEE/EE6EEEE/EEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEAEEEEE/EEEEEEEEEEE/EEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/EEEEEEEEEE6AEEEEEEAEEEEEEE6E6EEEEEEEEEEEAEEEEEEEEEEEEEEAEEEEEEEEEE/EE/EEEEEEEEE6EEEAEAEEAEEEAEEAEEE6EEEEEEEEEEEEEE/EEEEEEEEAEEEEEEEEEEEEAEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEAEAA6/EEAEEEEEEEEE6AEEEEEAA/EEEA/EEAEEE6E6/AAAEEEA/EAEEAEEEEEEAAEEAEE<AEEEE<EEEEEEAAEEEEEEEEEEEE<E<AEEEEAEE/E/EEEEEEEAAEEEEEEAEEAEEEEEEAEEE/EEAEEEEEEAEEEEEEEAE/EAEAEE/EAEEAEE
 NC_026431.1     2       T       745     ......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,^M.^M.^M.^M.^M.^M.^M.^M.^M.^K.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M.^M,^M,^M,^M,^M,^J,^M, EAEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEAEAEEEAEEEEEEEEEEEEEEEEAEEEEEEEEEEE/EEEEEEEAEEEAEEAEEEEEEAEEEEEAE/EEAEEEEEEEEEEEEEEEEEEEEE/EEEEEEEEEEEAEEAEEEEEEEAEAEEEEEEEAEEEEEEEEEE/EEEEEEEEEEEEEAEEEEEEEE6/EEEEEE/EAEEEEEEEEEEEEEEEEEEEEEEEAEEEEAAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE/EEEEEEEEEEEEEEEEEEEEEEEAE/EEEEEEEEEEEEEEEEEEAE/EE/EEEEEEEAEEEEEEEE/EEEEEEEEEEEEEEEEEEEAEEEEEEEEEEAEEEEAEEEEEEEE/EEEEAE/EEEEEE/EEEEEEEEEE/EEEAEEEEEEEEEEEEEEEEEEEEEAEEE/EEE6EE/EEEEEAEEEEEEEEEAEEEEEEAEEAA/EE/EAEEEEEEE/EAAEEEAEAEEE<EEEAEE<AEAEEEAEEEA/AAEE/EEEEEEEEEAEEEEEEEE<AEEEEEEAEAEEEEEEEEEEEAE<EE<AEEEEAEEEEEEEEEEEEEEAE<<EEEE<EEEAEEEEEAEAEEEAE<EEEEEEEEAE/EEEEEE<EEAE/E/AAAAAAAA!EAAAAA!AAA!EeEaA<e
@@ -775,12 +775,12 @@ NC_026431.1     258     .       G       A       .       PASS    DP=1863;ANN=A|sy
 - `snpEff` also generates summary HTML files stored in `./data/ivar/variants/sample01.REF_NC_*.variants.ann.summary.html`.
 - Here are the summary HTML files for all [the eight segments](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/snpEff/).
 
-### Step 20: Filter the most significant variants using snpSift
-**[`SnpSift`]**(https://pcingola.github.io/SnpEff/ss_introduction/) is a toolbox with many utilities: `filter`,`annotate`, `caseControl`, `extractFields`, `intervals` and a few others. 
+### Step 20: Filter the most significant variants using snpSift   
+[**`SnpSift`**](https://pcingola.github.io/SnpEff/ss_introduction/) is a toolbox with many utilities: `filter`,`annotate`, `caseControl`, `extractFields`, `intervals` and a few others. 
 - This tutorial uses `extractFields` operation to 'Extract fields from a VCF file to a TXT (tab separated) format'.  
 - Run the following command to get the most relevant fields.
 ```
-for varFile in $(find ./data/ivar/variants -name "*.ann.vcf.gz")
+for varFile in $(find ./data/ivar/variants -name "*.snpeff.vcf.gz")
 do
 	fileName01=`basename -- "$varFile"`
 	fileName=${fileName01%.*}
@@ -801,4 +801,49 @@ do
 		> ./data/ivar/variants/${outName}.snpsift.txt
 done
 ```
-> **Note:** *Takes about 40 Seconds*
+> **Note:** *Takes about 6 Seconds*
+- The output of `snpSiff extractfields` command looks like the snippet below:
+```
+#ANN[*].GENE    ANN[*].GENEID   ANN[*].IMPACT   ANN[*].EFFECT   ANN[*].FEATURE ANN[*].FEATUREID ANN[*].BIOTYPE  ANN[*].RANK     ANN[*].HGVS_C   ANN[*].HGVS_P  ANN[*].CDNA_POS  ANN[*].CDNA_LEN ANN[*].CDS_POS  ANN[*].CDS_LEN  ANN[*].AA_POS  ANN[*].AA_LEN    ANN[*].DISTANCE EFF[*].EFFECT   EFF[*].FUNCLASS EFF[*].CODON   EFF[*].AA        EFF[*].AA_LEN
+M1,M2   gene-UJ99_s7gp2,gene-UJ99_s7gp1 LOW,MODIFIER    synonymous_variant,intron_variant       transcript,transcript   Transcript_gene-UJ99_s7gp2,Transcript_gene-UJ99_s7gp1   Coding,Coding   1,1     c.75G>A,c.26+49G>A      p.Ala25Ala,.   75,-1    759,-1  75,-1   759,-1  25,-1   252,-1  0,0     synonymous_variant,intron_variant       NONE,NONE       c.75G>A,c.26+49G>A      p.Ala25Ala,.    252,-1 
+M1,M2   gene-UJ99_s7gp2,gene-UJ99_s7gp1 LOW,MODIFIER    synonymous_variant,intron_variant       transcript,transcript   Transcript_gene-UJ99_s7gp2,Transcript_gene-UJ99_s7gp1   Coding,Coding   1,1     c.102A>G,c.26+76A>G     p.Gly34Gly,.   102,-1   759,-1  102,-1  759,-1  34,-1   252,-1  0,0     synonymous_variant,intron_variant       NONE,NONE       c.102A>G,c.26+76A>G     p.Gly34Gly,.    252,-1 
+M1,M2   gene-UJ99_s7gp2,gene-UJ99_s7gp1 MODERATE,MODIFIER       missense_variant,intron_variant transcript,transcript   Transcript_gene-UJ99_s7gp2,Transcript_gene-UJ99_s7gp1   Coding,Coding   1,1     c.124C>A,c.26+98C>A     p.Leu42Ile,.   124,-1   759,-1  124,-1  759,-1  42,-1   252,-1  0,0     missense_variant,intron_variant NONE,NONE       c.124C>A,c.26+98C>A     p.Leu42Ile,.    252,-1         
+M1,M2   gene-UJ99_s7gp2,gene-UJ99_s7gp1 MODERATE,MODIFIER       missense_variant,intron_variant transcript,transcript   Transcript_gene-UJ99_s7gp2,Transcript_gene-UJ99_s7gp1   Coding,Coding   1,1     c.238G>A,c.26+212G>A    p.Val80Ile,.   238,-1   759,-1  238,-1  759,-1  80,-1   252,-1  0,0     missense_variant,intron_variant NONE,NONE       c.238G>A,c.26+212G>A    p.Val80Ile,.    252,-1         
+```
+- The result of `snpSift extractFields` can be best understood through this [Documantation page](https://pcingola.github.io/SnpEff/ss_extractfields/).
+
+### Step 25: Nextclade Clade assignment
+[**Nextclade**](https://docs.nextstrain.org/projects/nextclade/en/stable/) is a tool within the [**Nextrain**](https://nextstrain.org/) collection that performs pathogen centered phylogeograhic analysis.
+- It uses sequence differences in Multiple Sequence Alignment to assign to [clades](https://clades.nextstrain.org/). 
+- It also reports suspect quality issues with such sequences.
+- There are both [web-](https://clades.nextstrain.org/) and [command-line-interfaces](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli.html) for *nextclade*.   
+To run it in the command-line, we need some reference files: `genome`, `feature map`, `origin tree`, `primers` if used and `quality configurations`. Luckily, for H1N1 and a few other viral pathogens, these files have already been created and can be easily retrieved using the same tool. Otherwise, you will have to create/retrieve accordingly.  
+
+> 1. Get the reference data
+- Check the list of available nextclade datasets:
+```
+mkdir -p ./data/database/nextclade/
+nextclade dataset list > ./data/database/nextclade/nextcladelist.txt
+```
+- Identify the relevant H1N1 strain based on the reference genome we used.
+```
+less -S ./data/database/nextclade/nextcladelist.txt
+```
+- Select and Download latest H1N1 datasets
+```
+nextclade dataset get \
+        --name 'flu_h1n1pdm_ha' \
+        --reference 'CY121680' \
+        --output-dir ./data/database/nextclade/
+```
+> 2. Perform Clade assignment:
+```
+nextclade run \
+        --input-fasta ./data/ivar/consensus/sample01.consensus.fa \
+        --input-dataset ./data/database/nextclade/ \
+        --output-csv ./data/nextclade/sample01.nextclade.csv \
+        --output-tree ./data/nextclade/sample01.nextclade.auspice.json \
+        --output-dir ./data/nextclade/ \
+        --output-basename ./data/nextclade/sample01.nextclade. \
+        2> ./data/nextclade/sample01.nextclade.log
+```                                                     
