@@ -823,7 +823,7 @@ To run it in the command-line, we need some reference files: `genome`, `feature 
 
 - Check the list of available nextclade datasets:
 ```
-mkdir -p ./data/database/nextclade/
+mkdir -p ./data/database/nextclade/H1N1/
 nextclade dataset list > ./data/database/nextclade/nextcladelist.txt
 ```
 - Identify the relevant H1N1 strain based on the reference genome we used.
@@ -835,7 +835,7 @@ less -S ./data/database/nextclade/nextcladelist.txt
 nextclade dataset get \
         --name 'flu_h1n1pdm_ha' \
         --reference 'CY121680' \
-        --output-dir ./data/database/nextclade/
+        --output-dir ./data/database/nextclade/H1N1/
 ```
 > **Note** *This command takes approximately 10 seconds to complete*  
 - You have now downloaded Nextclade reference data for this analysis.  
@@ -849,13 +849,13 @@ Now execute nextclade analysis on your sequences.
 - Proceed with your analysis providing the consensus matching `REF_NC_026433.1`.
 ```
 nextclade run \
-        --input-fasta data/ivar/consensus/sample01.REF_NC_026433.1.consensus.fa \
-        --input-dataset ./data/database/nextclade/ \
-        --output-csv ./data/nextclade/sample01.REF_NC_026433.1.nextclade.csv \
+	data/ivar/consensus/sample01.REF_NC_026433.1.consensus.fa \
+        --input-dataset ./data/database/nextclade/H1N1/ \
+        --output-tsv ./data/nextclade/sample01.REF_NC_026433.1.nextclade.csv \
         --output-tree ./data/nextclade/sample01.REF_NC_026433.1.nextclade.auspice.json \
         --output-all ./data/nextclade/ \
-        --output-basename ./data/nextclade/sample01.REF_NC_026433.1.nextclade. \
-        2> ./data/nextclade/sample01.REF_NC_026433.1.nextclade.log
+        --output-basename ./data/nextclade/sample01.REF_NC_026433.1.nextclade \
+        |& tee ./data/nextclade/sample01.REF_NC_026433.1.nextclade.log
 ```                                                    
 - The outcome of this analysis will be stored in `./data/nextclade/`  
 > 3. Visualization: The output of Nextclade includes a phylogenetic tree in `.json` format. This tree can be visualized in [Auspice](https://auspice.us/).  
