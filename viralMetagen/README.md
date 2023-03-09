@@ -277,6 +277,30 @@ bzip2 -fk ./data/kraken/sample01.unclassified_1.fastq ./data/kraken/sample01.unc
 ### Step 8 (Optional): Taxonomic Classification of Reads
 
 Since we are working with metagenomic sequences, it would be fundamental for us to profile the microbes present in our clinical sample. To do this we need to *`BLAST`*  our sequences against a database of curated genomes whose source organisms are known. There are different databases and accompanying tools for this purpose as can be seen in this publication on [Metagenomic taxonomic classification tools](https://doi.org/10.1016/j.cell.2019.07.010)   
+
+#### Alternative 1: Using Kraken2
+> 1. Let us set up the database of regference genomes  
+[Kraken2](https://ccb.jhu.edu/software/kraken2/index.shtml) is a newer version of kraken, a taxonomic classification system that uses k-mer matching for high-accuracy and fast classification. By matching k-mers to `lowest common ancestor` of all available genome sequences, it classifys that query sequence. 
+```
+mkdir -p ./data/database/kraken2
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/kraken2/k2_pluspf_16gb_20221209 ./data/database/kraken2/
+```
+> 2. Filtering Host genome sequences - Takes about 6 minutes. 
+```
+kraken2 -db ./data/database/kraken2/k2_pluspf_16gb_20221209 \
+	--threads 4 \
+	--unclassified-out ./data/kraken/sample01.unclassified#.fastq \
+	--classified-out ./data/kraken/sample01.classified#.fastq \
+	--report ./data/kraken/sample01.kraken2.report.txt \
+	--output ./data/kraken/sample01.kraken2.out \
+	--gzip-compressed \
+	--report-zero-counts \
+	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
+	./data/fastp/sample01_R2.trim.fastq.gz
+```
+
+#### Alternative 2: Using Centrifuge
+
 To quickly profile the taxonomic composition of the reads present in the sequences we chose to work with **[centrifuge](https://ccb.jhu.edu/software/centrifuge/) module**. Centrifuge is a 'rapid and memory-efficient' classification tool for DNA sequences of microbial origin.You can proceed as follows:  
 > 1. set up the reference database:
 ```
@@ -315,7 +339,7 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 mkdir -p data/database/krona/
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
 ```
-> 2. Convert centrifuge report to kraken-like report.  
+> 2. If using Centrifuge convert centrifuge report to kraken-like report.  
 > **Note:** *Takes about 5 minutes*
 ```
 centrifuge-kreport -x ./data/database/centrifuge/hpvc \

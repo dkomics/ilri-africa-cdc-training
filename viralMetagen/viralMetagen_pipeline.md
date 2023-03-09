@@ -294,6 +294,82 @@ cd ../../../
 ### Step 8 (Optional): Taxonomic Classification of Reads
 Since we are working with metagenomic sequences, it would be fundamental for us
 to profile the microbes present in our clinical sample. To do this we need to *`BLAST`*  our sequences against a database of curated genomes whose source organisms are known. There are different databases and accompanying tools for this purpose as can be seen in this publication on [Metagenomic taxonomic classification tools](https://doi.org/10.1016/j.cell.2019.07.010)                            
+
+#### Alternative 1: Using Kraken2
+> 1. Let us set up the database of regference genomes
+[Kraken2](https://ccb.jhu.edu/software/kraken2/index.shtml) is a newer version of kraken, a taxonomic classification system that uses k-mer matching for high-accuracy and fast classification. By matching k-mers to `lowest common ancestor` of all available genome sequences, it classifys that query sequence.
+```
+mkdir -p ./data/database/kraken2
+ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/host_db/kraken2_human_db ./data/database/host_db/
+```
+> 2. Filtering Host genome sequences - Takes about 6 minutes.                  
+```
+kraken2 -db ./data/database/kraken2/kraken2_db \
+        --threads 4 \
+        --unclassified-out ./data/kraken/sample01.unclassified#.fastq \        
+        --classified-out ./data/kraken/sample01.classified#.fastq \
+        --report ./data/kraken/sample01.kraken2.report.txt \
+        --output ./data/kraken/sample01.kraken2.out \
+        --gzip-compressed \
+        --report-zero-counts \
+        --paired ./data/fastp/sample01_R1.trim.fastq.gz \
+        ./data/fastp/sample01_R2.trim.fastq.gz
+```
+
+##### Building Kraken2 Reference Databases:
+###### Alternative 01: Download prebuilt database
+A catalog of pre-built kraken2 databases are hosted in [Amazon Web Services](https://benlangmead.github.io/aws-indexes/k2) with all old and new versions.
+
+- Let us download Go to the site [Aws Indexes](https://benlangmead.github.io/aws-indexes/k2) and select a database with `viral`, `bacterial`, `archaea`, `plasmid`, `fungi`, and `protozoa` i.e ***PlusPF***. We will download a *PlusPF-16* in this tutorial, but there are three versions: PlusPF-8 (7.5 GB), PlusPF-16 (15 GB) and PlusPF (66 Gb).
+
+```
+mkdir -p ./data/database/kraken2
+cd ./data/database/kraken2
+wget https://genome-idx.s3.amazonaws.com/kraken/k2_pluspf_16gb_20221209.tar.gz -P ./  
+tar -xzvf ./k2_pluspf_16gb_20221209.tar.gz
+cd ../../../
+```
+###### Alteranive 02: Build Standard Kraken2 database 
+Kraken2 has a `kraken2-build` command that can download NCBI taxonomic information, complete RefSeq genomes. The `--standard` options is specific for bacteria, archaeal, viral domains, human and a collection of known vectors (UniVec_core).
+
+```
+mkdir -p ./data/database/kraken2
+cd ./data/database/kraken2
+kraken2-build --standard --threads 4 --db ./
+cd ../../../
+```
+
+###### Alteranive 03: Build Custom database
+To build own [custom database](https://github.com/DerrickWood/kraken2/wiki/Manual#custom-databases) based on a selection of target genomes on NCBI taxonomy we do as follows:  
+
+> 1. Download genomes: 
+```
+mkdir -p ./data/database/kraken2
+cd ./data/database/kraken2
+kraken2-build --download-library bacteria,viral,fungi,plasmid,protozoa,UniVec_Core \
+        --db ./ \
+        --threads 4
+```
+> 2. Downloading NCBI tax
+```
+kraken2-build --download-taxonomy \
+        --db ./
+```
+> 3. Build database
+```
+kraken2-build --build \
+        --db ./ \
+        --threads 4
+```
+> 4. Removing intermediate files to save space
+```
+kraken2-build --clean \
+        --db ./
+cd ../../../
+```
+
+#### Alternative 2: Using Centrifuge
+
 To quickly profile the taxonomic composition of the reads present in the sequences we chose to work with **[centrifuge](https://ccb.jhu.edu/software/centrifuge/) module**. Centrifuge is a 'rapid and memory-efficient' classification tool for DNA sequences of microbial origin.You can proceed as follows:                 
 > 1. set up the reference database:
 ```
@@ -340,7 +416,7 @@ cd ../../../
 mkdir -p data/database/krona/
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
 ```
-> 2. Convert centrifuge report to kraken-like report                           
+> 2. If using Centrifuge convert centrifuge report to kraken-like report                           
 ```
 centrifuge-kreport -x ./data/database/centrifuge/hpvc \
         ./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
