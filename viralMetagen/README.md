@@ -289,10 +289,10 @@ ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/data
 ```
 kraken2 -db ./data/database/kraken2/k2_pluspf_16gb_20221209 \
 	--threads 4 \
-	--unclassified-out ./data/kraken/sample01.unclassified#.fastq \
-	--classified-out ./data/kraken/sample01.classified#.fastq \
-	--report ./data/kraken/sample01.kraken2.report.txt \
-	--output ./data/kraken/sample01.kraken2.out \
+	--unclassified-out ./data/kraken/sample01.all_unclassified#.fastq \
+	--classified-out ./data/kraken/sample01.all_classified#.fastq \
+	--report ./data/kraken/sample01_kreport.txt \
+	--output ./data/kraken/sample01_kraken2.out \
 	--gzip-compressed \
 	--report-zero-counts \
 	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
