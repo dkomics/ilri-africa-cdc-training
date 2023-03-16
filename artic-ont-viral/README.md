@@ -255,22 +255,6 @@ of your data
     lengths distribution? and percetage GC content?
 
 
-4. Copy the entire `fastqc` output contents to your `home` directory.
-
-   ```
-   rsync -avP --partial /var/scratch/$USER/ont-artic/output/dataset-002/fastqc ~/
-   ```
-5. Copy the `fastqc` directory to you local computer by typing the command. Replace the 
-   <strong style="color:green;opacity: 0.80;">USER@</strong> with your actual `username`
-    
-    scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/fastqc .
-    
-6. Once copied to your local computer, open the `.html` file with any web browser
-   `Mozilla, Google Chrome, Edge, Expoler, Safari` to inspect the results.
-
-7. If you did not succed in getting the output to your computer, kindly follow
-   through this link: https://hpc.ilri.cgiar.org/~jjuma/ont-artic/output/dataset-002/fastqc/ERR3790222_fastqc.html
-
         
 #### ***Preprocessing size filtering***
 Because ARTIC protocol can generate chimeric reads, we perform length filtering.
@@ -816,10 +800,29 @@ https://www.genomedetective.com/app/typingtool/dengue/
 
 ## Transferring outputs from HPC to local PC
 
+1. Copy the entire `output` directory to the `home` directory.
+
+   ```
+   rsync -avP --partial /var/scratch/$USER/ont-artic/output ~/
+   ```
+2. Copy the `output` directory to you local computer by typing the command. Replace the 
+   <strong style="color:green;opacity: 0.80;">USER@</strong> with your actual `username`
+    
+    scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/output .
+
+
 #### ***Visualization***
 
 Ensure you have the tools ([IGV]((https://ormbunkar.se/aliview/downloads)), [AliView](https://ormbunkar.se/aliview/downloads) and [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)) installed on your local PC
 
+
+- To visualize fastqc output, open the `.html` file in the `fastqc` directory
+  with any web browser `Mozilla, Google Chrome, Edge, Expoler, Safari` to
+  inspect the results.
+  
+    If you did not succed in getting the `output` to your computer, kindly
+    follow through this link:
+    https://hpc.ilri.cgiar.org/~jjuma/ont-artic/output/dataset-002/fastqc/ERR3790222_fastqc.html
 
 - To visualize the sequence alignment, we will use [Integrated Genomics Viewer
   (IGV)](https://ormbunkar.se/aliview/downloads)
