@@ -27,7 +27,7 @@ tags: ["Pathogen genomics", "Genomic surveillance", "Bioinformatics", "Metadata"
     - [Variant calling](#variant-calling)
     - [Consensus building](#consensus-building)
     - [Phylogenetic analysis](#phylogenetic-analysis)
-- [Transfering outputs from HPC to local PC](#Transfering-outputs-from-HPC-to-local-PC)
+- [Transferring outputs from HPC to local PC](#transferring-outputs-from-hpc-to-local-pc)
     - [Visualization](#visualization)
 
 
