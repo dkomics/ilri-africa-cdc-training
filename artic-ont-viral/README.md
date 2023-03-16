@@ -26,8 +26,9 @@ tags: ["Pathogen genomics", "Genomic surveillance", "Bioinformatics", "Metadata"
     - [Post-processing alignment](#post-processing-alignment)
     - [Variant calling](#variant-calling)
     - [Consensus building](#consensus-building)
-    - [Visualizing alignments with IGV](#visualizing-alignments-with-igv)
     - [Phylogenetic analysis](#phylogenetic-analysis)
+- [Transfering outputs from HPC to local PC](#Transfering-outputs-from-HPC-to-local-PC)
+    - [Visualization](#visualization)
 
 
 ## Introduction
@@ -729,9 +730,7 @@ The header contains keywords that optionally semantically and      syntactically
 | 8 |  INFO        |An extensible list of key-value pairs (fields) describing the variation.                                                          |
 | 9 |  FORMAT      |An (optional) extensible list of fields for describing the samples                                                          |
 | + |  SAMPLES     |For each (optional) sample described in the file, values are given for the fields listed in FORMAT                                                           |
-#### ***Visualizing alignments with IGV***
-><img src="img/Screen Shot 2023-02-22 at 16.47.55.png" alt="Artic pipeline workflow"
->style="height:>px; width:27212px;"/>
+
 
 #### ***Compute coverage***
 Here we will use [bedtools](https://github.com/arq5x/bedtools2), a genomic
@@ -805,6 +804,36 @@ arithmetic and interval manipulation tool.
         -redo \
         --prefix DENV
     ```
+
+
+#### ***Typing***
+
+We will implement the Dengue virus typing tool to identify the serotype(s) and
+genotype(s) of the reconstructed consensus genomes. This will be performed using
+the typing tool available at
+https://www.genomedetective.com/app/typingtool/dengue/
+
+
+## Transferring outputs from HPC to local PC
+
+#### ***Visualization***
+
+Ensure you have the tools ([IGV]((https://ormbunkar.se/aliview/downloads)), [AliView](https://ormbunkar.se/aliview/downloads) and [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)) installed on your local PC
+
+
+- To visualize the sequence alignment, we will use [Integrated Genomics Viewer
+  (IGV)](https://ormbunkar.se/aliview/downloads)
+
+  <!-- ><img src="img/Screen Shot 2023-02-22 at 16.47.55.png" alt="Artic pipeline workflow" -->
+<!-- >>style="height:>px; width:27212px;"/> -->
+
+- To visualize the multiple sequence alignment, we will use
+  [AliView](https://ormbunkar.se/aliview/downloads)
+
+- To visualize the phylogenetic tree, we will use [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)
+
+
+
 
 > **Note**
 
