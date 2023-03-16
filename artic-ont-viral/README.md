@@ -805,12 +805,17 @@ https://www.genomedetective.com/app/typingtool/dengue/
    ```
    rsync -avP --partial /var/scratch/$USER/ont-artic/output ~/
    ``` -->
-Copy the `output` directory to your **local computer/PC** by typing the command. 
+Copy the `output` directory to your **local computer/PC** by typing the command.
+Replace the <strong style="color:green;opacity: 0.80;">USER{#}</strong> with your
+actual `username`. e.g `user10`, if you are `user10`
 
-Replace the 
-   <strong style="color:green;opacity: 0.80;">USER@</strong> with your actual `username`
-    
-    scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/output .
+**The IP ADDRESS(s) will be provided**
+
+```
+rsync -avP --partial USER{#}@{IP ADDRESS}:/var/scratch/USER{#}/ont-artic/output ~/
+```
+   
+<!-- scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/output . -->
 
 
 #### ***Visualization***
