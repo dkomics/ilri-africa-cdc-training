@@ -800,12 +800,14 @@ https://www.genomedetective.com/app/typingtool/dengue/
 
 ## Transferring outputs from HPC to local PC
 
-1. Copy the entire `output` directory to the `home` directory.
+<!-- 1. Copy the entire `output` directory to the `home` directory.
 
    ```
    rsync -avP --partial /var/scratch/$USER/ont-artic/output ~/
-   ```
-2. Copy the `output` directory to you local computer by typing the command. Replace the 
+   ``` -->
+Copy the `output` directory to your **local computer/PC** by typing the command. 
+
+Replace the 
    <strong style="color:green;opacity: 0.80;">USER@</strong> with your actual `username`
     
     scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/output .
