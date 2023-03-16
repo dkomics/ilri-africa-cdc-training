@@ -964,7 +964,8 @@ nextclade dataset get \
 Now execute nextclade analysis on your sequences.                              
 - If you paid attention to the `./data/database/nextclade/nextcladelist.txt` tje you will remamber seeing a dataset name like `flu_h1n1pdm_ha`. The `ha` in the
 name stands for `hemagglutinin (H)`. This is because Nextclade analysis only relys on the `hemagglutinin (H)` segment alone. That is `REF_NC_026433.1`.        
-- Proceed with your analysis providing the consensus matching `REF_NC_026433.1`.```
+- Proceed with your analysis providing the consensus matching `REF_NC_026433.1`.
+```
 nextclade run \
         data/ivar/consensus/sample01.REF_NC_026433.1.consensus.fa \            
         --input-dataset ./data/database/nextclade/H1N1/ \                      
