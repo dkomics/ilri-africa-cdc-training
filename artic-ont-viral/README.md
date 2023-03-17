@@ -832,7 +832,7 @@ rsync -avP --partial USER{#}@{IP ADDRESS}:/var/scratch/global/{user#}-artic ~/
 
 #### ***Visualization***
 
-Ensure you have the tools ([IGV](https://ormbunkar.se/aliview/downloads), [AliView](https://ormbunkar.se/aliview/downloads) and [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)) installed on your local PC
+Ensure you have the tools ([IGV](https://software.broadinstitute.org/software/igv/download), [AliView](https://ormbunkar.se/aliview/downloads) and [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)) installed on your local PC
 
 
 - To visualize fastqc output, open the `.html` file in the `fastqc` directory
@@ -844,7 +844,10 @@ Ensure you have the tools ([IGV](https://ormbunkar.se/aliview/downloads), [AliVi
     https://hpc.ilri.cgiar.org/~jjuma/ont-artic/output/dataset-002/fastqc/ERR3790222_fastqc.html
 
 - To visualize the sequence alignment, we will use [Integrated Genomics Viewer
-  (IGV)](https://ormbunkar.se/aliview/downloads)
+  (IGV)](https://software.broadinstitute.org/software/igv/download)
+  - Retrieve the genome from
+    https://hpc.ilri.cgiar.org/~jjuma/ont-artic/DENV2/DENV2.fasta
+  - Retrieve the genome index from https://hpc.ilri.cgiar.org/~jjuma/ont-artic/DENV2/DENV2.fasta.fai
 
   <!-- ><img src="img/Screen Shot 2023-02-22 at 16.47.55.png" alt="Artic pipeline workflow" -->
 <!-- >>style="height:>px; width:27212px;"/> -->
