@@ -745,14 +745,25 @@ arithmetic and interval manipulation tool.
 
 #### ***Phylogenetic analysis***
 
-1. Fetch selected whole genomes of Dengue virus from NCBI given a file
+
+1. We then change into the `compute05` `scratch` directory to create our project directory. Using the option`-p` (parent) `mkdir` will create any missing intermediate directories.
+    ```
+    cd /var/scratch/
+    mkdir -p $USER/ont-artic
+    cd $USER/ont-artic
+    ```
+2. The `data, metadata, primer-schemes, scripts` directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
+    ```
+    ln -s /var/scratch/global/ont-artic/[a]* .
+
+<!-- 1. Fetch selected whole genomes of Dengue virus from NCBI given a file
    containing a list of accessions
 
    ```
    bash /var/scratch/$USER/ont-artic/scripts/fetchAuxilliaryGenomes.sh \
     /var/scratch/$USER/ont-artic/metadata/genome-accessions.txt \
     /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes
-   ```
+   ``` -->
 
 2. Change to the output directory ```mafft```
     ```
@@ -764,7 +775,7 @@ arithmetic and interval manipulation tool.
 
     ```
     cat /var/scratch/$USER/ont-artic/genomes/DENV2/DENV2.fasta \
-    /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes/*.fasta \
+    /var/scratch/$USER/ont-artic/auxilliary-dengue-genomes/*.fasta \
     /var/scratch/$USER/ont-artic/output/dataset-002/medaka/ERR3790222.consensus.fasta > all_genomes.fasta
     ```
 
