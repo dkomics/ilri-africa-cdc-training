@@ -752,9 +752,9 @@ arithmetic and interval manipulation tool.
     mkdir -p $USER/ont-artic
     cd $USER/ont-artic
     ```
-2. The `data, metadata, primer-schemes, scripts` directories will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
+2. The `auxilliary-dengue-genomes` directory will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
     ```
-    ln -s /var/scratch/global/ont-artic/[a]* .
+    ln -s /var/scratch/global/ont-artic/a* .
 
 <!-- 1. Fetch selected whole genomes of Dengue virus from NCBI given a file
    containing a list of accessions
@@ -811,19 +811,20 @@ https://www.genomedetective.com/app/typingtool/dengue/
 
 ## Transferring outputs from HPC to local PC
 
-<!-- 1. Copy the entire `output` directory to the `home` directory.
+1. Copy the entire `output` directory to the `/var/scratch/global/` directory.
+   Replace the `{user#}` with your actual user name
 
    ```
-   rsync -avP --partial /var/scratch/$USER/ont-artic/output ~/
-   ``` -->
-Copy the `output` directory to your **local computer/PC** by typing the command.
+   rsync -avP --partial /var/scratch/$USER/ont-artic/output /var/scratch/global/{user#}-ont
+   ```
+On a new terminal on your local PC, copy the `output` directory to your **local computer/PC** by typing the command.
 Replace the <strong style="color:green;opacity: 0.80;">USER{#}</strong> with your
 actual `username`. e.g `user10`, if you are `user10`
 
 **The IP ADDRESS(s) will be provided**
 
 ```
-rsync -avP --partial USER{#}@{IP ADDRESS}:/var/scratch/USER{#}/ont-artic/output ~/
+rsync -avP --partial USER{#}@{IP ADDRESS}:/var/scratch/global/{user#}-artic ~/
 ```
    
 <!-- scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/output . -->
@@ -852,8 +853,7 @@ Ensure you have the tools ([IGV]((https://ormbunkar.se/aliview/downloads)), [Ali
   [AliView](https://ormbunkar.se/aliview/downloads)
 
 - To visualize the phylogenetic tree, we will use [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)
-
-
+    - Retrieve the metadata file from https://hpc.ilri.cgiar.org/~jjuma/ont-artic/metadata/auxilliary-metadata.txt
 
 
 > **Note**
