@@ -832,7 +832,7 @@ rsync -avP --partial USER{#}@{IP ADDRESS}:/var/scratch/global/{user#}-artic ~/
 
 #### ***Visualization***
 
-Ensure you have the tools ([IGV]((https://ormbunkar.se/aliview/downloads)), [AliView](https://ormbunkar.se/aliview/downloads) and [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)) installed on your local PC
+Ensure you have the tools ([IGV](https://ormbunkar.se/aliview/downloads), [AliView](https://ormbunkar.se/aliview/downloads) and [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)) installed on your local PC
 
 
 - To visualize fastqc output, open the `.html` file in the `fastqc` directory
