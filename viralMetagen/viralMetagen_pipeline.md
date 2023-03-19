@@ -316,6 +316,52 @@ kraken2 -db ./data/database/kraken2/kraken2_db \
         ./data/fastp/sample01_R2.trim.fastq.gz
 ```
 
+> 3. [Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#output-formats)
+Kraken2 has two output formats, the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) and [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format).
+In the Standard Kraken Output Format each sequence or sequence pair for `PE` data has a single line with five fields:
+```
+U       NB552490:29:HY2LGBGXK:1:11101:19971:3395        0       151|151 0:117 |:| 0:117
+U       NB552490:29:HY2LGBGXK:1:11101:20073:3396        0       90|90   0:56 |:| 0:56
+U       NB552490:29:HY2LGBGXK:1:11101:1828:3398 0       90|90   0:56 |:| 0:56
+U       NB552490:29:HY2LGBGXK:1:11101:23002:3401        0       151|151 0:117 |:| 0:117
+U       NB552490:29:HY2LGBGXK:1:11101:10728:3402        0       151|151 0:117 |:| 0:117
+```
+- "C"/"U": Indicates that the sequence was classified or unclassified.
+- The sequence ID, from the FASTQ header.
+- The taxonomy ID Kraken 2 used to label the sequence; 0 if the sequence is unclassified.
+- The length of the sequence in bp. In the case of `PE` data, a string with the lengths of the two reads separated by a pipe character.
+- A space-delimited list indicating the LCA mapping of each k-mer in the sequence(s). For example, "562:13 561:4 A:31 0:1 562:3" would indicate that:
+  - first 13 k-mers mapped to taxonomy ID #562
+  - next 4 k-mers mapped to taxonomy ID #561
+  - next 31 k-mers contained an ambiguous nucleotide
+  - next k-mer was not in the database
+  - last 3 k-mers mapped to taxonomy ID #562
+  - `PE` data will contain `|:|` to indicate the end and begining of a read
+
+The sample report output format is a tab-delimited file with one line per taxon and six standard collumns:
+```
+  9.26  2013272 2013272 U       0       unclassified                           
+ 90.74  19737212        164     -       1       root                           
+ 90.34  19649484        885     -       131567    cellular organisms           
+ 90.23  19625016        153145  D       2           Bacteria                   
+ 34.38  7476995 29291   -       1783272       Terrabacteria group              
+ 20.75  4512724 44302   P       1239            Firmicutes                     
+ 13.54  2944775 59520   C       91061             Bacilli                      
+ 10.73  2333737 60279   O       186826              Lactobacillales            
+  7.66  1666097 439     F       1300                  Streptococcaceae         
+  7.63  1659155 896729  G       1301                    Streptococcus
+  1.49  323559  7275    -       2608887                   unclassified Streptococcus
+  1.19  258141  258141  S       2610896                     Streptococcus sp. LPB0220
+```
+- Percentage of reads part of the clade rooted at this taxon
+- Number of reads within the clade rooted at this taxon
+- Number of reads assigned directly to this taxon
+- A rank code, indicating
+  - (U)nclassified, (R)oot, (D)omain, (K)ingdom, (P)hylum, (C)lass, (O)rder, (F)amily, (G)enus, or (S)pecies.
+  - Taxa that are not at any of these 10 ranks have a rank code of the closest ancestor rank with a number indicating the distance from that rank. E.g., "G2" indicates a taxon is between genus and species and the grandparent taxon is at the genus rank.
+- NCBI taxonomic ID number
+- Indented scientific name
+
 ##### Building Kraken2 Reference Databases:
 ###### Alternative 01: Download prebuilt database
 A catalog of pre-built kraken2 databases are hosted in [Amazon Web Services](https://benlangmead.github.io/aws-indexes/k2) with all old and new versions.
