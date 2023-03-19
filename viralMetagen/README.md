@@ -302,7 +302,8 @@ kraken2 -db ./data/database/kraken2/k2_pluspf_16gb_20221209 \
 	./data/kraken/sample01.unclassified_2.fastq.bz2
 ```
 
-> 3. [Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#output-formats)    
+> 3. [Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#output-formats)   
+ 
 Kraken2 has two output formats, the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) and [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format).  
 In the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) each sequence or sequence pair for `PE` data has a single line with five fields:
 ```
