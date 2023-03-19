@@ -316,9 +316,9 @@ kraken2 -db ./data/database/kraken2/kraken2_db \
         ./data/fastp/sample01_R2.trim.fastq.gz
 ```
 
-> 3. [Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#output-formats)
+> 3. [Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#output-formats)    
 Kraken2 has two output formats, the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) and [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format).
-In the Standard Kraken Output Format each sequence or sequence pair for `PE` data has a single line with five fields:
+In the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) each sequence or sequence pair for `PE` data has a single line with five fields:
 ```
 U       NB552490:29:HY2LGBGXK:1:11101:19971:3395        0       151|151 0:117 |:| 0:117
 U       NB552490:29:HY2LGBGXK:1:11101:20073:3396        0       90|90   0:56 |:| 0:56
@@ -338,7 +338,7 @@ U       NB552490:29:HY2LGBGXK:1:11101:10728:3402        0       151|151 0:117 |:
   - last 3 k-mers mapped to taxonomy ID #562
   - `PE` data will contain `|:|` to indicate the end and begining of a read
 
-The sample report output format is a tab-delimited file with one line per taxon and six standard collumns:
+The [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format) is a tab-delimited file with one line per taxon and six standard collumns:
 ```
   9.26  2013272 2013272 U       0       unclassified                           
  90.74  19737212        164     -       1       root                           
