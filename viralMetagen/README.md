@@ -282,7 +282,7 @@ bzip2 -fk ./data/kraken/sample01.unclassified_1.fastq ./data/kraken/sample01.unc
 Since we are working with metagenomic sequences, it would be fundamental for us to profile the microbes present in our clinical sample. To do this we need to *`BLAST`*  our sequences against a database of curated genomes whose source organisms are known. There are different databases and accompanying tools for this purpose as can be seen in this publication on [Metagenomic taxonomic classification tools](https://doi.org/10.1016/j.cell.2019.07.010)   
 
 #### Alternative 1: Using Kraken2
-> 1. Let us set up the database of regference genomes  
+> 1. Let us set up the database of regference genomes    
 [Kraken2](https://ccb.jhu.edu/software/kraken2/index.shtml) is a newer version of kraken, a taxonomic classification system that uses k-mer matching for high-accuracy and fast classification. By matching k-mers to `lowest common ancestor` of all available genome sequences, it classifys that query sequence. 
 ```
 mkdir -p ./data/database/kraken2
