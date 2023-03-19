@@ -26,8 +26,9 @@ tags: ["Pathogen genomics", "Genomic surveillance", "Bioinformatics", "Metadata"
     - [Post-processing alignment](#post-processing-alignment)
     - [Variant calling](#variant-calling)
     - [Consensus building](#consensus-building)
-    - [Visualizing alignments with IGV](#visualizing-alignments-with-igv)
     - [Phylogenetic analysis](#phylogenetic-analysis)
+- [Transferring outputs from HPC to local PC](#transferring-outputs-from-hpc-to-local-pc)
+    - [Visualization](#visualization)
 
 
 ## Introduction
@@ -253,22 +254,6 @@ of your data
     - What is total number of sequences? sequences flagged as poor quality? sequence
     lengths distribution? and percetage GC content?
 
-
-4. Copy the entire `fastqc` output contents to your `home` directory.
-
-   ```
-   rsync -avP --partial /var/scratch/$USER/ont-artic/output/dataset-002/fastqc ~/
-   ```
-5. Copy the `fastqc` directory to you local computer by typing the command. Replace the 
-   <strong style="color:green;opacity: 0.80;">USER@</strong> with your actual `username`
-    
-    scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/fastqc .
-    
-6. Once copied to your local computer, open the `.html` file with any web browser
-   `Mozilla, Google Chrome, Edge, Expoler, Safari` to inspect the results.
-
-7. If you did not succed in getting the output to your computer, kindly follow
-   through this link: https://hpc.ilri.cgiar.org/~jjuma/ont-artic/output/dataset-002/fastqc/ERR3790222_fastqc.html
 
         
 #### ***Preprocessing size filtering***
@@ -729,9 +714,7 @@ The header contains keywords that optionally semantically and      syntactically
 | 8 |  INFO        |An extensible list of key-value pairs (fields) describing the variation.                                                          |
 | 9 |  FORMAT      |An (optional) extensible list of fields for describing the samples                                                          |
 | + |  SAMPLES     |For each (optional) sample described in the file, values are given for the fields listed in FORMAT                                                           |
-#### ***Visualizing alignments with IGV***
-><img src="img/Screen Shot 2023-02-22 at 16.47.55.png" alt="Artic pipeline workflow"
->style="height:>px; width:27212px;"/>
+
 
 #### ***Compute coverage***
 Here we will use [bedtools](https://github.com/arq5x/bedtools2), a genomic
@@ -762,14 +745,25 @@ arithmetic and interval manipulation tool.
 
 #### ***Phylogenetic analysis***
 
-1. Fetch selected whole genomes of Dengue virus from NCBI given a file
+
+1. We then change into the `compute05` `scratch` directory to create our project directory. Using the option`-p` (parent) `mkdir` will create any missing intermediate directories.
+    ```
+    cd /var/scratch/
+    mkdir -p $USER/ont-artic
+    cd $USER/ont-artic
+    ```
+2. The `auxilliary-dengue-genomes` directory will be linked to the project directory, to limit redundancy. `-s` (soft) means that we are creating a soft link.
+    ```
+    ln -s /var/scratch/global/ont-artic/a* .
+
+<!-- 1. Fetch selected whole genomes of Dengue virus from NCBI given a file
    containing a list of accessions
 
    ```
    bash /var/scratch/$USER/ont-artic/scripts/fetchAuxilliaryGenomes.sh \
     /var/scratch/$USER/ont-artic/metadata/genome-accessions.txt \
     /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes
-   ```
+   ``` -->
 
 2. Change to the output directory ```mafft```
     ```
@@ -781,7 +775,7 @@ arithmetic and interval manipulation tool.
 
     ```
     cat /var/scratch/$USER/ont-artic/genomes/DENV2/DENV2.fasta \
-    /var/scratch/$USER/ont-artic/genomes/auxilliary-dengue-genomes/*.fasta \
+    /var/scratch/$USER/ont-artic/auxilliary-dengue-genomes/*.fasta \
     /var/scratch/$USER/ont-artic/output/dataset-002/medaka/ERR3790222.consensus.fasta > all_genomes.fasta
     ```
 
@@ -805,6 +799,65 @@ arithmetic and interval manipulation tool.
         -redo \
         --prefix DENV
     ```
+
+
+#### ***Typing***
+
+We will implement the Dengue virus typing tool to identify the serotype(s) and
+genotype(s) of the reconstructed consensus genomes. This will be performed using
+the typing tool available at
+https://www.genomedetective.com/app/typingtool/dengue/
+
+
+## Transferring outputs from HPC to local PC
+
+1. Copy the entire `output` directory to the `/var/scratch/global/` directory.
+   Replace the `{user#}` with your actual user name
+
+   ```
+   rsync -avP --partial /var/scratch/$USER/ont-artic/output /var/scratch/global/{user#}-ont
+   ```
+On a new terminal on your local PC, copy the `output` directory to your **local computer/PC** by typing the command.
+Replace the <strong style="color:green;opacity: 0.80;">USER{#}</strong> with your
+actual `username`. e.g `user10`, if you are `user10`
+
+**The IP ADDRESS(s) will be provided**
+
+```
+rsync -avP --partial USER{#}@{IP ADDRESS}:/var/scratch/global/{user#}-artic ~/
+```
+   
+<!-- scp <strong style="color:green;opacity: 0.80;">USER@</strong>hpc.ilri.cgiar.org:~/output . -->
+
+
+#### ***Visualization***
+
+Ensure you have the tools ([IGV](https://software.broadinstitute.org/software/igv/download), [AliView](https://ormbunkar.se/aliview/downloads) and [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)) installed on your local PC
+
+
+- To visualize fastqc output, open the `.html` file in the `fastqc` directory
+  with any web browser `Mozilla, Google Chrome, Edge, Expoler, Safari` to
+  inspect the results.
+  
+    If you did not succed in getting the `output` to your computer, kindly
+    follow through this link:
+    https://hpc.ilri.cgiar.org/~jjuma/ont-artic/output/dataset-002/fastqc/ERR3790222_fastqc.html
+
+- To visualize the sequence alignment, we will use [Integrated Genomics Viewer
+  (IGV)](https://software.broadinstitute.org/software/igv/download)
+  - Retrieve the genome from
+    https://hpc.ilri.cgiar.org/~jjuma/ont-artic/DENV2/DENV2.fasta
+  - Retrieve the genome index from https://hpc.ilri.cgiar.org/~jjuma/ont-artic/DENV2/DENV2.fasta.fai
+
+  <!-- ><img src="img/Screen Shot 2023-02-22 at 16.47.55.png" alt="Artic pipeline workflow" -->
+<!-- >>style="height:>px; width:27212px;"/> -->
+
+- To visualize the multiple sequence alignment, we will use
+  [AliView](https://ormbunkar.se/aliview/downloads)
+
+- To visualize the phylogenetic tree, we will use [Figtree](http://tree.bio.ed.ac.uk/software/figtree/)
+    - Retrieve the metadata file from https://hpc.ilri.cgiar.org/~jjuma/ont-artic/metadata/auxilliary-metadata.txt
+
 
 > **Note**
 
