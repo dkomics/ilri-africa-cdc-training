@@ -1,5 +1,5 @@
 ---
-Title: README.md
+Title: viralMetagen_pipeline.md
 Tags: ["Viral metaenomics", "H1N1", "segmented viral genome", "Bioinformatics", "Linux", "Analysis", "Tutorial"]
 ---
 # **Building capacity in Pathogen Genomics: Influenza A Virus - Metagenomics Approach**
@@ -62,11 +62,11 @@ ssh <user_name>@hpc.ilri.cgiar.org
 There are two nodes to choose from: `compute05`  and `compute06`. If your username (`Bio4InfoXX`) ends with an ***Odd Number*** (1,3,5,7,9) use `compute05` and if it ends with n ***even number*** (2,4,6,8,0) use `compute06`. Now let us secure a four of CPUs in one of the HPC nodes.  
 >Compute05
 ```
-interactive -w compute05 -c 4 -J metagen -p batch
+interactive -w compute05 -c 2 -J metagen -p batch
 ```
 >Compute06
 ```
-interactive -w compute06 -c 4 -J metagen -p batch
+interactive -w compute06 -c 2 -J metagen -p batch
 ```
 
 ## Bioinformatics Analysis

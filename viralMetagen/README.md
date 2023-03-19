@@ -63,11 +63,11 @@ ssh <user_name>@hpc.ilri.cgiar.org
 There are two nodes to choose from: `compute05`  and `compute06`. If your username (`Bio4InfoXX`) ends with an ***Odd Number*** (1,3,5,7,9) use `compute05` and if it ends with n ***even number*** (2,4,6,8,0) use `compute06`. Now let us secure a four of CPUs in one of the HPC nodes.  
 >Compute05
 ```
-interactive -w compute05 -c 4 -J metagen -p batch
+interactive -w compute05 -c 2 -J metagen -p batch
 ```
 >Compute06
 ```
-interactive -w compute06 -c 4 -J metagen -p batch
+interactive -w compute06 -c 2 -J metagen -p batch
 ```
 
 ## Bioinformatics Analysis
@@ -172,10 +172,11 @@ fastqc -t 4 \
 	./data/fastq/sample01_R1.fastq.gz \
 	./data/fastq/sample01_R2.fastq.gz
 ```
-This will take about 7 Minutes. 
-Would like to download the results of the `fastqc` command to your local laptop for visualization?.   
+This will take about 2 Minutes.   
+
+>**Quiz:** *Would like to download the results of the `fastqc` command to your local laptop for visualization?*   
 If **YES**, you will need to download the `HTML` report to your laptop. Do this by running the following command.  
-You can proceed and copy fastqc HTML output files to `~/home`: 
+You can proceed and copy fastqc HTML output files to `/home/`(`~/`): 
 ```
 mkdir -p ~/viralMetagen
 cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
@@ -188,7 +189,8 @@ scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 > **Discussion:** A report from this step can be found in these links: [sample01_R1](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1_fastqc.html) and [sample01_R2](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2_fastqc.html). Let us have a discussion about the results as we wait for the run to complete.
 
 ### Step 5: Quality Trimming fastq files with fastp and Trims adapter sequences
-After assessing the quality, we will proceed and do some Quality Control (QC). With **fastp** module we will trim reads with qualities less than 20 phred score, remove adapters, remove dublicates and remove PhiX if any.
+After assessing the quality, we will proceed and do some Quality Control (QC).   
+With **fastp** module we will trim reads with qualities less than 20 phred score, remove adapters, remove dublicates and remove PhiX if any.
 ```
 fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--in2 ./data/fastq/sample01_R2.fastq.gz \
@@ -205,7 +207,8 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--dedup \
 	|& tee ./data/fastp/sample01.fastp.log
 ```
-This command may take about 15 minutes to complete, so we can proceed and explore the output of the command above in this link: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)  
+This command may take about 5 minutes to complete.   
+We can proceed and explore the output of the command above in this link: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)  
 
 You can proceed and copy the fastp HTML output files to local laptop as follows.  
 ```
@@ -232,7 +235,7 @@ scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 > **Discussion:** A report from this step can be found in these links: [sample01_R1.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html) and [sample01_R2.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2.trim_fastqc.html). Let us have a discussion about the results as we wait for the run to complete. It will take approximately 7 minutes.
 
 ### Step 7: Filter Host Genome Reads.
-Remember our sequences come from a human host, and it is **NEITHER legal NOR ethical to analyse human sequences without the permision and ethical approval by relevant authorities**. To avoid any such mistakes it is always required that you exclude any human sequences from your reads before any analysis.
+Remember our sequences come from a human host, and it is **NEITHER legal NOR ethical to analyse human sequences without the permission and ethical approval by relevant authorities**. To avoid any such mistakes it is always required that you exclude any human sequences from your reads before any analysis.
 
 In this step we use **`kraken2` module** and a database of human host genome to filter reads mapping to the human genome. *Ideally we are classifing and removing any classified sequences*
 > 1. Let us first set up the human host database
@@ -240,7 +243,7 @@ In this step we use **`kraken2` module** and a database of human host genome to 
 mkdir -p ./data/database/host_db
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/host_db/kraken2_human_db ./data/database/host_db/
 ```
-> 2. Filtering Host genome sequences - Takes about 6 minutes. 
+> 2. Filtering Host genome sequences - Takes about 3 minutes. 
 ```
 kraken2 -db ./data/database/host_db/kraken2_human_db \
 	--threads 4 \
@@ -254,7 +257,7 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 	./data/fastp/sample01_R2.trim.fastq.gz
 ```
 > 3. Compress the output of kraken. The fastq files generated by kraken2 need to be compressed to a format (bzip2) useful in the next downstream step.
-> **Note:** This takes aboute 13 minutes
+> **Note:** This takes aboute 5 minutes
 ```
 bzip2 -fk ./data/kraken/sample01.unclassified_1.fastq ./data/kraken/sample01.unclassified_2.fastq
 ```
@@ -295,10 +298,25 @@ kraken2 -db ./data/database/kraken2/k2_pluspf_16gb_20221209 \
 	--output ./data/kraken/sample01_kraken2.out \
 	--gzip-compressed \
 	--report-zero-counts \
-	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
-	./data/fastp/sample01_R2.trim.fastq.gz
+	--paired ./data/kraken/sample01.unclassified_1.fastq.bz2 \
+	./data/kraken/sample01.unclassified_2.fastq.bz2
 ```
 
+> **Quiz:** *How do you build or access a pathogen classification reference database for kraken2*
+---
+<details close>
+  <summary>Tip</summary>
+  How to build a kraken2 Database
+  <blockquote>
+    <p dir="auto">
+      <strong>Solution:</strong>
+      <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-kraken2-reference-databases"
+      ref="nofollow">Building Kraken2 pathogen classification database</a>
+    </p>
+  </blockquote>
+</details>
+
+---
 #### Alternative 2: Using Centrifuge
 
 To quickly profile the taxonomic composition of the reads present in the sequences we chose to work with **[centrifuge](https://ccb.jhu.edu/software/centrifuge/) module**. Centrifuge is a 'rapid and memory-efficient' classification tool for DNA sequences of microbial origin.You can proceed as follows:  
@@ -312,7 +330,7 @@ ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/data
 centrifuge -x ./data/database/centrifuge/hpvc \
 	-1 ./data/kraken/sample01.unclassified_1.fastq.bz2 \
 	-2 ./data/kraken/sample01.unclassified_2.fastq.bz2 \
-	--report-file ./data/centrifuge/sample01-report.txt \
+	--report-file ./data/centrifuge/sample01-kreport.txt \
 	-S ./data/centrifuge/sample01-results.txt \
 	--threads 4 \
 	--mm 100GB
