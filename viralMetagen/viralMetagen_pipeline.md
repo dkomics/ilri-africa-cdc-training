@@ -302,7 +302,7 @@ to profile the microbes present in our clinical sample. To do this we need to *`
 mkdir -p ./data/database/kraken2
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/host_db/kraken2_human_db ./data/database/host_db/
 ```
-> 2. Filtering Host genome sequences - Takes about 6 minutes.                  
+> 2. Taxonomic classification of non-host sequences - Takes about 4 minutes.   
 ```
 kraken2 -db ./data/database/kraken2/kraken2_db \
         --threads 4 \
@@ -310,7 +310,7 @@ kraken2 -db ./data/database/kraken2/kraken2_db \
         --classified-out ./data/kraken/sample01.all_classified#.fastq \
         --report ./data/kraken/sample01.all_kraken2.report.txt \
         --output ./data/kraken/sample01.all_kraken2.out \
-        --gzip-compressed \
+        --bzip2-compressed \
         --report-zero-counts \
         --paired ./data/fastp/sample01_R1.trim.fastq.gz \
         ./data/fastp/sample01_R2.trim.fastq.gz
@@ -320,11 +320,11 @@ kraken2 -db ./data/database/kraken2/kraken2_db \
 Kraken2 has two output formats, the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) and [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format).
 In the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) each sequence or sequence pair for `PE` data has a single line with five fields:
 ```
-U       NB552490:29:HY2LGBGXK:1:11101:19971:3395        0       151|151 0:117 |:| 0:117
-U       NB552490:29:HY2LGBGXK:1:11101:20073:3396        0       90|90   0:56 |:| 0:56
-U       NB552490:29:HY2LGBGXK:1:11101:1828:3398 0       90|90   0:56 |:| 0:56
-U       NB552490:29:HY2LGBGXK:1:11101:23002:3401        0       151|151 0:117 |:| 0:117
-U       NB552490:29:HY2LGBGXK:1:11101:10728:3402        0       151|151 0:117 |:| 0:117
+C       NB552490:29:HY2LGBGXK:1:11101:19971:3395        1660    151|151 0:16 1760:1 0:16 1660:3 0:16 1660:2 0:20 2049:1 0:5 2049:2 0:9 1760:5 0:6 2049:4 0:10 2:1 |:| 0:18 2:2 1760:5 0:1 1760:1 0:3 2:7 0:16 2:3 0:10 2049:4 0:6 1760:5 0:9 2049:2 0:5 2049:1 0:19
+C       NB552490:29:HY2LGBGXK:1:11101:20073:3396        43675   90|90   1760:2 0:8 43675:3 0:33 2:4 1760:5 0:1 |:| 0:1 1760:5 2:4 0:33 43675:3 0:8 1760:2
+C       NB552490:29:HY2LGBGXK:1:11101:1828:3398 475     90|90   0:3 2:1 0:31 475:5 0:16 |:| 0:19 475:2 0:31 2:1 0:3
+C       NB552490:29:HY2LGBGXK:1:11101:23002:3401        838     151|151 0:37 838:24 0:2 838:1 0:8 838:8 0:9 838:2 0:2 838:3 0:7 838:5 0:9 |:| 0:3 838:3 0:5 838:1 0:9 838:1 0:7 976:6 0:3 171549:5 0:21 838:5 0:7 838:3 0:2 838:2 0:9 838:8 0:8 838:1 0:2 838:6
+C       NB552490:29:HY2LGBGXK:1:11101:10728:3402        470565  151|151 0:3 838:3 0:6 838:1 0:5 838:1 0:10 838:5 0:13 171549:2 0:12 838:3 0:21 470565:1 0:4 470565:5 2:1 0:6 171549:3 0:1 2:7 0:4 |:| 0:7 838:5 0:24 2:7 0:1 171549:3 0:6 2:1 470565:5 0:4 470565:1 0:21 838:3 0:12 171549:2 0:13 838:2
 ```
 - "C"/"U": Indicates that the sequence was classified or unclassified.
 - The sequence ID, from the FASTQ header.
