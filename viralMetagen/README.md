@@ -350,6 +350,13 @@ The [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Ma
 - NCBI taxonomic ID number
 - Indented scientific name
 
+> 4. Preparing the classification report data to suitable krona input format.  
+> **Note:** *Takes about 40 Seconds*
+```
+cat ./data/kraken2/sample01-results.txt | cut -f 2,3 > ./data/krona/sample01-kraken2.krona
+```
+
+
 
 > **Quiz:** *How do you build or access a pathogen classification reference database for kraken2*
 ---
@@ -384,6 +391,17 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 	--threads 4 \
 	--mm 100GB
 ```
+> 3. If using Centrifuge convert centrifuge report to kraken-like report.
+> **Note:** *Takes about 5 minutes*
+```
+centrifuge-kreport -x ./data/database/centrifuge/hpvc \
+        ./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
+```
+> 4. Preparing the classification report data to suitable krona input format.  
+> **Note:** *Takes about 40 Seconds*
+```
+cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-centrifuge.krona
+```
 
 > **Quiz:** *How do you Build or access a centrifuge Database?*
 ---
@@ -407,18 +425,12 @@ A very important part of analysis is communicating the results of the analysis i
 mkdir -p data/database/krona/
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
 ```
-> 2. If using Centrifuge convert centrifuge report to kraken-like report.  
-> **Note:** *Takes about 5 minutes*
-```
-centrifuge-kreport -x ./data/database/centrifuge/hpvc \
-	./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
-```
-> 3. Preparing the classification report data to suitable krona input format.  
+> 2. Preparing the classification report data to suitable krona input format.  
 > **Note:** *Takes about 40 Seconds*
 ```
 cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-results.krona
 ```
-> 4. Visiualize the report - create a HTML filei  
+> 3. Visiualize the report - create a HTML filei  
 > **Note:** *Takes about 3 Minutes*
 ```
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
