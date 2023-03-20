@@ -63,11 +63,11 @@ ssh <user_name>@hpc.ilri.cgiar.org
 There are two nodes to choose from: `compute05`  and `compute06`. If your username (`Bio4InfoXX`) ends with an ***Odd Number*** (1,3,5,7,9) use `compute05` and if it ends with n ***even number*** (2,4,6,8,0) use `compute06`. Now let us secure a four of CPUs in one of the HPC nodes.  
 >Compute05
 ```
-interactive -w compute05 -c 4 -J metagen -p batch
+interactive -w compute05 -c 2 -J metagen -p batch
 ```
 >Compute06
 ```
-interactive -w compute06 -c 4 -J metagen -p batch
+interactive -w compute06 -c 2 -J metagen -p batch
 ```
 
 ## Bioinformatics Analysis
@@ -172,10 +172,11 @@ fastqc -t 4 \
 	./data/fastq/sample01_R1.fastq.gz \
 	./data/fastq/sample01_R2.fastq.gz
 ```
-This will take about 7 Minutes. 
-Would like to download the results of the `fastqc` command to your local laptop for visualization?.   
+This will take about 2 Minutes.   
+
+>**Quiz:** *Would like to download the results of the `fastqc` command to your local laptop for visualization?*   
 If **YES**, you will need to download the `HTML` report to your laptop. Do this by running the following command.  
-You can proceed and copy fastqc HTML output files to `~/home`: 
+You can proceed and copy fastqc HTML output files to `/home/`(`~/`): 
 ```
 mkdir -p ~/viralMetagen
 cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
@@ -188,7 +189,8 @@ scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 > **Discussion:** A report from this step can be found in these links: [sample01_R1](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1_fastqc.html) and [sample01_R2](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2_fastqc.html). Let us have a discussion about the results as we wait for the run to complete.
 
 ### Step 5: Quality Trimming fastq files with fastp and Trims adapter sequences
-After assessing the quality, we will proceed and do some Quality Control (QC). With **fastp** module we will trim reads with qualities less than 20 phred score, remove adapters, remove dublicates and remove PhiX if any.
+After assessing the quality, we will proceed and do some Quality Control (QC).   
+With **fastp** module we will trim reads with qualities less than 20 phred score, remove adapters, remove dublicates and remove PhiX if any.
 ```
 fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--in2 ./data/fastq/sample01_R2.fastq.gz \
@@ -205,7 +207,8 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--dedup \
 	|& tee ./data/fastp/sample01.fastp.log
 ```
-This command may take about 15 minutes to complete, so we can proceed and explore the output of the command above in this link: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)  
+This command may take about 5 minutes to complete.   
+We can proceed and explore the output of the command above in this link: [sample01](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastp/sample01.fastp.html)  
 
 You can proceed and copy the fastp HTML output files to local laptop as follows.  
 ```
@@ -232,7 +235,7 @@ scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./
 > **Discussion:** A report from this step can be found in these links: [sample01_R1.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R1.trim_fastqc.html) and [sample01_R2.trim](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/fastqc/sample01_R2.trim_fastqc.html). Let us have a discussion about the results as we wait for the run to complete. It will take approximately 7 minutes.
 
 ### Step 7: Filter Host Genome Reads.
-Remember our sequences come from a human host, and it is **NEITHER legal NOR ethical to analyse human sequences without the permision and ethical approval by relevant authorities**. To avoid any such mistakes it is always required that you exclude any human sequences from your reads before any analysis.
+Remember our sequences come from a human host, and it is **NEITHER legal NOR ethical to analyse human sequences without the permission and ethical approval by relevant authorities**. To avoid any such mistakes it is always required that you exclude any human sequences from your reads before any analysis.
 
 In this step we use **`kraken2` module** and a database of human host genome to filter reads mapping to the human genome. *Ideally we are classifing and removing any classified sequences*
 > 1. Let us first set up the human host database
@@ -240,7 +243,7 @@ In this step we use **`kraken2` module** and a database of human host genome to 
 mkdir -p ./data/database/host_db
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/host_db/kraken2_human_db ./data/database/host_db/
 ```
-> 2. Filtering Host genome sequences - Takes about 6 minutes. 
+> 2. Filtering Host genome sequences - Takes about 3 minutes. 
 ```
 kraken2 -db ./data/database/host_db/kraken2_human_db \
 	--threads 4 \
@@ -254,7 +257,7 @@ kraken2 -db ./data/database/host_db/kraken2_human_db \
 	./data/fastp/sample01_R2.trim.fastq.gz
 ```
 > 3. Compress the output of kraken. The fastq files generated by kraken2 need to be compressed to a format (bzip2) useful in the next downstream step.
-> **Note:** This takes aboute 13 minutes
+> **Note:** This takes aboute 5 minutes
 ```
 bzip2 -fk ./data/kraken/sample01.unclassified_1.fastq ./data/kraken/sample01.unclassified_2.fastq
 ```
@@ -280,12 +283,13 @@ Since we are working with metagenomic sequences, it would be fundamental for us 
 
 #### Alternative 1: Using Kraken2
 > 1. Let us set up the database of regference genomes  
+  
 [Kraken2](https://ccb.jhu.edu/software/kraken2/index.shtml) is a newer version of kraken, a taxonomic classification system that uses k-mer matching for high-accuracy and fast classification. By matching k-mers to `lowest common ancestor` of all available genome sequences, it classifys that query sequence. 
 ```
 mkdir -p ./data/database/kraken2
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/kraken2/k2_pluspf_16gb_20221209 ./data/database/kraken2/
 ```
-> 2. Filtering Host genome sequences - Takes about 6 minutes. 
+> 2. Taxonomic classification of non-host sequences - Takes about 6 minutes. 
 ```
 kraken2 -db ./data/database/kraken2/k2_pluspf_16gb_20221209 \
 	--threads 4 \
@@ -293,12 +297,82 @@ kraken2 -db ./data/database/kraken2/k2_pluspf_16gb_20221209 \
 	--classified-out ./data/kraken/sample01.all_classified#.fastq \
 	--report ./data/kraken/sample01_kreport.txt \
 	--output ./data/kraken/sample01_kraken2.out \
-	--gzip-compressed \
+	--bzip2-compressed \
 	--report-zero-counts \
-	--paired ./data/fastp/sample01_R1.trim.fastq.gz \
-	./data/fastp/sample01_R2.trim.fastq.gz
+	--paired ./data/kraken/sample01.unclassified_1.fastq.bz2 \
+	./data/kraken/sample01.unclassified_2.fastq.bz2
 ```
 
+> 3. [Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#output-formats)   
+ 
+Kraken2 has two output formats, the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) and [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format).  
+In the [Standard Kraken Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-output-format) each sequence or sequence pair for `PE` data has a single line with five fields:
+```
+C       NB552490:29:HY2LGBGXK:1:11101:19971:3395        1660    151|151 0:16 1760:1 0:16 1660:3 0:16 1660:2 0:20 2049:1 0:5 2049:2 0:9 1760:5 0:6 2049:4 0:10 2:1 |:| 0:18 2:2 1760:5 0:1 1760:1 0:3 2:7 0:16 2:3 0:10 2049:4 0:6 1760:5 0:9 2049:2 0:5 2049:1 0:19
+C       NB552490:29:HY2LGBGXK:1:11101:20073:3396        43675   90|90   1760:2 0:8 43675:3 0:33 2:4 1760:5 0:1 |:| 0:1 1760:5 2:4 0:33 43675:3 0:8 1760:2
+C       NB552490:29:HY2LGBGXK:1:11101:1828:3398 475     90|90   0:3 2:1 0:31 475:5 0:16 |:| 0:19 475:2 0:31 2:1 0:3
+C       NB552490:29:HY2LGBGXK:1:11101:23002:3401        838     151|151 0:37 838:24 0:2 838:1 0:8 838:8 0:9 838:2 0:2 838:3 0:7 838:5 0:9 |:| 0:3 838:3 0:5 838:1 0:9 838:1 0:7 976:6 0:3 171549:5 0:21 838:5 0:7 838:3 0:2 838:2 0:9 838:8 0:8 838:1 0:2 838:6
+C       NB552490:29:HY2LGBGXK:1:11101:10728:3402        470565  151|151 0:3 838:3 0:6 838:1 0:5 838:1 0:10 838:5 0:13 171549:2 0:12 838:3 0:21 470565:1 0:4 470565:5 2:1 0:6 171549:3 0:1 2:7 0:4 |:| 0:7 838:5 0:24 2:7 0:1 171549:3 0:6 2:1 470565:5 0:4 470565:1 0:21 838:3 0:12 171549:2 0:13 838:2
+```
+- "C"/"U": Indicates that the sequence was classified or unclassified.
+- The sequence ID, from the FASTQ header.
+- The taxonomy ID Kraken 2 used to label the sequence; 0 if the sequence is unclassified.
+- The length of the sequence in bp. In the case of `PE` data, a string with the lengths of the two reads separated by a pipe character.
+- A space-delimited list indicating the LCA mapping of each k-mer in the sequence(s). For example, "562:13 561:4 A:31 0:1 562:3" would indicate that:
+  - first 13 k-mers mapped to taxonomy ID #562
+  - next 4 k-mers mapped to taxonomy ID #561
+  - next 31 k-mers contained an ambiguous nucleotide
+  - next k-mer was not in the database
+  - last 3 k-mers mapped to taxonomy ID #562
+  - `PE` data will contain `|:|` to indicate the end and begining of a read  
+
+The [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Manual#sample-report-output-format) is a tab-delimited file with one line per taxon and six standard collumns:
+```
+  9.26  2013272 2013272 U       0       unclassified
+ 90.74  19737212        164     -       1       root
+ 90.34  19649484        885     -       131567    cellular organisms
+ 90.23  19625016        153145  D       2           Bacteria
+ 34.38  7476995 29291   -       1783272       Terrabacteria group
+ 20.75  4512724 44302   P       1239            Firmicutes
+ 13.54  2944775 59520   C       91061             Bacilli
+ 10.73  2333737 60279   O       186826              Lactobacillales
+  7.66  1666097 439     F       1300                  Streptococcaceae
+  7.63  1659155 896729  G       1301                    Streptococcus
+  1.49  323559  7275    -       2608887                   unclassified Streptococcus
+  1.19  258141  258141  S       2610896                     Streptococcus sp. LPB0220
+```
+- Percentage of reads part of the clade rooted at this taxon
+- Number of reads within the clade rooted at this taxon
+- Number of reads assigned directly to this taxon
+- A rank code, indicating 
+  - (U)nclassified, (R)oot, (D)omain, (K)ingdom, (P)hylum, (C)lass, (O)rder, (F)amily, (G)enus, or (S)pecies. 
+  - Taxa that are not at any of these 10 ranks have a rank code of the closest ancestor rank with a number indicating the distance from that rank. E.g., "G2" indicates a taxon is between genus and species and the grandparent taxon is at the genus rank.  
+- NCBI taxonomic ID number
+- Indented scientific name
+
+> 4. Preparing the classification report data to suitable krona input format.  
+> **Note:** *Takes about 40 Seconds*
+```
+cat ./data/kraken/sample01_kraken2.out | cut -f 2,3 > ./data/krona/sample01-kraken2.krona
+```
+
+
+
+> **Quiz:** *How do you build or access a pathogen classification reference database for kraken2*
+---
+<details close>
+  <summary>Tip</summary>
+  How to build a kraken2 Database
+  <blockquote>
+    <p dir="auto">
+      <strong>Solution:</strong>
+      <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-kraken2-reference-databases"
+      ref="nofollow">Building Kraken2 pathogen classification database</a>
+    </p>
+  </blockquote>
+</details>
+
+---
 #### Alternative 2: Using Centrifuge
 
 To quickly profile the taxonomic composition of the reads present in the sequences we chose to work with **[centrifuge](https://ccb.jhu.edu/software/centrifuge/) module**. Centrifuge is a 'rapid and memory-efficient' classification tool for DNA sequences of microbial origin.You can proceed as follows:  
@@ -312,10 +386,44 @@ ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/data
 centrifuge -x ./data/database/centrifuge/hpvc \
 	-1 ./data/kraken/sample01.unclassified_1.fastq.bz2 \
 	-2 ./data/kraken/sample01.unclassified_2.fastq.bz2 \
-	--report-file ./data/centrifuge/sample01-report.txt \
+	--report-file ./data/centrifuge/sample01-kreport.txt \
 	-S ./data/centrifuge/sample01-results.txt \
 	--threads 4 \
 	--mm 100GB
+```
+The centrifuge output is a tab-separated eight collumn file:
+```
+readID  seqID   taxID   score   2ndBestScore    hitLength       queryLength	numMatches
+NB552490:29:HY2LGBGXK:1:11101:19625:1735        NZ_LS483346.1   1305    36992  36992   302     302     3
+NB552490:29:HY2LGBGXK:1:11101:19625:1735        NZ_LS483385.1   1305    36992  36992   302     302     3
+NB552490:29:HY2LGBGXK:1:11101:19625:1735        NC_009009.1     388919  36992  36992   302     302     3
+NB552490:29:HY2LGBGXK:1:11101:23844:1735        NZ_CP012072.1   52773   36992  0       302     302     1
+NB552490:29:HY2LGBGXK:1:11101:5273:1736 NC_011374.1     565575  1568    1568   86      302     4
+```
+- The first column is the read ID from a raw sequencing read
+- The second column is the sequence ID of the genomic sequence, where the read is classified
+- The third column is the taxonomic ID of the genomic sequence in the second column
+- The fourth column is the score for the classification, which is the weighted sum of hit
+- The fifth column is the score for the next best classification.
+- The sixth column is a pair of two numbers: 
+  - (1) an approximate number of base pairs of the read that match the genomic sequence and 
+  - (2) the length of a read or the combined length of mate pairs
+- The seventh column is a pair of two numbers: 
+  - (1) an approximate number of base pairs of the read that match the genomic sequence and 
+  - (2) the length of a read or the combined length of mate pairs. 
+- The eighth column is the number of classifications for this read, indicating how many assignments were made
+
+
+> 3. If using Centrifuge convert centrifuge report to kraken-like report.
+> **Note:** *Takes about 5 minutes*
+```
+centrifuge-kreport -x ./data/database/centrifuge/hpvc \
+        ./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
+```
+> 4. Preparing the classification report data to suitable krona input format.  
+> **Note:** *Takes about 40 Seconds*
+```
+cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-centrifuge.krona
 ```
 
 > **Quiz:** *How do you Build or access a centrifuge Database?*
@@ -334,29 +442,19 @@ centrifuge -x ./data/database/centrifuge/hpvc \
 
 ---
 #### Visualise the Taxonomic classification results with krona tools
+A very important part of analysis is communicating the results of the analysis in a way that is easy to understand. [Krona tools](https://github.com/marbl/Krona/wiki) offers a set of tools that can be used to visualize all types of taxonomic abundance classification results from various tools.    
+It plots an interactive HTML pie chart for every sample. In case of many samples there are other tools such as [pavian R package](https://github.com/fbreitwieser/pavian). 
 > 1. Set up the reference krona Taxonomy database:  
 ```
 mkdir -p data/database/krona/
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
 ```
-> 2. If using Centrifuge convert centrifuge report to kraken-like report.  
-> **Note:** *Takes about 5 minutes*
-```
-centrifuge-kreport -x ./data/database/centrifuge/hpvc \
-	./data/centrifuge/sample01-results.txt > ./data/krona/sample01-kreport.txt
-```
-> 3. Preparing the classification report data to suitable krona input format.  
-> **Note:** *Takes about 40 Seconds*
-```
-cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-results.krona
-```
-> 4. Visiualize the report - create a HTML filei  
+> 2. Visiualize the report - create a HTML filei  
 > **Note:** *Takes about 3 Minutes*
 ```
-apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
-	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
+ktImportTaxonomy -tax ./data/database/krona/taxonomy \
 	-o ./data/krona/sample01_taxonomy.krona.html \
-	./data/krona/sample01-results.krona 
+	./data/krona/sample01-kraken2.krona 
 ```
 > **Discussion:** A HTML report is generated from this step and can be found in this links: [sample01_taxonomy.krona.html](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/krona/sample01_taxonomy.krona.html)   
 > **Quiz:** *How do you Build a krona Taxonomy Database?*
@@ -378,7 +476,7 @@ apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 ## Lets Focus on a specific pathogenic virus: H1N1 - Influenza A Virus
 
 ### Step 9: Downloading the Reference data - reference genome and annotation files
-Based on the taxonomic classification we can tell that we have a high abundance of ***H1N1 Influenza A Virus***. To conduct analysis focused on this virus we will have to download the refernce Genome data from NCBI Genome database. The Reference Genome for Influenza A virus H1N1 (A/California/07/2009(H1N1))).  
+Based on the taxonomic classification we can tell that we have a high abundance of ***H1N1 Influenza A Virus***. To conduct analysis focused on this virus we will have to download the refernce Genome data from NCBI Genome database. The Reference Genome for Influenza A virus H1N1 (A/California/07/2009(H1N1)).  
 Follow the following steps to identify and download the data:  
 > 1. On a web browser, open the link [NCBI](https://www.ncbi.nlm.nih.gov/).
 > 2. Type 'H1N1' on the search box and select 'Genome' database. On the landing page you will get you will see:  
@@ -386,7 +484,7 @@ Follow the following steps to identify and download the data:
   > **Reference genome:** [Influenza A virus (A/New York/392/2004(H3N2))](https://www.ncbi.nlm.nih.gov/genome/10290?genome_assembly_id=899994) 
  
 Because the Influenza A Virus genome segments rapidly evolves, we will select the most recent reference genome to H1N1. This would be A/California/07/2009(H1N1). Reported in the [2009 pandemic](https://doi.org/10.1371/journal.pone.0013381) in California.
-> 3. Under [Download sequence and annotation from **RefSeq** or **GenBank**] select the [RefSeq](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/).
+> 3. Under `Download sequence and annotation from **RefSeq** or **GenBank**` select the [`RefSeq`](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/).
 > 4. Note that there are seven versions of `Influenza_A_virus/latest_assembly_versions`.   
 Select the genome version [ViralMultiSegProj274766](https://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Influenza_A_virus/latest_assembly_versions/GCF_001343785.1_ViralMultiSegProj274766/).  
 You can click on `*_assembly_report.txt` to confirm `A/California/07/2009(H1N1)`.
@@ -571,6 +669,7 @@ Now we have eight bam files for the eight Influenza A virus segments.
 ```
 ls ./data/bowtie/*REF_*.bam | xargs -n1 -P5 samtools index -@ 4
 ```
+In the command above `ls ./data/bowtie/*REF_*.bam` will list all files in `ls ./data/bowtie/` that match the regular expression `*REF_*.bam` and pass the results to `xargs` command. [`xargs`(*e**x**tended **arg**uments*)](https://en.wikipedia.org/wiki/Xargs#:~:text=xargs%20(short%20for%20%22extended%20arguments,into%20arguments%20to%20a%20command.) command is used in Unix-like OSs to build and execute commands in standard intput. It takes input from the standard input and pass it as arguments to a command. `-n1` option tells `xargs` to pass the argument one at a time to the recipient cmmand `samtools index`. This is important because `samtools index` command can only take one input `.bam` file at a go. `-p5` tells `xargs` to initiate a maximum total of five processes at a go, hence at no one time will we have more than five `samtools index` processes being executed by the above command.
 
 ### Step 16: Loop through segmented BAM files and generate consensus:
 To generate a consensus from the read alignment `BAM` file for one segment `NC_026431.1` we will run the following command:  
