@@ -353,7 +353,7 @@ The [Sample Report Output Format](https://github.com/DerrickWood/kraken2/wiki/Ma
 > 4. Preparing the classification report data to suitable krona input format.  
 > **Note:** *Takes about 40 Seconds*
 ```
-cat ./data/kraken2/sample01-results.txt | cut -f 2,3 > ./data/krona/sample01-kraken2.krona
+cat ./data/kraken/sample01_kraken2.out | cut -f 2,3 > ./data/krona/sample01-kraken2.krona
 ```
 
 
@@ -425,18 +425,13 @@ A very important part of analysis is communicating the results of the analysis i
 mkdir -p data/database/krona/
 ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/database/krona/* ./data/database/krona/
 ```
-> 2. Preparing the classification report data to suitable krona input format.  
-> **Note:** *Takes about 40 Seconds*
-```
-cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-results.krona
-```
-> 3. Visiualize the report - create a HTML filei  
+> 2. Visiualize the report - create a HTML filei  
 > **Note:** *Takes about 3 Minutes*
 ```
 apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \
 	ktImportTaxonomy -tax ./data/database/krona/taxonomy \
 	-o ./data/krona/sample01_taxonomy.krona.html \
-	./data/krona/sample01-results.krona 
+	./data/krona/sample01-kraken2.krona 
 ```
 > **Discussion:** A HTML report is generated from this step and can be found in this links: [sample01_taxonomy.krona.html](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/krona/sample01_taxonomy.krona.html)   
 > **Quiz:** *How do you Build a krona Taxonomy Database?*
