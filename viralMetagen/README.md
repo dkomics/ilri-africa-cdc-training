@@ -179,7 +179,7 @@ If **YES**, you will need to download the `HTML` report to your laptop. Do this 
 You can proceed and copy fastqc HTML output files to `/home/`(`~/`): 
 ```
 mkdir -p ~/viralMetagen
-cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
+cp /var/scratch/${USER}/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
 ```
 Then run the following command on your local machine.
 ***Warning!!!:*** ***Run this command on your laptop not HPC***
@@ -213,7 +213,7 @@ We can proceed and explore the output of the command above in this link: [sample
 
 You can proceed and copy the fastp HTML output files to local laptop as follows.  
 ```
-cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastp/*.html ~/viralMetagen/
+cp /var/scratch/${USER}/ilri-africa-cdc-training/viralMetagen/data/fastp/*.html ~/viralMetagen/
 ```
 Then run this command on your laptop not HPC `scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./`
 
@@ -227,7 +227,7 @@ fastqc -t 4 \
 ```
 To copy the trimmed fastqc output files to local laptop. Run this commands:
 ```
-cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*trim_fastqc.html ~/viralMetagen/
+cp /var/scratch/${USER}/ilri-africa-cdc-training/viralMetagen/data/fastqc/*trim_fastqc.html ~/viralMetagen/
 ```
 ***Run this command on your laptop not HPC***
 ```
