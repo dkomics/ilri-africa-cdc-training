@@ -911,7 +911,7 @@ NC_026431.1     258     .       G       A       .       PASS    DP=1863;ANN=A|sy
     <p dir="auto">
       <strong>Solution:</strong>
       <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-snpeff-database"
-      ref="nofollow">Building krona Taxonomy database</a>
+      ref="nofollow">Building snpEff Annotation database</a>
     </p>
   </blockquote>
 </details>
