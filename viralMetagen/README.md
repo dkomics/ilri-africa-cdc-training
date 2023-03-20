@@ -200,6 +200,7 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--html ./data/fastp/sample01.fastp.html \
 	--failed_out ./data/fastp/sample01_fail.fastq.gz \
 	--thread 4 \
+	-5 -3 -r \
 	--detect_adapter_for_pe \
 	--qualified_quality_phred 20 \
 	--cut_mean_quality 20 \
