@@ -439,6 +439,36 @@ centrifuge -x ./data/database/centrifuge/hpvc \
         --threads 4 \
         --mm 100GB
 ```
+The centrifuge output is a tab-separated eight collumn file:
+```
+readID  seqID   taxID   score   2ndBestScore    hitLength       queryLength
+numMatches
+NB552490:29:HY2LGBGXK:1:11101:19625:1735        NZ_LS483346.1   1305    36992
+36992   302     302     3
+NB552490:29:HY2LGBGXK:1:11101:19625:1735        NZ_LS483385.1   1305    36992
+36992   302     302     3
+NB552490:29:HY2LGBGXK:1:11101:19625:1735        NC_009009.1     388919  36992
+36992   302     302     3
+NB552490:29:HY2LGBGXK:1:11101:23844:1735        NZ_CP012072.1   52773   36992
+0       302     302     1
+NB552490:29:HY2LGBGXK:1:11101:5273:1736 NC_011374.1     565575  1568    1568
+86      302     4
+```
+- The first column is the read ID from a raw sequencing read 
+- The second column is the sequence ID of the genomic sequence, where the read is classified
+- The third column is the taxonomic ID of the genomic sequence in the second column
+- The fourth column is the score for the classification, which is the weighted sum of hit
+- The fifth column is the score for the next best classification.
+- The sixth column is a pair of two numbers: 
+  - (1) an approximate number of base pairs of the read that match the genomic sequence and 
+  - (2) the length of a read or the combined length of mate pairs
+- The seventh column is a pair of two numbers: 
+  - (1) an approximate number of base pairs of the read that match the genomic sequence and 
+  - (2) the length of a read or the combined length of mate pairs.             
+- The eighth column is the number of classifications for this read, indicating how many assignments were made
+
+
+
 > 3. If using Centrifuge convert centrifuge report to kraken-like report.
 > **Note:** *Takes about 5 minutes*
 ```
@@ -485,9 +515,8 @@ ln -s /var/scratch/global/gkibet/ilri-africa-cdc-training/viralMetagen/data/data
 > 2. Visiualize the report - create a HTML file                                
 > **Note:** *Takes about 3 Minutes*
 ```
-apptainer run scripts/singularity/krona_2.7.1--pl526_5.sif \                   
-        ktImportTaxonomy -tax ./data/database/krona/taxonomy \                 
-        -o ./data/krona/sample01_taxonomy.krona.html \
+ktImportTaxonomy -tax ./data/database/krona/taxonomy \
+	-o ./data/krona/sample01_taxonomy.krona.html \
         ./data/krona/sample01-kraken2.krona
 ```
 > **Discussion:** A HTML report is generated from this step and can be found in this links: [sample01_taxonomy.krona.html](https://hpc.ilri.cgiar.org/~gkibet/ilri-africa-cdc-training/krona/sample01_taxonomy.krona.html)  
