@@ -442,7 +442,8 @@ cat ./data/centrifuge/sample01-results.txt | cut -f 1,3 > ./data/krona/sample01-
 
 ---
 #### Visualise the Taxonomic classification results with krona tools
-A very important part of analysis is communicating the results of the analysis in a way that is easy to understand. The 
+A very important part of analysis is communicating the results of the analysis in a way that is easy to understand. [Krona tools](https://github.com/marbl/Krona/wiki) offers a set of tools that can be used to visualize all types of taxonomic abundance classification results from various tools.    
+It plots an interactive HTML pie chart for every sample. In case of many samples there are other tools such as [pavian R package](https://github.com/fbreitwieser/pavian). 
 > 1. Set up the reference krona Taxonomy database:  
 ```
 mkdir -p data/database/krona/
@@ -475,7 +476,7 @@ ktImportTaxonomy -tax ./data/database/krona/taxonomy \
 ## Lets Focus on a specific pathogenic virus: H1N1 - Influenza A Virus
 
 ### Step 9: Downloading the Reference data - reference genome and annotation files
-Based on the taxonomic classification we can tell that we have a high abundance of ***H1N1 Influenza A Virus***. To conduct analysis focused on this virus we will have to download the refernce Genome data from NCBI Genome database. The Reference Genome for Influenza A virus H1N1 (A/California/07/2009(H1N1))).  
+Based on the taxonomic classification we can tell that we have a high abundance of ***H1N1 Influenza A Virus***. To conduct analysis focused on this virus we will have to download the refernce Genome data from NCBI Genome database. The Reference Genome for Influenza A virus H1N1 (A/California/07/2009(H1N1)).  
 Follow the following steps to identify and download the data:  
 > 1. On a web browser, open the link [NCBI](https://www.ncbi.nlm.nih.gov/).
 > 2. Type 'H1N1' on the search box and select 'Genome' database. On the landing page you will get you will see:  
@@ -668,6 +669,7 @@ Now we have eight bam files for the eight Influenza A virus segments.
 ```
 ls ./data/bowtie/*REF_*.bam | xargs -n1 -P5 samtools index -@ 4
 ```
+In the command above `ls ./data/bowtie/*REF_*.bam` will list all files in `ls ./data/bowtie/` that match the regular expression `*REF_*.bam` and pass the results to `xargs` command. [`xargs`(*e**x**tended **arg**uments*)](https://en.wikipedia.org/wiki/Xargs#:~:text=xargs%20(short%20for%20%22extended%20arguments,into%20arguments%20to%20a%20command.) command is used in Unix-like OSs to build and execute commands in standard intput. It takes input from the standard input and pass it as arguments to a command. `-n1` option tells `xargs` to pass the argument one at a time to the recipient cmmand `samtools index`. This is important because `samtools index` command can only take one input `.bam` file at a go. `-p5` tells `xargs` to initiate a maximum total of five processes at a go, hence at no one time will we have more than five `samtools index` processes being executed by the above command.
 
 ### Step 16: Loop through segmented BAM files and generate consensus:
 To generate a consensus from the read alignment `BAM` file for one segment `NC_026431.1` we will run the following command:  
