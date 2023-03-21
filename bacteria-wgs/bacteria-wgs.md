@@ -273,6 +273,8 @@ Genome assembly refers to the process of putting back together the nucleotide se
 	-m 50
     ```
 
+    If you do not have the `contigs.fasta` file, you can obtains it through this soft link and place it in the `spades` directory.
+
     View the `contigs.fasta` file
 
     ```
