@@ -166,7 +166,7 @@ interactive -w compute05 -c 2
 ### ***Prepare the reference genome***
 
 
-1. While still in the `genome` directory, we will index the reference sequence using samtools' `faidx`. Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for samtools' operations.
+1. While still in the `genome` directory, we will index the reference sequence using samtools' `faidx`. Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with `\n`. This is essential for samtools' operations.
 
     ```
     module load samtools/1.9
@@ -300,11 +300,13 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     ```
     quast.py \
     /var/scratch/$USER/bacteria-wgs/results/spades/contigs.fasta \
-    -t 1 \
+    -t 2 \
     -o /var/scratch/$USER/bacteria-wgs/results/quast
     ```
+- Click on the following link to view the [quast report](https://hpc.ilri.cgiar.org/~kmwangi/quast/report.html).
+- From the same report, we can view the statistics on a [contigs viewer using Icarus](https://hpc.ilri.cgiar.org/~kmwangi/quast/icarus_viewers/contig_size_viewer.html)
 
-2. #### ***Genome completeness***  
+1. #### ***Genome completeness***  
     Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs). BUSCO makes use of the OrthoDB set of single-copy orthologous that are found in at least 90% of all the organisms in question. Ideally, the sequenced genome should contain most of these highly conserved genes. If your genome doesn't contain a large portion of these single-copy orthologs it may indicate that your genome is not complete. Here is BUSCO's [user guide](https://vcru.wisc.edu/simonlab/bioinformatics/programs/busco/BUSCO_v3_userguide.pdf).
 
     Load `BUSCO`
