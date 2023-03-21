@@ -323,7 +323,7 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     -m genome \
     -o SRR292862_busco \
     -l bacteria \
-    -c 1 \
+    -c 2 \
     -f
     ```
 
@@ -362,7 +362,7 @@ cd /var/scratch/$USER/bacteria-wgs/results/prokka
 prokka \
 /var/scratch/$USER/bacteria-wgs/results/spades/contigs.fasta \
 --outdir /var/scratch/$USER/bacteria-wgs/results/prokka \
---cpus 1 \
+--cpus 2 \
 --mincontiglen 200 \
 --centre C \
 --locustag L \
@@ -399,7 +399,7 @@ blastn \
 -db /export/data/bio/ncbi/blast/db/v5/nt \
 -outfmt '6 qseqid staxids bitscore std sscinames sskingdoms stitle' \
 -culling_limit 5 \
--num_threads 1 \
+-num_threads 2 \
 -evalue 1e-25 \
 -out /var/scratch/$USER/bacteria-wgs/results/blast/contigs.fasta.vs.nt.cul5.1e25.megablast.out
 
