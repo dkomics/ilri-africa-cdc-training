@@ -274,6 +274,9 @@ Genome assembly refers to the process of putting back together the nucleotide se
     ```
 
     If you do not have the `contigs.fasta` file, you can obtains it through this soft link and place it in the `spades` directory.
+    ```
+    ln -s /var/scratch/global/bacteria-wgs/data/spades/contigs.fasta .
+    ```
 
     View the `contigs.fasta` file
 
