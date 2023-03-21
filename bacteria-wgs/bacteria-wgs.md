@@ -221,6 +221,8 @@ interactive -w compute05 -c 2
     ***Optional***
         Run step 3. above for the other 2 samples.
 
+We can view the fastq report here: [SRR292862_1_fastqc.html](https://hpc.ilri.cgiar.org/~kmwangi/SRR292862_1_fastqc.html)
+
 ### ***Quality and adapter filtering***
 The preceeding step will guide us on the possible filtering and trimming operations to subject our data to. Depending on your study design, it is important to minimise noise as much as to zero, if possible. However, the latter case may be practically impossible.
 
@@ -247,7 +249,7 @@ The preceeding step will guide us on the possible filtering and trimming operati
         -j SRR292862.fastp.json \
         2> SRR292862.fastp.log
     ```
-
+We can view the results of fastp here: [SRR292862.fastp.html](https://hpc.ilri.cgiar.org/~kmwangi/SRR292862.fastp.html)
  
 ### ***Perform genome assembly***  
 
