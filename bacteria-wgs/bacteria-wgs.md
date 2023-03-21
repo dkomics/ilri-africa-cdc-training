@@ -387,6 +387,10 @@ module load blast/2.12.0+
 ```
 
 ```
+cd /var/scratch/$USER/bacteria-wgs/results/blast
+```
+
+```
 blastn \
 -task megablast \
 -query /var/scratch/$USER/bacteria-wgs/results/spades/contigs.fasta \
@@ -415,7 +419,7 @@ Virulence factors are properties that enable a microbe to establish itself withi
     -db /var/scratch/${USER}/bacteria-wgs/databases/VFDB/vfdb_seta_nt \
     -out /var/scratch/$USER/bacteria-wgs/results/blast/virulence_factors_blast_VFDB.out \
     -outfmt '6 qseqid staxids bitscore std sscinames sskingdoms stitle' \
-    -num_threads 1
+    -num_threads 2
 
 ```
 
@@ -423,6 +427,8 @@ View the blast output results
 ```
 less -S /var/scratch/$USER/bacteria-wgs/results/blast/virulence_factors_blast_VFDB.out
 ```
+
+Learn more about [blast output format 6](https://www.metagenomics.wiki/tools/blast/blastn-output-format-6).
 
 >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>** 
 Search the blast output to see if we find the following genes:
@@ -436,14 +442,12 @@ Here, we will use [Resistance Gene Identifier (RGI)](https://card.mcmaster.ca/an
 module purge
 
 module load rgi/6.0.2
-
 ```  
 
 ```
 cd /var/scratch/$USER/bacteria-wgs/results/rgi
 
 ln -s /var/scratch/global/bacteria-wgs/databases/localDB .
-
 ```
 
 
