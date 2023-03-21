@@ -179,7 +179,7 @@ If **YES**, you will need to download the `HTML` report to your laptop. Do this 
 You can proceed and copy fastqc HTML output files to `/home/`(`~/`): 
 ```
 mkdir -p ~/viralMetagen
-cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
+cp /var/scratch/${USER}/ilri-africa-cdc-training/viralMetagen/data/fastqc/*.html ~/viralMetagen/
 ```
 Then run the following command on your local machine.
 ***Warning!!!:*** ***Run this command on your laptop not HPC***
@@ -200,6 +200,7 @@ fastp --in1 ./data/fastq/sample01_R1.fastq.gz \
 	--html ./data/fastp/sample01.fastp.html \
 	--failed_out ./data/fastp/sample01_fail.fastq.gz \
 	--thread 4 \
+	-5 -3 -r \
 	--detect_adapter_for_pe \
 	--qualified_quality_phred 20 \
 	--cut_mean_quality 20 \
@@ -212,7 +213,7 @@ We can proceed and explore the output of the command above in this link: [sample
 
 You can proceed and copy the fastp HTML output files to local laptop as follows.  
 ```
-cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastp/*.html ~/viralMetagen/
+cp /var/scratch/${USER}/ilri-africa-cdc-training/viralMetagen/data/fastp/*.html ~/viralMetagen/
 ```
 Then run this command on your laptop not HPC `scp <username>@hpc.ilri.cgiar.org:~/viralMetagen/*.html ./`
 
@@ -226,7 +227,7 @@ fastqc -t 4 \
 ```
 To copy the trimmed fastqc output files to local laptop. Run this commands:
 ```
-cp /var/scratch/gkibet/ilri-africa-cdc-training/viralMetagen/data/fastqc/*trim_fastqc.html ~/viralMetagen/
+cp /var/scratch/${USER}/ilri-africa-cdc-training/viralMetagen/data/fastqc/*trim_fastqc.html ~/viralMetagen/
 ```
 ***Run this command on your laptop not HPC***
 ```
@@ -669,7 +670,7 @@ Now we have eight bam files for the eight Influenza A virus segments.
 ```
 ls ./data/bowtie/*REF_*.bam | xargs -n1 -P5 samtools index -@ 4
 ```
-In the command above `ls ./data/bowtie/*REF_*.bam` will list all files in `ls ./data/bowtie/` that match the regular expression `*REF_*.bam` and pass the results to `xargs` command. [`xargs`(*e**x**tended **arg**uments*)](https://en.wikipedia.org/wiki/Xargs#:~:text=xargs%20(short%20for%20%22extended%20arguments,into%20arguments%20to%20a%20command.) command is used in Unix-like OSs to build and execute commands in standard intput. It takes input from the standard input and pass it as arguments to a command. `-n1` option tells `xargs` to pass the argument one at a time to the recipient cmmand `samtools index`. This is important because `samtools index` command can only take one input `.bam` file at a go. `-p5` tells `xargs` to initiate a maximum total of five processes at a go, hence at no one time will we have more than five `samtools index` processes being executed by the above command.
+In the command above `ls ./data/bowtie/*REF_*.bam` will list all files in `ls ./data/bowtie/` that match the regular expression `*REF_*.bam` and pass the results to `xargs` command. [`xargs`(*e**x**tended **arg**uments*)](https://en.wikipedia.org/wiki/Xargs) command is used in Unix-like OSs to build and execute commands in standard intput. It takes input from the standard input and pass it as arguments to a command. `-n1` option tells `xargs` to pass the argument one at a time to the recipient cmmand `samtools index`. This is important because `samtools index` command can only take one input `.bam` file at a go. `-p5` tells `xargs` to initiate a maximum total of five processes at a go, hence at no one time will we have more than five `samtools index` processes being executed by the above command.
 
 ### Step 16: Loop through segmented BAM files and generate consensus:
 To generate a consensus from the read alignment `BAM` file for one segment `NC_026431.1` we will run the following command:  
@@ -910,7 +911,7 @@ NC_026431.1     258     .       G       A       .       PASS    DP=1863;ANN=A|sy
     <p dir="auto">
       <strong>Solution:</strong>
       <a href="https://github.com/ILRI-Genomics-Platform/ilri-africa-cdc-training/blob/master/viralMetagen/viralMetagen_pipeline.md#building-snpeff-database"
-      ref="nofollow">Building krona Taxonomy database</a>
+      ref="nofollow">Building snpEff Annotation database</a>
     </p>
   </blockquote>
 </details>
