@@ -23,7 +23,6 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
       - [***Prepare the reference genome***](#prepare-the-reference-genome)
       - [***Quality assessment***](#quality-assessment)
       - [***Quality and adapter filtering***](#quality-and-adapter-filtering)
-      - [***bcftools***](#bcftools)
       - [***Perform genome assembly***](#perform-genome-assembly)
       - [***Genome assessment***](#genome-assessment)
       - [***Genome annotation***](#genome-annotation)
@@ -287,7 +286,6 @@ Genome assembly refers to the process of putting back together the nucleotide se
 >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>** 
 - How many sequences do you have in your `contigs.fasta` file?
   
-
 
 ### ***Genome assessment***  
 Genome assessment entails producing the quality metrics that gauge both the completeness and contiguity of the assembled genome. Good quality metrics ensure that we are confident in the biological insights we obtain from the assembled genome. 
