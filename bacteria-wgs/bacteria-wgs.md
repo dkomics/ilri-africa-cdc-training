@@ -23,8 +23,7 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
       - [***Prepare the reference genome***](#prepare-the-reference-genome)
       - [***Quality assessment***](#quality-assessment)
       - [***Quality and adapter filtering***](#quality-and-adapter-filtering)
-      - [***bcftools***](#bcftools)
-      - [***Generate consensus genome sequences***](#generate-consensus-genome-sequences)
+      - [***Perform genome assembly***](#perform-genome-assembly)
       - [***Genome assessment***](#genome-assessment)
       - [***Genome annotation***](#genome-annotation)
       - [***Organism identification***](#organism-identification)
@@ -33,7 +32,7 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
 
 
 ## Introduction
-*E. coli* are ubiquitous bacteria found in the environment including the gut of humans and other animals and consists of numerous types and strains. Most types of *E. coli* are normal inhabitants of the gut of animals and do not cause diseases. However, some of the strains of *E. coli* have acquired genes that enable them to cause disease. These strains are commonly associated with food poisoning leading to diarrhoea and are referred to as diarrheagenic *E. coli* (DEC). Transmission occurs primarily through contaminated food but can also accur via person-to-person transmission, animal contact and water. Shiga toxin-producing *E. coli* (STEC) serotype O157:H7 causes bloody diarrhoea and has previosuly been responsible for outbreaks worldwide.  
+*E. coli* are ubiquitous bacteria found in the environment including the gut of humans and other animals and consists of numerous types and strains. Most types of *E. coli* are normal inhabitants of the gut of animals and do not cause diseases. However, some of the strains of *E. coli* have acquired genes that enable them to cause disease. These strains are commonly associated with food poisoning leading to diarrhoea and are referred to as diarrheagenic *E. coli* (DEC). Transmission occurs primarily through contaminated food but can also occur via person-to-person transmission, animal contact and water. Shiga toxin-producing *E. coli* (STEC) serotype O157:H7 causes bloody diarrhoea and has previosuly been responsible for outbreaks worldwide.  
 
 > **Note**
 
@@ -53,7 +52,7 @@ This module will come after the introductory Linux module and therefore assumes 
 
 >**Note**
 
->Once inside the `hpc`, all instances of ```$USER``` will be equivalent to the hpc username that you were assigned, for example `Bio4Info$$`. Your username, by default, is stored in a variable called `USER`. By using it, you will not have to type-in your username, rather, your shell will automatically pick your username which is the value stored in the `USER` variable. The `$` (dollar) character-prefix to a variable name is used to call the value of that variable.
+>Once inside the `hpc`, all instances of ```$USER``` will be equivalent to the hpc username that you were assigned. Your username, by default, is stored in a variable called `USER`. By using it, you will not have to type-in your username, rather, your shell will automatically pick your username which is the value stored in the `USER` variable. The `$` (dollar) character-prefix to a variable name is used to call the value of that variable.
 
 ### Set-Up
 We will use the computer lab at ILRI, which is already equipped with Linux-operating desktop computers. Since we will be working from the remote servers, we will not need special setup for personal laptops. However, toward the end of the program, we can look into access to a Linux server from a Windows PC; or how to install a Linux (sub)system for any interested persons.  
@@ -71,7 +70,7 @@ The HPC head node has 4 CPUs and we need to access more CPUs/resources in other 
 You will have to move from the cluster's master node into the node where we will be working from (it is called `compute05`). Use the following command; `-w` requests (a) specific list of host(s).  
 
 ```
-interactive -w compute05
+interactive -w compute05 -c 2
 ```  
 
 `ssh` allows you to securely connect to the remote computer over internet, while `interactive` allows you to reserve resources to work interactively in a specified node within the computing cluster using the `-w` flag.
@@ -99,7 +98,7 @@ interactive -w compute05
     ```
 4. List the contents of the `data/raw_data` directory, from where we will retrieve our ```fastq``` files.
     ```
-    ls data/raw_data
+    ls -lht data/raw_data
     
     ```
 #### ***Data retrieval and integrity checks***
@@ -166,11 +165,12 @@ interactive -w compute05
 ### ***Prepare the reference genome***
 
 
-1. While still in the `genome` directory, we will index the reference sequence using samtools' `faidx`. Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with`\n`. This is essential for samtools' operations.
+1. While still in the `genome` directory, we will index the reference sequence using samtools' `faidx`. Indexing produces a `.fai` file consisting of five tab-separated columns: `chrname, seqlength, first-base offset, seqlinewidth` without `\n` (newline character) and `seqlinewidth` with `\n`. This is essential for samtools' operations.
 
     ```
     module load samtools/1.9
-
+    ```
+    ```
     samtools faidx ecoli_k12_substrain_genome.fasta
     ```
     The above command generates the index for reference genome with the name `ecoli_k12_substrain_genome.fasta.fai`  
@@ -191,7 +191,8 @@ interactive -w compute05
 
     ```
     module load bwa/0.7.17
-    
+    ```
+    ```
     bwa index ecoli_k12_substrain_genome.fasta
 
     ```
@@ -211,13 +212,15 @@ interactive -w compute05
 3. Run ```fastqc```
     ```
     fastqc \
-        -t 1 \
+        -t 2 \
         -o . \
         /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_1.fastq.gz \
         /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_2.fastq.gz
     ```
     ***Optional***
         Run step 3. above for the other 2 samples.
+
+We can view the fastq report here: [SRR292862_1_fastqc.html](https://hpc.ilri.cgiar.org/~kmwangi/SRR292862_1_fastqc.html)
 
 ### ***Quality and adapter filtering***
 The preceeding step will guide us on the possible filtering and trimming operations to subject our data to. Depending on your study design, it is important to minimise noise as much as to zero, if possible. However, the latter case may be practically impossible.
@@ -236,7 +239,7 @@ The preceeding step will guide us on the possible filtering and trimming operati
 
     ```
     fastp \
-        -w 1 \
+        -w 2 \
         -i /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_1.fastq.gz \
         -I /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_2.fastq.gz \
         -o SRR292862_1.trim.fastq.gz \
@@ -245,9 +248,9 @@ The preceeding step will guide us on the possible filtering and trimming operati
         -j SRR292862.fastp.json \
         2> SRR292862.fastp.log
     ```
-
+We can view the results of fastp here: [SRR292862.fastp.html](https://hpc.ilri.cgiar.org/~kmwangi/SRR292862.fastp.html)
  
-### ***Generate consensus genome sequences***  
+### ***Perform genome assembly***  
 
 Genome assembly refers to the process of putting back together the nucleotide sequences usually using short DNA sequences to create a representation of the original chromosome from which the sequences originated. The goal of genome assembly tools is to create long contiguous pieces of sequence (contigs) from short reads. The contigs are then ordered and oriented in relation to one another to form scaffolds. Genome assembly is a computationally intensive and difficult problem. The assembly tools have parameters that need to be tweaked and have a large effect on the outcome of any assembly. The parameters are adjusted accordingly until a desirable draft genome assembly is achieved. 
 
@@ -266,8 +269,13 @@ Genome assembly refers to the process of putting back together the nucleotide se
 	-1 /var/scratch/$USER/bacteria-wgs/results/fastp/SRR292862_1.trim.fastq.gz \
 	-2 /var/scratch/$USER/bacteria-wgs/results/fastp/SRR292862_2.trim.fastq.gz \
 	-o ./ \
-	-t 1 \
-	-m 384
+	-t 2 \
+	-m 50
+    ```
+
+    If you do not have the `contigs.fasta` file, you can obtains it through this soft link and place it in the `spades` directory.
+    ```
+    ln -s /var/scratch/global/bacteria-wgs/data/spades/contigs.fasta .
     ```
 
     View the `contigs.fasta` file
@@ -284,7 +292,6 @@ Genome assembly refers to the process of putting back together the nucleotide se
 - How many sequences do you have in your `contigs.fasta` file?
   
 
-
 ### ***Genome assessment***  
 Genome assessment entails producing the quality metrics that gauge both the completeness and contiguity of the assembled genome. Good quality metrics ensure that we are confident in the biological insights we obtain from the assembled genome. 
 
@@ -298,12 +305,14 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     ```
     quast.py \
     /var/scratch/$USER/bacteria-wgs/results/spades/contigs.fasta \
-    -t 1 \
+    -t 2 \
     -o /var/scratch/$USER/bacteria-wgs/results/quast
     ```
+- Click on the following link to view the [quast report](https://hpc.ilri.cgiar.org/~kmwangi/quast/report.html).
+- From the same report, we can view the statistics on a [contigs viewer using Icarus](https://hpc.ilri.cgiar.org/~kmwangi/quast/icarus_viewers/contig_size_viewer.html)
 
-2. #### ***Genome completeness***  
-    Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs). BUSCO makes use of the OrthoDB set of single-copy orthologous that are found in at least 90% of all the organisms in question. Ideally, the sequenced genome should contain most of these highly conserved genes. If your genome doesn't contain a large portion of these single-copy orthologs it may indicate that your genome is not complete. 
+1. #### ***Genome completeness***  
+    Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs). BUSCO makes use of the OrthoDB set of single-copy orthologous that are found in at least 90% of all the organisms in question. Ideally, the sequenced genome should contain most of these highly conserved genes. If your genome doesn't contain a large portion of these single-copy orthologs it may indicate that your genome is not complete. Here is BUSCO's [user guide](https://vcru.wisc.edu/simonlab/bioinformatics/programs/busco/BUSCO_v3_userguide.pdf).
 
     Load `BUSCO`
     ```
@@ -319,7 +328,7 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     -m genome \
     -o SRR292862_busco \
     -l bacteria \
-    -c 1 \
+    -c 2 \
     -f
     ```
 
@@ -349,7 +358,8 @@ module purge
 
 ```
 module load prokka/1.11
-
+```
+```
 cd /var/scratch/$USER/bacteria-wgs/results/prokka
 ```  
 
@@ -357,7 +367,7 @@ cd /var/scratch/$USER/bacteria-wgs/results/prokka
 prokka \
 /var/scratch/$USER/bacteria-wgs/results/spades/contigs.fasta \
 --outdir /var/scratch/$USER/bacteria-wgs/results/prokka \
---cpus 1 \
+--cpus 2 \
 --mincontiglen 200 \
 --centre C \
 --locustag L \
@@ -384,13 +394,17 @@ module load blast/2.12.0+
 ```
 
 ```
+cd /var/scratch/$USER/bacteria-wgs/results/blast
+```
+
+```
 blastn \
 -task megablast \
 -query /var/scratch/$USER/bacteria-wgs/results/spades/contigs.fasta \
 -db /export/data/bio/ncbi/blast/db/v5/nt \
 -outfmt '6 qseqid staxids bitscore std sscinames sskingdoms stitle' \
 -culling_limit 5 \
--num_threads 1 \
+-num_threads 2 \
 -evalue 1e-25 \
 -out /var/scratch/$USER/bacteria-wgs/results/blast/contigs.fasta.vs.nt.cul5.1e25.megablast.out
 
@@ -412,7 +426,7 @@ Virulence factors are properties that enable a microbe to establish itself withi
     -db /var/scratch/${USER}/bacteria-wgs/databases/VFDB/vfdb_seta_nt \
     -out /var/scratch/$USER/bacteria-wgs/results/blast/virulence_factors_blast_VFDB.out \
     -outfmt '6 qseqid staxids bitscore std sscinames sskingdoms stitle' \
-    -num_threads 1
+    -num_threads 2
 
 ```
 
@@ -420,6 +434,8 @@ View the blast output results
 ```
 less -S /var/scratch/$USER/bacteria-wgs/results/blast/virulence_factors_blast_VFDB.out
 ```
+
+Learn more about [blast output format 6](https://www.metagenomics.wiki/tools/blast/blastn-output-format-6).
 
 >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>** 
 Search the blast output to see if we find the following genes:
@@ -433,14 +449,12 @@ Here, we will use [Resistance Gene Identifier (RGI)](https://card.mcmaster.ca/an
 module purge
 
 module load rgi/6.0.2
-
 ```  
 
 ```
 cd /var/scratch/$USER/bacteria-wgs/results/rgi
 
 ln -s /var/scratch/global/bacteria-wgs/databases/localDB .
-
 ```
 
 
