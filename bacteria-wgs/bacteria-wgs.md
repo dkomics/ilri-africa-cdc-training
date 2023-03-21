@@ -33,7 +33,7 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
 
 
 ## Introduction
-*E. coli* are ubiquitous bacteria found in the environment including the gut of humans and other animals and consists of numerous types and strains. Most types of *E. coli* are normal inhabitants of the gut of animals and do not cause diseases. However, some of the strains of *E. coli* have acquired genes that enable them to cause disease. These strains are commonly associated with food poisoning leading to diarrhoea and are referred to as diarrheagenic *E. coli* (DEC). Transmission occurs primarily through contaminated food but can also accur via person-to-person transmission, animal contact and water. Shiga toxin-producing *E. coli* (STEC) serotype O157:H7 causes bloody diarrhoea and has previosuly been responsible for outbreaks worldwide.  
+*E. coli* are ubiquitous bacteria found in the environment including the gut of humans and other animals and consists of numerous types and strains. Most types of *E. coli* are normal inhabitants of the gut of animals and do not cause diseases. However, some of the strains of *E. coli* have acquired genes that enable them to cause disease. These strains are commonly associated with food poisoning leading to diarrhoea and are referred to as diarrheagenic *E. coli* (DEC). Transmission occurs primarily through contaminated food but can also occur via person-to-person transmission, animal contact and water. Shiga toxin-producing *E. coli* (STEC) serotype O157:H7 causes bloody diarrhoea and has previosuly been responsible for outbreaks worldwide.  
 
 > **Note**
 
@@ -71,7 +71,7 @@ The HPC head node has 4 CPUs and we need to access more CPUs/resources in other 
 You will have to move from the cluster's master node into the node where we will be working from (it is called `compute05`). Use the following command; `-w` requests (a) specific list of host(s).  
 
 ```
-interactive -w compute05
+interactive -w compute05 -c 2
 ```  
 
 `ssh` allows you to securely connect to the remote computer over internet, while `interactive` allows you to reserve resources to work interactively in a specified node within the computing cluster using the `-w` flag.
@@ -99,7 +99,7 @@ interactive -w compute05
     ```
 4. List the contents of the `data/raw_data` directory, from where we will retrieve our ```fastq``` files.
     ```
-    ls data/raw_data
+    ls -lht data/raw_data
     
     ```
 #### ***Data retrieval and integrity checks***
@@ -170,7 +170,8 @@ interactive -w compute05
 
     ```
     module load samtools/1.9
-
+    ```
+    ```
     samtools faidx ecoli_k12_substrain_genome.fasta
     ```
     The above command generates the index for reference genome with the name `ecoli_k12_substrain_genome.fasta.fai`  
@@ -191,7 +192,8 @@ interactive -w compute05
 
     ```
     module load bwa/0.7.17
-    
+    ```
+    ```
     bwa index ecoli_k12_substrain_genome.fasta
 
     ```
@@ -211,7 +213,7 @@ interactive -w compute05
 3. Run ```fastqc```
     ```
     fastqc \
-        -t 1 \
+        -t 2 \
         -o . \
         /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_1.fastq.gz \
         /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_2.fastq.gz
@@ -236,7 +238,7 @@ The preceeding step will guide us on the possible filtering and trimming operati
 
     ```
     fastp \
-        -w 1 \
+        -w 2 \
         -i /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_1.fastq.gz \
         -I /var/scratch/$USER/bacteria-wgs/data/raw_data/SRR292862_2.fastq.gz \
         -o SRR292862_1.trim.fastq.gz \
@@ -349,7 +351,8 @@ module purge
 
 ```
 module load prokka/1.11
-
+```
+```
 cd /var/scratch/$USER/bacteria-wgs/results/prokka
 ```  
 
