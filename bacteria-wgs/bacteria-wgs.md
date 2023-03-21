@@ -24,7 +24,7 @@ tags: [ "Pathogen Genomics", "Bioinformatics", "Metadata", "Linux", "Analysis", 
       - [***Quality assessment***](#quality-assessment)
       - [***Quality and adapter filtering***](#quality-and-adapter-filtering)
       - [***bcftools***](#bcftools)
-      - [***Generate consensus genome sequences***](#generate-consensus-genome-sequences)
+      - [***Perform genome assembly***](#perform-genome-assembly)
       - [***Genome assessment***](#genome-assessment)
       - [***Genome annotation***](#genome-annotation)
       - [***Organism identification***](#organism-identification)
@@ -53,7 +53,7 @@ This module will come after the introductory Linux module and therefore assumes 
 
 >**Note**
 
->Once inside the `hpc`, all instances of ```$USER``` will be equivalent to the hpc username that you were assigned, for example `Bio4Info$$`. Your username, by default, is stored in a variable called `USER`. By using it, you will not have to type-in your username, rather, your shell will automatically pick your username which is the value stored in the `USER` variable. The `$` (dollar) character-prefix to a variable name is used to call the value of that variable.
+>Once inside the `hpc`, all instances of ```$USER``` will be equivalent to the hpc username that you were assigned. Your username, by default, is stored in a variable called `USER`. By using it, you will not have to type-in your username, rather, your shell will automatically pick your username which is the value stored in the `USER` variable. The `$` (dollar) character-prefix to a variable name is used to call the value of that variable.
 
 ### Set-Up
 We will use the computer lab at ILRI, which is already equipped with Linux-operating desktop computers. Since we will be working from the remote servers, we will not need special setup for personal laptops. However, toward the end of the program, we can look into access to a Linux server from a Windows PC; or how to install a Linux (sub)system for any interested persons.  
@@ -249,7 +249,7 @@ The preceeding step will guide us on the possible filtering and trimming operati
     ```
 
  
-### ***Generate consensus genome sequences***  
+### ***Perform genome assembly***  
 
 Genome assembly refers to the process of putting back together the nucleotide sequences usually using short DNA sequences to create a representation of the original chromosome from which the sequences originated. The goal of genome assembly tools is to create long contiguous pieces of sequence (contigs) from short reads. The contigs are then ordered and oriented in relation to one another to form scaffolds. Genome assembly is a computationally intensive and difficult problem. The assembly tools have parameters that need to be tweaked and have a large effect on the outcome of any assembly. The parameters are adjusted accordingly until a desirable draft genome assembly is achieved. 
 
@@ -268,8 +268,8 @@ Genome assembly refers to the process of putting back together the nucleotide se
 	-1 /var/scratch/$USER/bacteria-wgs/results/fastp/SRR292862_1.trim.fastq.gz \
 	-2 /var/scratch/$USER/bacteria-wgs/results/fastp/SRR292862_2.trim.fastq.gz \
 	-o ./ \
-	-t 1 \
-	-m 384
+	-t 2 \
+	-m 50
     ```
 
     View the `contigs.fasta` file
@@ -305,7 +305,7 @@ Genome assessment entails producing the quality metrics that gauge both the comp
     ```
 
 2. #### ***Genome completeness***  
-    Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs). BUSCO makes use of the OrthoDB set of single-copy orthologous that are found in at least 90% of all the organisms in question. Ideally, the sequenced genome should contain most of these highly conserved genes. If your genome doesn't contain a large portion of these single-copy orthologs it may indicate that your genome is not complete. 
+    Genome completeness assesses the presence or absence of highly conserved genes (orthologs) in an assembly. This assessment is usually performed using BUSCO (Benchmarking Universal Single-Copy Orthologs). BUSCO makes use of the OrthoDB set of single-copy orthologous that are found in at least 90% of all the organisms in question. Ideally, the sequenced genome should contain most of these highly conserved genes. If your genome doesn't contain a large portion of these single-copy orthologs it may indicate that your genome is not complete. Here is BUSCO's [user guide](https://vcru.wisc.edu/simonlab/bioinformatics/programs/busco/BUSCO_v3_userguide.pdf).
 
     Load `BUSCO`
     ```
