@@ -273,6 +273,11 @@ Genome assembly refers to the process of putting back together the nucleotide se
 	-m 50
     ```
 
+    If you do not have the `contigs.fasta` file, you can obtains it through this soft link and place it in the `spades` directory.
+    ```
+    ln -s /var/scratch/global/bacteria-wgs/data/spades/contigs.fasta .
+    ```
+
     View the `contigs.fasta` file
 
     ```
@@ -471,4 +476,9 @@ rgi main --input_sequence /var/scratch/$USER/bacteria-wgs/results/spades/contigs
 rgi heatmap --input /var/scratch/$USER/bacteria-wgs/results/rgi \
 --output /var/scratch/$USER/bacteria-wgs/results/rgi/SRR292862_rgi_alphabetic.png
 
+```
+### References
+
+```
+Rohde, H., Qin, J., Cui, Y., Li, D., Loman, N. J., Hentschke, M., Chen, W., Pu, F., Peng, Y., Li, J., Xi, F., Li, S., Li, Y., Zhang, Z., Yang, X., Zhao, M., Wang, P., Guan, Y., Cen, Z., … Yang, R. (2011). Open-Source Genomic Analysis of Shiga-Toxin–Producing E. coli O104:H4. New England Journal of Medicine, 365(8), 718–724. https://doi.org/10.1056/NEJMoa1107643
 ```

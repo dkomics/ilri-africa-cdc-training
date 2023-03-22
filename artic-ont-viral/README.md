@@ -79,7 +79,12 @@ accurate sequencing technologies are available.
 
 >**Note**  
 
->Once logged on the `hpc`, all instances of ```$USER``` will be equivalent to the hpc username that you were assigned, for example `Bio4Info$$`. Your username, by default, is stored in a variable called `USER`. By using it, you will not have to type-in your username, rather, your shell will automatically pick your username which is the value stored in the `USER` variable. The `$` (dollar) character-prefix to a variable name is used to call the value of that variable.
+>Once logged on the `hpc`, all instances of ```$USER``` will be equivalent to
+>the hpc username that you were assigned. Your username, by default, is stored
+>in a system variable called `USER`. By using it, you will not have to type-in
+>your username, rather, your shell will automatically pick your username which
+>is the value stored in the `USER` variable. The `$` (dollar) character-prefix
+>to a variable name is used to call the value of that variable.
 
 ### Set-Up
 We will access the tools and software for the analysis using the high
