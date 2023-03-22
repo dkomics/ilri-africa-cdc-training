@@ -44,9 +44,7 @@ The following auxilliary files are provided and you will need to create
 `symbolic` links 
 
 - Primer scheme for amplicon in `bed` format located at
-  `/var/scratch/global/ont-artic/primer-schemes/primer.bed`
-- Reference genome file in `fasta` format located at
-  `/var/scratch/global/ont-artic/primer-schemes/reference.fasta`
+  `/var/scratch/global/ont-artic/primer-schemes`
 - Additional Dengue virus genomes in `fasta` format located at
   `/var/scratch/global/ont-artic/auxilliary-dengue-genomes`
 - Utility scripts available at `/var/scratch/global/ont-artic/scripts`
@@ -64,11 +62,11 @@ Ensure you are working in the `/var/scratch/$USER/` directory
 1. Login to the `hpc` using your provided credentials
 2. Begin an `interactive` session with 2 `cpus` on either `compute05` or
    `compute06`
-3. Create `soft` or `symbolic` links to the required directories or files
+3. Create `soft` or `symbolic` links to the required directories
 4. Organize your project directory structure as indicated below. 
 
     <img src="../img/dir-exercise.png" alt="Project directory structure"
-    style="height: px; width:2721px;"/>
+    style="height: px; width:272px;"/>
 5. Load all the required modules that will be utilized in the analysis steps
 6. The raw data in `fastq` format can be retrieved from the European Nucleotide
    Archive [(ENA)](https://www.ebi.ac.uk/ena/browser/) database. 
@@ -85,8 +83,10 @@ Ensure you are working in the `/var/scratch/$USER/` directory
     <br>
     </details>
 
+7. Retrieve the reference genome and place it in the `genomes`
+
  
-7. For use in variant calling and visualization of alignment, please create the
+8. For use in variant calling and visualization of alignment, please create the
    genome index of the reference genome
 
    >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>**
@@ -94,7 +94,7 @@ Ensure you are working in the `/var/scratch/$USER/` directory
     - What does the above step perform?
     - What is the size of the genome in base pairs?
 
-8. Perform a quality assessment of the raw reads in `fastq` format and output
+9. Perform a quality assessment of the raw reads in `fastq` format and output
     the files in the appropriate directory.
 
     >**<strong style="color:magenta;opacity: 0.80;">Quiz:</strong>**
@@ -102,7 +102,7 @@ Ensure you are working in the `/var/scratch/$USER/` directory
     - Report the total number of sequences? sequences flagged as poor quality? sequence
     lengths distribution? and percetage GC content?
 
-9. Perform a preprocessing step to only select viable reads for subsequent
+10. Perform a preprocessing step to only select viable reads for subsequent
     downstream steps. Be guided by the primer scheme and the quality assessment
     report to select the optimal read lengths
     
@@ -117,7 +117,7 @@ Ensure you are working in the `/var/scratch/$USER/` directory
     - How many reads pass the filtering process when using your selected
       amplicon lengths?
 
-10. Perform reference based read alignment to the reference genome and output
+11. Perform reference based read alignment to the reference genome and output
     the alignment files in the appropriate directory. Carry out the steps that
     will:
     - The `FLAG` column in the alignment format allows us to identify the
@@ -129,7 +129,7 @@ Ensure you are working in the `/var/scratch/$USER/` directory
     >**<strong style="color:magenta;opacity: 0.80 ">Quiz:</strong>**
     - What is the percentage of mapped reads?
 
-11. Perform a post-alignment process to assign each raed to its derived
+12. Perform a post-alignment process to assign each raed to its derived
     amplicon, normalise the amplicons and remove incorrect primer-pairs. Output
     the results in the appropriate directory. After every post-processing step,
     sort and index the resulting alignments while naming the files with the
@@ -144,7 +144,7 @@ Ensure you are working in the `/var/scratch/$USER/` directory
     - What is the mapping rate of the primer trimmed alignments?
 
 
-12. For each primer pool, perform variant calling to while using the given model
+13. For each primer pool, perform variant calling to while using the given model
     and output the results in the relevant output directory. 
     
     - Ensure you follow all the steps including `INDELS` identification before
@@ -155,32 +155,32 @@ Ensure you are working in the `/var/scratch/$USER/` directory
       FAIL. 
     - Index the variants that PASS file after compression
     
-13. Compute depths for each primer pool and mask low depth regions to generate a
+14. Compute depths for each primer pool and mask low depth regions to generate a
     preconsensus file
     >**<strong style="color:magenta;opacity: 0.80 ">Quiz:</strong>**
     - What is the highest depth for each primer pool?
 
-14. Generate consensus sequence and rename the header of the resulting consensus
+15. Generate consensus sequence and rename the header of the resulting consensus
     file
 
     >**<strong style="color:magenta;opacity: 0.80 ">Quiz:</strong>**
     - What is the coverage of the resulting consensus sequence?
 
 
-15. Compute non-normalized read depth per position and plot the output using the
+16. Compute non-normalized read depth per position and plot the output using the
     utility Rscript provided
 
-16. In the alignment directoty, concatenate the reference genome file, the
+17. In the alignment directoty, concatenate the reference genome file, the
     `auxilliary-dengue-genomes` `fasta` files and the generated consensus sequence
     into a single `fasta` file
     - Ensure to only retain only the first string character and exclude the rest
       if the characters including the first space in the sequence headers
 
-17. Perform a multiple sequence alignment and generate a maximul likelihood
+18. Perform a multiple sequence alignment and generate a maximul likelihood
     phylogenetic tree
     
-18. Identify the serotype and genotype of the sample using the typing tool available at
+19. Identify the serotype and genotype of the sample using the typing tool available at
 https://www.genomedetective.com/app/typingtool/dengue/
 
-19. Transfer the outputs from the `hpc` to your `local` PC and visualize the
+20. Transfer the outputs from the `hpc` to your `local` PC and visualize the
     `.html`, `.bam`, `.pdf` and `treefile` using appropriate tools.
