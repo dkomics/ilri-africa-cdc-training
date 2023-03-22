@@ -7,23 +7,10 @@ tags: ["Pathogen genomics", "Genomic surveillance", "Bioinformatics", "Metadata"
 ###### ***Trainers***: [John Juma](https://github.com/ajodeh-juma), [Gilbert Kibet](https://github.com/kibet-gilbert) & [Kennedy Mwangi](https://github.com/ousodaniel)
 ---
 
-- [Introduction](#introduction)
 - [Task](#task)
 - [Workflow](#workflow)
 - [Auxilliary data](#auxilliary-data)
 - [Instructions](#instructions)
-
-
-## Introduction
-Dengue is a mosquito-borne viral disease that has rapidly spread to all regions of WHO in recent years. Dengue virus is transmitted by female mosquitoes mainly
-of the species *Aedes aegypti* and, to a lesser extent, *Ae. albopictus*. These
-mosquitoes are also vectors of chikungunya, yellow fever and Zika viruses.
-
-Dengue is widespread throughout the tropics, with local variations in risk
-influenced by climate parameters as well as social and environmental factors.
-Dengue is caused by a virus of the Flaviviridae family and there are four
-distinct, but closely related, serotypes of the virus that cause dengue (DENV-1,
-DENV-2, DENV-3 and DENV-4). 
 
 
 ## Task
@@ -55,9 +42,10 @@ The following auxilliary files are provided and you will need to create
 
 >**Note**
 Please document all the steps in the analysis and replicate the commands in a
-`text` file.
+`text` file. You can copy and paste the commands you run in the `text` file.
 
-Ensure you are working in the `/var/scratch/$USER/` directory
+Ensure you are working in the `/var/scratch/$USER/` directory and give your
+project directory a unique name .e.g `ont-exercise`
 
 1. Login to the `hpc` using your provided credentials
 2. Begin an `interactive` session with 2 `cpus` on either `compute05` or
