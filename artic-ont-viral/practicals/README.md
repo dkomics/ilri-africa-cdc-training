@@ -66,7 +66,7 @@ Ensure you are working in the `/var/scratch/$USER/` directory
 4. Organize your project directory structure as indicated below. 
 
     <img src="../img/dir-exercise.png" alt="Project directory structure"
-    style="height: px; width:2721px;"/>
+    style="height: px; width:272px;"/>
 5. Load all the required modules that will be utilized in the analysis steps
 6. The raw data in `fastq` format can be retrieved from the European Nucleotide
    Archive [(ENA)](https://www.ebi.ac.uk/ena/browser/) database. 
