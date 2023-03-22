@@ -44,7 +44,7 @@ In May and June of 2011, an *E. coli* outbreak occured in Germany infecting more
 
 
 ## Scope
-In this workshop we will tackle, hands-on, the basic principles employed to generate consensus genome sequences of *E. coli* that caused the outbreak in Germany, and identify the serotypes involved in outbreaks, virulence factors, and possible anti-microbial resistance genes (AMRs). We will use the genome sequencing data of an isolate from a 16-year-old girl admitted to hospital with bloody diarrhea and abdominal pain.
+In this workshop we will tackle, hands-on, the basic principles employed to generate consensus genome sequences of *E. coli* that caused the outbreak in Germany, and identify the serotypes involved in outbreaks, virulence factors, and possible anti-microbial resistance genes (AMRs). We will use the genome sequencing data of an isolate from a 16-year-old girl admitted to hospital with bloody diarrhea and abdominal pain. Read more about this dataset [[1]](#1).
 
 ## Prerequisite
 
@@ -476,9 +476,8 @@ rgi main --input_sequence /var/scratch/$USER/bacteria-wgs/results/spades/contigs
 rgi heatmap --input /var/scratch/$USER/bacteria-wgs/results/rgi \
 --output /var/scratch/$USER/bacteria-wgs/results/rgi/SRR292862_rgi_alphabetic.png
 
-```
-### References
+``` 
+### **References**   
 
-```
+<a id="1">[1]</a> 
 Rohde, H., Qin, J., Cui, Y., Li, D., Loman, N. J., Hentschke, M., Chen, W., Pu, F., Peng, Y., Li, J., Xi, F., Li, S., Li, Y., Zhang, Z., Yang, X., Zhao, M., Wang, P., Guan, Y., Cen, Z., … Yang, R. (2011). Open-Source Genomic Analysis of Shiga-Toxin–Producing E. coli O104:H4. New England Journal of Medicine, 365(8), 718–724. https://doi.org/10.1056/NEJMoa1107643
-```
