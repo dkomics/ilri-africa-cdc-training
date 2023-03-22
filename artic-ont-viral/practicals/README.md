@@ -109,7 +109,7 @@ project directory a unique name .e.g `ont-exercise`
     the alignment files in the appropriate directory. Carry out the steps that
     will:
     - The `FLAG` column in the alignment format allows us to identify the
-      mapped or unmapped reads. Extract reads that align to the reference genome
+      mapped or unmapped reads. Extract reads that map to the reference genome
     - Sort the resulting mapped alignment
     - Index the alignment according to `coordinate`
     - Generate statistics on the resulting alignment
