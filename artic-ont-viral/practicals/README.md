@@ -71,7 +71,7 @@ project directory a unique name .e.g `ont-exercise`
     <br>
     </details>
 
-7. Retrieve the reference genome and place it in the `genomes`
+7. Retrieve the reference genome and place it in the `genomes` directory
 
  
 8. For use in variant calling and visualization of alignment, please create the
