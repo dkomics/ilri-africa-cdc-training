@@ -369,7 +369,7 @@ cat ./data/kraken/sample01_kraken2.out | cut -f 2,3 > ./data/krona/sample01-krak
 ```
 
 
-##### Building Kraken2 Reference Databases:
+##### Building [Kraken2 Reference Databases](https://github.com/DerrickWood/kraken2/wiki/Manual#kraken-2-databases):
 ###### Alternative 01: Download prebuilt database
 A catalog of pre-built kraken2 databases are hosted in [Amazon Web Services](https://benlangmead.github.io/aws-indexes/k2) with all old and new versions.
 
@@ -382,7 +382,7 @@ wget https://genome-idx.s3.amazonaws.com/kraken/k2_pluspf_16gb_20221209.tar.gz -
 tar -xzvf ./k2_pluspf_16gb_20221209.tar.gz
 cd ../../../
 ```
-###### Alteranive 02: Build Standard Kraken2 database 
+###### Alteranive 02: [Build Standard Kraken2 database](https://github.com/DerrickWood/kraken2/wiki/Manual#standard-kraken-2-database) 
 Kraken2 has a `kraken2-build` command that can download NCBI taxonomic information, complete RefSeq genomes. The `--standard` options is specific for bacteria, archaeal, viral domains, human and a collection of known vectors (UniVec_core).
 
 ```
